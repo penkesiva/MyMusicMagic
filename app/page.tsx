@@ -3,8 +3,9 @@
 import { createClient } from '@/lib/supabase/client'
 import { TrackCard } from '@/components/tracks/TrackCard'
 import { Database } from '@/types/database'
-import { AudioPlayer } from '@/components/player/AudioPlayer'
+import AudioPlayer from '@/app/components/AudioPlayer'
 import { useState, useEffect, useRef } from 'react'
+import { Squares2X2Icon, ListBulletIcon } from '@heroicons/react/24/outline'
 
 type Track = Database['public']['Tables']['tracks']['Row']
 type ViewMode = 'grid' | 'list'
@@ -60,14 +61,14 @@ export default function HomePage() {
   }, [])
 
   const handlePlay = (track: Track) => {
-    if (currentTrack?.id === track.id) {
-      // Toggle play/pause for current track
-      setIsPlaying(!isPlaying)
-    } else {
-      // Play new track
-      setCurrentTrack(track)
-      setIsPlaying(true)
-    }
+    // Always start playing when clicking play button
+    setCurrentTrack(track)
+    setIsPlaying(true)
+  }
+
+  const handleClosePlayer = () => {
+    setIsPlaying(false)
+    setCurrentTrack(null)
   }
 
   const handleInfo = (track: Track) => {
@@ -134,28 +135,30 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-white">Featured Tracks</h2>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
               <button
                 type="button"
                 onClick={() => handleViewModeChange('list')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                className={`p-2 rounded-lg transition-colors ${
                   viewMode === 'list'
                     ? 'bg-primary-500 text-white'
                     : 'bg-dark-200 text-white hover:bg-dark-300'
                 }`}
+                title="List View"
               >
-                List View
+                <ListBulletIcon className="h-5 w-5" />
               </button>
               <button
                 type="button"
                 onClick={() => handleViewModeChange('grid')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                className={`p-2 rounded-lg transition-colors ${
                   viewMode === 'grid'
                     ? 'bg-primary-500 text-white'
                     : 'bg-dark-200 text-white hover:bg-dark-300'
                 }`}
+                title="Grid View"
               >
-                Grid View
+                <Squares2X2Icon className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -292,16 +295,24 @@ export default function HomePage() {
 
       {/* Audio Player */}
       {currentTrack && (
-        <div className="fixed bottom-0 left-0 right-0 bg-dark-200 border-t border-dark-300">
-          <AudioPlayer
-            track={currentTrack}
-            isPlaying={isPlaying}
-            onPlayPause={() => setIsPlaying(!isPlaying)}
-            onTrackEnd={() => {
-              setIsPlaying(false)
-              setCurrentTrack(null)
-            }}
-          />
+        <div className="fixed bottom-0 left-0 right-0 bg-transparent p-4">
+          <div className="relative">
+            <button
+              onClick={handleClosePlayer}
+              className="absolute -top-2 -right-2 p-1 rounded-full bg-gray-900/80 hover:bg-gray-800/80 transition-colors border border-gray-800/50"
+              title="Close player"
+            >
+              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <AudioPlayer
+              audioUrl={currentTrack.audio_url}
+              title={currentTrack.title}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+            />
+          </div>
         </div>
       )}
     </div>
