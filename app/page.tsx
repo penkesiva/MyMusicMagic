@@ -68,8 +68,10 @@ export default function HomePage() {
       setIsPlaying(!isPlaying)
     } else {
       setCurrentTrack(track)
-      setIsPlaying(true)
       setShowPlayer(true)
+      setTimeout(() => {
+        setIsPlaying(true)
+      }, 100)
     }
   }
 

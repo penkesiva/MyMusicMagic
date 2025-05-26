@@ -26,7 +26,7 @@ export default function AudioAnalyzer({
   onDurationChange
 }: AudioAnalyzerProps) {
   const [audioData, setAudioData] = useState<Float32Array>(new Float32Array(0));
-  const [visualizerType, setVisualizerType] = useState<VisualizerType>('bars');
+  const [visualizerType, setVisualizerType] = useState<VisualizerType>('waveform');
   const analyzerRef = useRef<AnalyserNode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);

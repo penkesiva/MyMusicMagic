@@ -87,15 +87,18 @@ export default function AudioPlayer({
       audio.load();
       
       previousAudioUrlRef.current = audioUrl;
-      audio.play()
-        .then(() => {
-          setIsPlaying(true);
-          onPlay?.();
-        })
-        .catch(error => {
-          console.error('Error playing new audio:', error);
-          setIsPlaying(false);
-        });
+      
+      setTimeout(() => {
+        audio.play()
+          .then(() => {
+            setIsPlaying(true);
+            onPlay?.();
+          })
+          .catch(error => {
+            console.error('Error playing new audio:', error);
+            setIsPlaying(false);
+          });
+      }, 100);
     }
   }, [audioUrl, isPlaying, onPlay, onPause]);
 
