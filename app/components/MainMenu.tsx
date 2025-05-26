@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { 
   Bars3Icon,
   MusicalNoteIcon,
@@ -14,9 +14,33 @@ import {
 
 export function MainMenu() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout>()
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const pathname = usePathname()
+  const supabase = createClient()
+
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+
+        setIsAdmin(profile?.role === 'admin')
+      } else {
+        setIsAdmin(false)
+      }
+    }
+
+    checkAdminStatus()
+  }, [supabase])
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
@@ -44,6 +68,16 @@ export function MainMenu() {
       }
     }
   }, [])
+
+  // Don't show menu in admin pages
+  if (pathname.startsWith('/admin')) {
+    return null
+  }
+
+  // Only show menu button for admin users
+  if (!isAdmin) {
+    return null
+  }
 
   return (
     <div 
