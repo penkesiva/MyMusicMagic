@@ -329,7 +329,6 @@ export function TrackUploadForm({ onUploadComplete }: TrackUploadFormProps) {
               ref={audioFileRef}
               accept="audio/*"
               required
-              onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
@@ -347,7 +346,6 @@ export function TrackUploadForm({ onUploadComplete }: TrackUploadFormProps) {
               name="thumbnail_file"
               ref={thumbnailFileRef}
               accept="image/*"
-              onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
