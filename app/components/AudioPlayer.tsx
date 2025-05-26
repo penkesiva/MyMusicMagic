@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { PlayIcon, PauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import AudioVisualizer from './AudioVisualizer';
+import AudioAnalyzer from './AudioAnalyzer';
 
 interface AudioPlayerProps {
   audioUrl: string;
@@ -10,15 +11,25 @@ interface AudioPlayerProps {
   onPlay?: () => void;
   onPause?: () => void;
   onClose: () => void;
+  isPlaying?: boolean;
 }
 
-export default function AudioPlayer({ audioUrl, title, onPlay, onPause, onClose }: AudioPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
+export default function AudioPlayer({ 
+  audioUrl, 
+  title, 
+  onPlay, 
+  onPause, 
+  onClose,
+  isPlaying: externalIsPlaying = false 
+}: AudioPlayerProps) {
+  const [isPlaying, setIsPlaying] = useState(externalIsPlaying);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [isAudioReady, setIsAudioReady] = useState(false);
+  const previousAudioUrlRef = useRef(audioUrl);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -30,6 +41,7 @@ export default function AudioPlayer({ audioUrl, title, onPlay, onPause, onClose 
 
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
+      setIsAudioReady(true);
     };
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
@@ -47,18 +59,83 @@ export default function AudioPlayer({ audioUrl, title, onPlay, onPause, onClose 
     }
   }, [volume, isMuted]);
 
-  const togglePlay = () => {
+  useEffect(() => {
+    setIsPlaying(externalIsPlaying);
+  }, [externalIsPlaying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (previousAudioUrlRef.current !== audioUrl) {
+      if (isPlaying) {
+        audio.pause();
+        onPause?.();
+      }
+      
+      setCurrentTime(0);
+      setIsAudioReady(false);
+      
+      audio.src = audioUrl;
+      audio.load();
+      
+      previousAudioUrlRef.current = audioUrl;
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+          onPlay?.();
+        })
+        .catch(error => {
+          console.error('Error playing new audio:', error);
+          setIsPlaying(false);
+        });
+    }
+  }, [audioUrl, isPlaying, onPlay, onPause]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !isAudioReady) return;
+
+    if (previousAudioUrlRef.current === audioUrl && isPlaying) {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.error('Error playing audio:', error);
+          setIsPlaying(false);
+        });
+      }
+    }
+  }, [isAudioReady, audioUrl, isPlaying]);
+
+  useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     if (isPlaying) {
-      audio.pause();
-      onPause?.();
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.error('Error playing audio:', error);
+          setIsPlaying(false);
+        });
+      }
     } else {
-      audio.play();
-      onPlay?.();
+      audio.pause();
     }
-    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const newIsPlaying = !isPlaying;
+    setIsPlaying(newIsPlaying);
+    
+    if (newIsPlaying) {
+      onPlay?.();
+    } else {
+      onPause?.();
+    }
   };
 
   const toggleMute = () => {
@@ -89,7 +166,12 @@ export default function AudioPlayer({ audioUrl, title, onPlay, onPause, onClose 
   return (
     <div className="max-w-md mx-auto backdrop-blur-sm bg-gray-900/30 rounded-lg p-3 space-y-2 border border-gray-800/50">
       <div className="relative">
-        <audio ref={audioRef} src={audioUrl} />
+        <audio 
+          ref={audioRef} 
+          src={audioUrl} 
+          preload="auto"
+          crossOrigin="anonymous"
+        />
         
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-white truncate max-w-[200px]">{title}</h3>
@@ -133,11 +215,13 @@ export default function AudioPlayer({ audioUrl, title, onPlay, onPause, onClose 
           </div>
         </div>
 
-        <AudioVisualizer
-          audioUrl={audioUrl}
-          isPlaying={isPlaying}
-          onDurationChange={setDuration}
-        />
+        {isAudioReady && (
+          <AudioAnalyzer
+            audioElement={audioRef.current || undefined}
+            isPlaying={isPlaying}
+            onDurationChange={setDuration}
+          />
+        )}
 
         <div className="flex items-center space-x-2">
           <span className="text-xs text-gray-300">{formatTime(currentTime)}</span>
