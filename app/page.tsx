@@ -362,7 +362,7 @@ export default function HomePage() {
 
               <div className="flex items-center justify-between pt-4 border-t border-dark-300">
                 <span className="text-sm text-gray-400">
-                  Duration: {Math.floor(selectedTrack.duration / 60)}:{(selectedTrack.duration % 60).toString().padStart(2, '0')}
+                  Duration: {Math.floor(selectedTrack.duration / 60)}:{(Math.floor(selectedTrack.duration) % 60).toString().padStart(2, '0')}
                 </span>
                 <button
                   onClick={() => {
