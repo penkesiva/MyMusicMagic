@@ -13,7 +13,7 @@ type ViewMode = 'grid' | 'list'
 export default function HomePage() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isFeaturedHighlighted, setIsFeaturedHighlighted] = useState(false)

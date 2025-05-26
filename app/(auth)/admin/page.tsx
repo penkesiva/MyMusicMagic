@@ -15,7 +15,7 @@ export default function AdminPage() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [editingTrack, setEditingTrack] = useState<Track | null>(null)
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
   const supabase = createClient()
 
   const fetchTracks = async () => {
