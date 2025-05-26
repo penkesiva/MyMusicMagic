@@ -5,7 +5,7 @@ import { TrackCard } from '@/components/tracks/TrackCard'
 import { Database } from '@/types/database'
 import AudioPlayer from '@/app/components/AudioPlayer'
 import { useState, useEffect, useRef } from 'react'
-import { Squares2X2Icon, ListBulletIcon } from '@heroicons/react/24/outline'
+import { Squares2X2Icon, ListBulletIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 type Track = Database['public']['Tables']['tracks']['Row']
 type ViewMode = 'grid' | 'list'
@@ -20,6 +20,7 @@ export default function HomePage() {
   const featuredRef = useRef<HTMLDivElement>(null)
   const [volume, setVolume] = useState(1)
   const [showPlayer, setShowPlayer] = useState(false)
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const supabase = createClient()
 
   // Fetch published tracks
@@ -79,8 +80,11 @@ export default function HomePage() {
   }
 
   const handleInfo = (track: Track) => {
-    // TODO: Implement info functionality
-    console.log('Show info for track:', track.title)
+    setSelectedTrack(track)
+  }
+
+  const handleCloseInfo = () => {
+    setSelectedTrack(null)
   }
 
   const handleViewModeChange = (mode: ViewMode) => {
@@ -311,6 +315,66 @@ export default function HomePage() {
               onPause={() => setIsPlaying(false)}
               onClose={handleClose}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Track Info Modal */}
+      {selectedTrack && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-2xl bg-dark-200 rounded-lg overflow-hidden">
+            <div className="relative">
+              <img
+                src={selectedTrack.thumbnail_url}
+                alt={selectedTrack.title}
+                className="w-full h-64 object-cover"
+              />
+              <button
+                onClick={handleCloseInfo}
+                className="absolute top-4 right-4 p-2 bg-dark-200/80 rounded-full text-gray-400 hover:text-white transition-colors"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <h3 className="text-2xl font-bold text-white">{selectedTrack.title}</h3>
+              
+              {selectedTrack.description && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-1">Description</h4>
+                  <p className="text-gray-400">{selectedTrack.description}</p>
+                </div>
+              )}
+
+              {selectedTrack.composer_notes && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-1">Composer Notes</h4>
+                  <p className="text-gray-400 whitespace-pre-wrap">{selectedTrack.composer_notes}</p>
+                </div>
+              )}
+
+              {selectedTrack.lyrics && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-300 mb-1">Lyrics</h4>
+                  <p className="text-gray-400 whitespace-pre-wrap">{selectedTrack.lyrics}</p>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-4 border-t border-dark-300">
+                <span className="text-sm text-gray-400">
+                  Duration: {Math.floor(selectedTrack.duration / 60)}:{(selectedTrack.duration % 60).toString().padStart(2, '0')}
+                </span>
+                <button
+                  onClick={() => {
+                    handlePlay(selectedTrack)
+                    handleCloseInfo()
+                  }}
+                  className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                >
+                  Play Track
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
