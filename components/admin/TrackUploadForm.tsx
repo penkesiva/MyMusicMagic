@@ -6,7 +6,11 @@ import { Database } from '@/types/database'
 
 type Track = Database['public']['Tables']['tracks']['Insert']
 
-export const TrackUploadForm = () => {
+interface TrackUploadFormProps {
+  onUploadComplete?: () => void;
+}
+
+export function TrackUploadForm({ onUploadComplete }: TrackUploadFormProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -152,6 +156,9 @@ export const TrackUploadForm = () => {
       })
       if (audioFileRef.current) audioFileRef.current.value = ''
       if (thumbnailFileRef.current) thumbnailFileRef.current.value = ''
+
+      // Notify parent component
+      onUploadComplete?.()
     } catch (err) {
       console.error('Upload error:', err)
       setError(err instanceof Error ? err.message : 'An error occurred during upload')
