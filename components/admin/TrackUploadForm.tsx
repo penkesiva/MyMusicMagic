@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
+import { PlusIcon, XMarkIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 
 type Track = Database['public']['Tables']['tracks']['Insert']
 
@@ -11,6 +12,8 @@ interface TrackUploadFormProps {
 }
 
 export function TrackUploadForm({ onUploadComplete }: TrackUploadFormProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showOptionalFields, setShowOptionalFields] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -167,161 +170,224 @@ export function TrackUploadForm({ onUploadComplete }: TrackUploadFormProps) {
     }
   }
 
+  const handleCancel = () => {
+    setIsExpanded(false)
+    setTrack({
+      title: '',
+      description: '',
+      composer_notes: '',
+      lyrics: '',
+      is_published: false,
+    })
+    if (audioFileRef.current) audioFileRef.current.value = ''
+    if (thumbnailFileRef.current) thumbnailFileRef.current.value = ''
+    setError(null)
+    setSuccess(false)
+  }
+
+  if (!isExpanded) {
+    return (
+      <button
+        onClick={() => setIsExpanded(true)}
+        className="w-full flex items-center justify-center p-4 bg-dark-200 rounded-lg hover:bg-dark-300 transition-colors text-white"
+      >
+        <PlusIcon className="h-5 w-5 mr-2" />
+        <span>Upload New Track</span>
+      </button>
+    )
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto p-6">
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500 rounded-lg">
-          <p className="text-sm text-red-500">{error}</p>
-        </div>
-      )}
-
-      {success && (
-        <div className="p-4 bg-green-500/10 border border-green-500 rounded-lg">
-          <p className="text-sm text-green-500">Track uploaded successfully!</p>
-        </div>
-      )}
-
-      <div className="space-y-4">
-        <div>
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-gray-300"
-          >
-            Title *
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            required
-            value={track.title}
-            onChange={handleInputChange}
-            className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-300"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={track.description || ''}
-            onChange={handleInputChange}
-            rows={3}
-            className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="composer_notes"
-            className="block text-sm font-medium text-gray-300"
-          >
-            Composer Notes
-          </label>
-          <textarea
-            id="composer_notes"
-            name="composer_notes"
-            value={track.composer_notes || ''}
-            onChange={handleInputChange}
-            rows={4}
-            className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="lyrics"
-            className="block text-sm font-medium text-gray-300"
-          >
-            Lyrics
-          </label>
-          <textarea
-            id="lyrics"
-            name="lyrics"
-            value={track.lyrics || ''}
-            onChange={handleInputChange}
-            rows={6}
-            className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="audio"
-            className="block text-sm font-medium text-gray-300"
-          >
-            Audio File *
-          </label>
-          <input
-            type="file"
-            id="audio"
-            ref={audioFileRef}
-            accept="audio/*"
-            required
-            className="mt-1 block w-full text-sm text-gray-400
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-lg file:border-0
-              file:text-sm file:font-medium
-              file:bg-primary-500 file:text-white
-              hover:file:bg-primary-600
-              file:cursor-pointer"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="thumbnail"
-            className="block text-sm font-medium text-gray-300"
-          >
-            Thumbnail Image *
-          </label>
-          <input
-            type="file"
-            id="thumbnail"
-            ref={thumbnailFileRef}
-            accept="image/*"
-            required
-            className="mt-1 block w-full text-sm text-gray-400
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-lg file:border-0
-              file:text-sm file:font-medium
-              file:bg-primary-500 file:text-white
-              hover:file:bg-primary-600
-              file:cursor-pointer"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="is_published"
-            name="is_published"
-            checked={track.is_published}
-            onChange={handleInputChange}
-            className="h-4 w-4 text-primary-500 focus:ring-primary-500 border-dark-400 rounded"
-          />
-          <label
-            htmlFor="is_published"
-            className="ml-2 block text-sm text-gray-300"
-          >
-            Publish immediately
-          </label>
-        </div>
+    <div className="bg-dark-200 rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between p-4 border-b border-dark-300">
+        <h3 className="text-lg font-medium text-white">Upload New Track</h3>
+        <button
+          onClick={handleCancel}
+          className="p-2 text-gray-400 hover:text-white transition-colors"
+          disabled={isUploading}
+        >
+          <XMarkIcon className="h-5 w-5" />
+        </button>
       </div>
 
-      <button
-        type="submit"
-        disabled={isUploading}
-        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        {isUploading ? 'Uploading...' : 'Upload Track'}
-      </button>
-    </form>
+      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500 rounded-lg">
+            <p className="text-sm text-red-500">{error}</p>
+          </div>
+        )}
+
+        {success && (
+          <div className="p-4 bg-green-500/10 border border-green-500 rounded-lg">
+            <p className="text-sm text-green-500">Track uploaded successfully!</p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-300"
+            >
+              Title *
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              value={track.title}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowOptionalFields(!showOptionalFields)}
+            className="flex items-center text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            {showOptionalFields ? (
+              <>
+                <ChevronUpIcon className="h-4 w-4 mr-1" />
+                Hide optional details
+              </>
+            ) : (
+              <>
+                <ChevronDownIcon className="h-4 w-4 mr-1" />
+                Show optional details
+              </>
+            )}
+          </button>
+
+          {showOptionalFields && (
+            <div className="space-y-4 pt-2 border-t border-dark-300">
+              <div>
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={track.description || ''}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="composer_notes"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Composer Notes
+                </label>
+                <textarea
+                  id="composer_notes"
+                  name="composer_notes"
+                  value={track.composer_notes || ''}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="lyrics"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Lyrics
+                </label>
+                <textarea
+                  id="lyrics"
+                  name="lyrics"
+                  value={track.lyrics || ''}
+                  onChange={handleInputChange}
+                  rows={5}
+                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label
+              htmlFor="audio_file"
+              className="block text-sm font-medium text-gray-300"
+            >
+              Audio File *
+            </label>
+            <input
+              type="file"
+              id="audio_file"
+              name="audio_file"
+              ref={audioFileRef}
+              accept="audio/*"
+              required
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="thumbnail_file"
+              className="block text-sm font-medium text-gray-300"
+            >
+              Thumbnail Image
+            </label>
+            <input
+              type="file"
+              id="thumbnail_file"
+              name="thumbnail_file"
+              ref={thumbnailFileRef}
+              accept="image/*"
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="is_published"
+              name="is_published"
+              checked={track.is_published}
+              onChange={handleInputChange}
+              className="h-4 w-4 rounded border-dark-400 bg-dark-300 text-primary-500 focus:ring-primary-500"
+            />
+            <label
+              htmlFor="is_published"
+              className="ml-2 block text-sm text-gray-300"
+            >
+              Publish track
+            </label>
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <button
+            type="button"
+            onClick={handleCancel}
+            disabled={isUploading}
+            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isUploading}
+            className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isUploading ? 'Uploading...' : 'Upload Track'}
+          </button>
+        </div>
+      </form>
+    </div>
   )
 } 
