@@ -17,7 +17,7 @@ export default function AudioWaveform({
   audioData,
   isPlaying,
   width = 400,
-  height = 60,
+  height = 30,
   barWidth = 2,
   barGap = 1,
   barColor = '#4F46E5',
@@ -71,7 +71,7 @@ export default function AudioWaveform({
     const draw = () => {
       if (!ctx || !canvas) return;
 
-      // Clear canvas with fade effect
+      // Clear canvas
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -98,37 +98,42 @@ export default function AudioWaveform({
           }
         }
 
-        // Calculate average only if we have valid samples
         const average = validSamples > 0 ? sum / validSamples : 0;
         
-        // Calculate bar height (with some amplification for better visibility)
-        // Ensure the height is finite and within bounds
+        // Direct height calculation without smoothing
         const barHeight = Math.min(
           canvas.height,
-          Math.max(1, average * canvas.height * 1.5)
+          Math.max(1, average * canvas.height * 2.5) // Increased amplification
         );
         
-        // Ensure y position is valid
         const y = Math.max(0, Math.min(canvas.height - barHeight, (canvas.height - barHeight) / 2));
 
-        // Only create gradient if we have valid coordinates
         if (isFinite(y) && isFinite(barHeight) && barHeight > 0) {
+          // Gradient
           const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight);
           gradient.addColorStop(0, barColor);
-          gradient.addColorStop(1, '#818CF8'); // Lighter shade for bottom
+          gradient.addColorStop(0.5, '#818CF8');
+          gradient.addColorStop(1, '#6366F1');
           ctx.fillStyle = gradient;
 
-          // Add glow effect
-          ctx.shadowBlur = 5;
+          // Glow effect
+          ctx.shadowBlur = 8;
           ctx.shadowColor = barColor;
           
-          // Draw rounded bar
+          // Draw bar
           ctx.beginPath();
           ctx.roundRect(x, y, barWidth, barHeight, 2);
           ctx.fill();
           
+          // Add inner glow
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+          ctx.fill();
+          
           // Reset shadow
           ctx.shadowBlur = 0;
+          ctx.shadowColor = 'transparent';
         }
         
         x += barWidth + barGap;

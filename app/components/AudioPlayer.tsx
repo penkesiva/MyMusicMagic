@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { PlayIcon, PauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import AudioVisualizer from './AudioVisualizer';
 import AudioAnalyzer from './AudioAnalyzer';
 
 interface AudioPlayerProps {
@@ -66,6 +65,14 @@ export default function AudioPlayer({
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    console.log('AudioPlayer audio element updated:', {
+      audioUrl,
+      isPlaying,
+      isAudioReady,
+      hasAudioElement: !!audio,
+      audioElementSrc: audio.src
+    });
 
     if (previousAudioUrlRef.current !== audioUrl) {
       if (isPlaying) {
@@ -164,13 +171,20 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="max-w-md mx-auto backdrop-blur-sm bg-gray-900/30 rounded-lg p-3 space-y-2 border border-gray-800/50">
+    <div className="max-w-md mx-auto backdrop-blur-sm bg-gray-900/80 rounded-lg p-3 space-y-2 border border-gray-800/50">
       <div className="relative">
         <audio 
           ref={audioRef} 
           src={audioUrl} 
           preload="auto"
           crossOrigin="anonymous"
+          onLoadedMetadata={() => {
+            console.log('Audio metadata loaded:', {
+              duration: audioRef.current?.duration,
+              readyState: audioRef.current?.readyState
+            });
+            setIsAudioReady(true);
+          }}
         />
         
         <div className="flex items-center justify-between mb-2">
@@ -216,11 +230,13 @@ export default function AudioPlayer({
         </div>
 
         {isAudioReady && (
-          <AudioAnalyzer
-            audioElement={audioRef.current || undefined}
-            isPlaying={isPlaying}
-            onDurationChange={setDuration}
-          />
+          <div className="mt-2">
+            <AudioAnalyzer
+              audioElement={audioRef.current || undefined}
+              isPlaying={isPlaying}
+              onDurationChange={setDuration}
+            />
+          </div>
         )}
 
         <div className="flex items-center space-x-2">

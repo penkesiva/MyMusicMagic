@@ -2,12 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import AudioWaveform from './AudioWaveform';
+import AudioWaveformLine from './AudioWaveformLine';
+import { ViewColumnsIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 interface AudioAnalyzerProps {
   audioElement?: HTMLAudioElement;
   isPlaying: boolean;
   onDurationChange?: (duration: number) => void;
 }
+
+type VisualizerType = 'bars' | 'waveform';
 
 // Keep track of audio elements that are already connected
 const connectedAudioElements = new WeakMap<HTMLAudioElement, {
@@ -22,6 +26,7 @@ export default function AudioAnalyzer({
   onDurationChange
 }: AudioAnalyzerProps) {
   const [audioData, setAudioData] = useState<Float32Array>(new Float32Array(0));
+  const [visualizerType, setVisualizerType] = useState<VisualizerType>('bars');
   const analyzerRef = useRef<AnalyserNode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -30,6 +35,13 @@ export default function AudioAnalyzer({
 
   // Initialize audio analyzer
   useEffect(() => {
+    console.log('AudioAnalyzer effect triggered:', {
+      hasAudioElement: !!audioElement,
+      isInitialized,
+      isPlaying,
+      audioUrl: audioElement?.src
+    });
+
     if (!audioElement || isInitialized) return;
 
     console.log('Initializing audio analyzer');
@@ -100,6 +112,13 @@ export default function AudioAnalyzer({
 
   // Analyze audio data
   useEffect(() => {
+    console.log('Audio analysis effect triggered:', {
+      hasAnalyzer: !!analyzerRef.current,
+      isPlaying,
+      isInitialized,
+      dataLength: audioData.length
+    });
+
     if (!analyzerRef.current || !isPlaying || !isInitialized) {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -128,15 +147,44 @@ export default function AudioAnalyzer({
     };
   }, [isPlaying, isInitialized]);
 
+  const toggleVisualizer = () => {
+    setVisualizerType(prev => prev === 'bars' ? 'waveform' : 'bars');
+  };
+
   return (
-    <AudioWaveform
-      audioData={audioData}
-      isPlaying={isPlaying}
-      height={60}
-      barWidth={2}
-      barGap={1}
-      barColor="#4F46E5"
-      backgroundColor="rgba(17, 24, 39, 0.1)"
-    />
+    <div className="relative h-[30px] flex items-center">
+      <div className="flex-1 pr-8">
+        {visualizerType === 'bars' ? (
+          <AudioWaveform
+            audioData={audioData}
+            isPlaying={isPlaying}
+            height={30}
+            barWidth={2}
+            barGap={1}
+            barColor="#4F46E5"
+            backgroundColor="rgba(17, 24, 39, 0.1)"
+          />
+        ) : (
+          <AudioWaveformLine
+            audioData={audioData}
+            isPlaying={isPlaying}
+            height={30}
+            lineColor="#4F46E5"
+            backgroundColor="rgba(17, 24, 39, 0.1)"
+          />
+        )}
+      </div>
+      <button
+        onClick={toggleVisualizer}
+        className="absolute right-0 p-1 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors z-10"
+        title={`Switch to ${visualizerType === 'bars' ? 'waveform' : 'bar graph'} visualizer`}
+      >
+        {visualizerType === 'bars' ? (
+          <ViewColumnsIcon className="h-4 w-4 text-white" />
+        ) : (
+          <ChartBarIcon className="h-4 w-4 text-white" />
+        )}
+      </button>
+    </div>
   );
 } 
