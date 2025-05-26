@@ -26,9 +26,12 @@ export default function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
+  const [showPlayPrompt, setShowPlayPrompt] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isAudioReady, setIsAudioReady] = useState(false);
   const previousAudioUrlRef = useRef(audioUrl);
+  const promptTimeoutRef = useRef<NodeJS.Timeout>();
+  const playButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -134,6 +137,25 @@ export default function AudioPlayer({
     }
   }, [isPlaying]);
 
+  useEffect(() => {
+    // Check if user has seen the prompt before
+    const hasSeenPrompt = localStorage.getItem('hasSeenPlayPrompt');
+    if (!hasSeenPrompt) {
+      setShowPlayPrompt(true);
+      // Hide after 5 seconds
+      promptTimeoutRef.current = setTimeout(() => {
+        setShowPlayPrompt(false);
+        localStorage.setItem('hasSeenPlayPrompt', 'true');
+      }, 5000);
+    }
+
+    return () => {
+      if (promptTimeoutRef.current) {
+        clearTimeout(promptTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const togglePlay = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -145,6 +167,12 @@ export default function AudioPlayer({
       onPlay?.();
     } else {
       onPause?.();
+    }
+    
+    // Hide prompt and mark as seen when user interacts
+    if (showPlayPrompt) {
+      setShowPlayPrompt(false);
+      localStorage.setItem('hasSeenPlayPrompt', 'true');
     }
   };
 
@@ -212,16 +240,30 @@ export default function AudioPlayer({
               onChange={handleVolumeChange}
               className="w-20 h-1 bg-gray-700/50 rounded-lg appearance-none cursor-pointer"
             />
-            <button
-              onClick={togglePlay}
-              className="p-1 rounded-full bg-indigo-600/80 hover:bg-indigo-700/80 transition-colors"
-            >
-              {isPlaying ? (
-                <PauseIcon className="h-4 w-4 text-white" />
-              ) : (
-                <PlayIcon className="h-4 w-4 text-white" />
+            <div className="relative">
+              <button
+                ref={playButtonRef}
+                onClick={togglePlay}
+                className="p-1 rounded-full bg-indigo-600/80 hover:bg-indigo-700/80 transition-colors"
+              >
+                {isPlaying ? (
+                  <PauseIcon className="h-4 w-4 text-white" />
+                ) : (
+                  <PlayIcon className="h-4 w-4 text-white" />
+                )}
+              </button>
+              
+              {/* Play prompt tooltip */}
+              {showPlayPrompt && !isPlaying && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                  bg-white rounded-lg px-3 py-2 text-sm text-gray-800
+                  border border-gray-200 shadow-lg whitespace-nowrap z-50">
+                  Click to play
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 
+                    rotate-45 w-2 h-2 bg-white border-r border-b border-gray-200" />
+                </div>
               )}
-            </button>
+            </div>
             <button
               onClick={onClose}
               className="p-1 rounded-full bg-gray-800/80 hover:bg-gray-700/80 transition-colors"
