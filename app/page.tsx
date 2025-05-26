@@ -18,6 +18,8 @@ export default function HomePage() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isFeaturedHighlighted, setIsFeaturedHighlighted] = useState(false)
   const featuredRef = useRef<HTMLDivElement>(null)
+  const [volume, setVolume] = useState(1)
+  const [showPlayer, setShowPlayer] = useState(false)
   const supabase = createClient()
 
   // Fetch published tracks
@@ -61,12 +63,17 @@ export default function HomePage() {
   }, [])
 
   const handlePlay = (track: Track) => {
-    // Always start playing when clicking play button
-    setCurrentTrack(track)
-    setIsPlaying(true)
+    if (currentTrack?.id === track.id) {
+      setIsPlaying(!isPlaying)
+    } else {
+      setCurrentTrack(track)
+      setIsPlaying(true)
+      setShowPlayer(true)
+    }
   }
 
-  const handleClosePlayer = () => {
+  const handleClose = () => {
+    setShowPlayer(false)
     setIsPlaying(false)
     setCurrentTrack(null)
   }
@@ -169,7 +176,7 @@ export default function HomePage() {
                 key={track.id}
                 track={track}
                 variant={viewMode}
-                onPlay={handlePlay}
+                onPlay={() => handlePlay(track)}
                 onInfo={handleInfo}
                 isPlaying={currentTrack?.id === track.id && isPlaying}
               />
@@ -235,7 +242,7 @@ export default function HomePage() {
                   key={track.id}
                   track={track}
                   variant={viewMode}
-                  onPlay={handlePlay}
+                  onPlay={() => handlePlay(track)}
                   onInfo={handleInfo}
                   isPlaying={currentTrack?.id === track.id && isPlaying}
                 />
@@ -294,23 +301,15 @@ export default function HomePage() {
       </footer>
 
       {/* Audio Player */}
-      {currentTrack && (
+      {showPlayer && currentTrack && (
         <div className="fixed bottom-0 left-0 right-0 bg-transparent p-4">
           <div className="relative">
-            <button
-              onClick={handleClosePlayer}
-              className="absolute -top-2 -right-2 p-1 rounded-full bg-gray-900/80 hover:bg-gray-800/80 transition-colors border border-gray-800/50"
-              title="Close player"
-            >
-              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
             <AudioPlayer
               audioUrl={currentTrack.audio_url}
               title={currentTrack.title}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
+              onClose={handleClose}
             />
           </div>
         </div>

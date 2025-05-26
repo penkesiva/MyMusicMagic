@@ -1,20 +1,22 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface AudioVisualizerProps {
   audioUrl: string;
   isPlaying: boolean;
   onDurationChange?: (duration: number) => void;
+  audioElement?: HTMLAudioElement;
 }
 
-export default function AudioVisualizer({ audioUrl, isPlaying, onDurationChange }: AudioVisualizerProps) {
+export default function AudioVisualizer({ audioUrl, isPlaying, onDurationChange, audioElement }: AudioVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const animationFrameRef = useRef<number>();
   const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const [isOscillatorRunning, setIsOscillatorRunning] = useState(false);
 
   useEffect(() => {
     const setupAudio = async () => {
@@ -88,6 +90,82 @@ export default function AudioVisualizer({ audioUrl, isPlaying, onDurationChange 
       }
     }
   }, [isPlaying]);
+
+  useEffect(() => {
+    if (!audioElement) return;
+
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const analyser = audioContext.createAnalyser();
+    const source = audioContext.createMediaElementSource(audioElement);
+    const gainNode = audioContext.createGain();
+
+    // Connect nodes
+    source.connect(analyser);
+    analyser.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    // Configure analyser
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.8;
+    analyserRef.current = analyser;
+
+    // Create oscillator for silent playback
+    const oscillator = audioContext.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(0.1, audioContext.currentTime);
+    oscillator.connect(gainNode);
+
+    return () => {
+      if (isOscillatorRunning && oscillator) {
+        try {
+          oscillator.stop();
+          setIsOscillatorRunning(false);
+        } catch (error) {
+          console.log('Oscillator was not running, no need to stop');
+        }
+      }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      audioContext.close();
+    };
+  }, [audioElement, isOscillatorRunning]);
+
+  useEffect(() => {
+    if (!audioElement || !analyserRef.current) return;
+
+    if (isPlaying) {
+      try {
+        if (!isOscillatorRunning) {
+          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(0.1, audioContext.currentTime);
+          oscillator.connect(analyserRef.current);
+          oscillator.start();
+          setIsOscillatorRunning(true);
+        }
+        analyserRef.current.getByteTimeDomainData(new Uint8Array(analyserRef.current.frequencyBinCount));
+      } catch (error) {
+        console.log('Error starting oscillator:', error);
+      }
+    } else {
+      try {
+        if (isOscillatorRunning) {
+          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(0.1, audioContext.currentTime);
+          oscillator.connect(analyserRef.current);
+          oscillator.start();
+          setIsOscillatorRunning(true);
+        }
+        analyserRef.current.getByteTimeDomainData(new Uint8Array(analyserRef.current.frequencyBinCount));
+      } catch (error) {
+        console.log('Error stopping oscillator:', error);
+      }
+    }
+  }, [isPlaying, audioElement, isOscillatorRunning]);
 
   const draw = () => {
     if (!canvasRef.current || !analyserRef.current) return;
