@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/types/database';
-import { PencilIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, XMarkIcon, CheckIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
 type Track = Database['public']['Tables']['tracks']['Row'];
 
@@ -21,7 +21,28 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
   const [isPublished, setIsPublished] = useState(track.is_published);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const thumbnailFileRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
+
+  useEffect(() => {
+    // Cleanup preview URL when component unmounts
+    return () => {
+      if (thumbnailPreview) {
+        URL.revokeObjectURL(thumbnailPreview);
+      }
+    };
+  }, [thumbnailPreview]);
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnailFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setThumbnailPreview(previewUrl);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +50,31 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
     setError(null);
 
     try {
+      let thumbnailUrl = track.thumbnail_url;
+
+      // Upload new thumbnail if one was selected
+      if (thumbnailFile) {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+        if (!user) throw new Error('Not authenticated');
+
+        const thumbnailPath = `${user.id}/${Date.now()}-${thumbnailFile.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('thumbnails')
+          .upload(thumbnailPath, thumbnailFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('thumbnails')
+          .getPublicUrl(thumbnailPath);
+
+        thumbnailUrl = urlData.publicUrl;
+      }
+
       console.log('Updating track:', {
         id: track.id,
         title,
@@ -36,6 +82,7 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
         composerNotes,
         lyrics,
         isPublished,
+        thumbnailUrl,
       });
 
       const updateData = {
@@ -44,6 +91,7 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
         composer_notes: composerNotes || null,
         lyrics: lyrics || null,
         is_published: isPublished,
+        thumbnail_url: thumbnailUrl,
       };
 
       console.log('Update data:', updateData);
@@ -105,6 +153,45 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
       )}
 
       <div className="space-y-4">
+        {/* Thumbnail Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Thumbnail
+          </label>
+          <div className="flex items-start space-x-4">
+            <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-dark-300">
+              <img
+                src={thumbnailPreview || track.thumbnail_url}
+                alt="Track thumbnail"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                <PhotoIcon className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <div className="flex-grow">
+              <input
+                type="file"
+                ref={thumbnailFileRef}
+                accept="image/*"
+                onChange={handleThumbnailChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => thumbnailFileRef.current?.click()}
+                className="px-4 py-2 bg-dark-300 text-white rounded-lg hover:bg-dark-400 transition-colors text-sm"
+              >
+                Change Thumbnail
+              </button>
+              <p className="mt-2 text-xs text-gray-400">
+                Recommended size: 1000x1000px. Max file size: 5MB.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Existing form fields */}
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-300">
             Title
