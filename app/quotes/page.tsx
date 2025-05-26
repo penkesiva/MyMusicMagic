@@ -80,9 +80,9 @@ function MusicNote({ delay, duration, startX, startY, isExiting, noteType }: {
 }
 
 export default function QuotesPage() {
-  const [currentQuote, setCurrentQuote] = useState<Quote | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [currentQuote, setCurrentQuote] = useState<Quote>(quotes[0])
+  const [isVisible, setIsVisible] = useState(true)
+  const [position, setPosition] = useState({ x: 20, y: 20 })
   const [musicNotes, setMusicNotes] = useState<Array<{
     id: number;
     delay: number;
@@ -94,6 +94,7 @@ export default function QuotesPage() {
   }>>([])
   const quoteRef = useRef<HTMLDivElement>(null)
   const noteIdRef = useRef(0)
+  const lastQuoteIdRef = useRef<number>(currentQuote.id) // Track the last shown quote
 
   // Function to generate new music notes
   const generateMusicNotes = useCallback(() => {
@@ -118,53 +119,70 @@ export default function QuotesPage() {
         isExiting: true
       }))
     )
-    // Start fading in new notes immediately while old ones are fading out
     setTimeout(() => {
       generateMusicNotes()
-    }, 500) // Start new notes halfway through the fade out
+    }, 500)
   }, [generateMusicNotes])
 
   // Initialize music notes
   useEffect(() => {
     generateMusicNotes()
-    const interval = setInterval(fadeOutOldNotes, 12000) // Change notes every 12 seconds
+    const interval = setInterval(fadeOutOldNotes, 12000)
     return () => clearInterval(interval)
   }, [generateMusicNotes, fadeOutOldNotes])
 
   const getRandomPosition = useCallback(() => {
-    if (!quoteRef.current) return { x: 0, y: 0 }
+    if (!quoteRef.current) return { x: 20, y: 20 }
 
-    const quoteWidth = 500 // increased from 400 to 500
-    const quoteHeight = 200 // max quote height
-    const padding = 20 // padding from screen edges
+    const quoteWidth = 500
+    const quoteHeight = 200
+    const padding = 20
 
     // Calculate safe boundaries
     const maxX = window.innerWidth - quoteWidth - padding
     const maxY = window.innerHeight - quoteHeight - padding
 
-    // Ensure we don't go below minimum values
-    const x = Math.max(padding, Math.min(maxX, Math.random() * maxX))
-    const y = Math.max(padding, Math.min(maxY, Math.random() * maxY))
+    // Get current position
+    const currentX = position.x
+    const currentY = position.y
 
-    return { x, y }
+    // Generate new position ensuring it's different from current
+    let newX, newY
+    do {
+      newX = Math.max(padding, Math.min(maxX, Math.random() * maxX))
+      newY = Math.max(padding, Math.min(maxY, Math.random() * maxY))
+    } while (
+      Math.abs(newX - currentX) < 100 && 
+      Math.abs(newY - currentY) < 100
+    )
+
+    return { x: newX, y: newY }
+  }, [position])
+
+  const getNextQuote = useCallback(() => {
+    // Filter out the last shown quote
+    const availableQuotes = quotes.filter(quote => quote.id !== lastQuoteIdRef.current)
+    // Select a random quote from the remaining ones
+    const randomQuote = availableQuotes[Math.floor(Math.random() * availableQuotes.length)]
+    // Update the last shown quote
+    lastQuoteIdRef.current = randomQuote.id
+    return randomQuote
   }, [])
 
   const showNextQuote = useCallback(() => {
-    // Start fading out current quote
     setIsVisible(false)
     
-    // After 500ms (halfway through fade out), start fading in new quote
     setTimeout(() => {
-      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
-      setCurrentQuote(randomQuote)
+      const nextQuote = getNextQuote()
+      setCurrentQuote(nextQuote)
       setPosition(getRandomPosition())
       setIsVisible(true)
     }, 500)
-  }, [getRandomPosition])
+  }, [getNextQuote, getRandomPosition])
 
+  // Start quote rotation
   useEffect(() => {
-    showNextQuote()
-    const interval = setInterval(showNextQuote, 8000) // Show each quote for 8 seconds
+    const interval = setInterval(showNextQuote, 6000)
     return () => clearInterval(interval)
   }, [showNextQuote])
 
@@ -189,30 +207,28 @@ export default function QuotesPage() {
       ))}
 
       {/* Quote display */}
-      {currentQuote && (
-        <div
-          ref={quoteRef}
-          className={`fixed transition-all duration-1000 ${
-            isVisible 
-              ? 'opacity-100 transform scale-100' 
-              : 'opacity-0 transform scale-95'
-          }`}
-          style={{
-            left: `${position.x}px`,
-            top: `${position.y}px`,
-            maxWidth: '500px', // increased from 400px to 500px
-          }}
-        >
-          <div className="bg-dark-200/90 backdrop-blur-sm rounded-lg p-6 shadow-xl text-center">
-            <p className="text-lg text-white/90 font-light leading-relaxed mb-4 italic">
-              "{currentQuote.text}"
-            </p>
-            <p className="text-primary-400 text-sm font-medium">
-              — {currentQuote.author}
-            </p>
-          </div>
+      <div
+        ref={quoteRef}
+        className={`fixed transition-all duration-1000 ${
+          isVisible 
+            ? 'opacity-100 transform scale-100' 
+            : 'opacity-0 transform scale-95'
+        }`}
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          maxWidth: '500px',
+        }}
+      >
+        <div className="bg-dark-200/90 backdrop-blur-sm rounded-lg p-6 shadow-xl">
+          <p className="text-lg text-white/90 font-light leading-relaxed mb-4 italic text-center">
+            "{currentQuote.text}"
+          </p>
+          <p className="text-primary-400 text-sm font-medium text-right">
+            — {currentQuote.author}
+          </p>
         </div>
-      )}
+      </div>
     </div>
   )
 } 
