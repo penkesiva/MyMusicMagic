@@ -74,7 +74,6 @@ export const TrackCard = ({ track, variant, onPlay, onInfo, isPlaying = false }:
           {isPlaying && (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/30">
               <AudioWaveformAnimation />
-              <span className="text-xs font-medium text-indigo-200">Playing</span>
             </div>
           )}
           <span className="text-sm text-gray-400">
@@ -112,7 +111,6 @@ export const TrackCard = ({ track, variant, onPlay, onInfo, isPlaying = false }:
             {isPlaying && (
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/30 mr-2">
                 <AudioWaveformAnimation />
-                <span className="text-xs font-medium text-indigo-200">Playing</span>
               </div>
             )}
             <span className="text-sm text-gray-300">
