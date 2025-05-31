@@ -12,6 +12,23 @@ interface TrackCardProps {
   isPlaying?: boolean
 }
 
+function AudioWaveformAnimation() {
+  return (
+    <div className="flex items-center h-4 space-x-[4px]">
+      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-[dotbounce_1s_ease-in-out_infinite_0ms]" />
+      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-[dotbounce_1s_ease-in-out_infinite_150ms]" />
+      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-[dotbounce_1s_ease-in-out_infinite_300ms]" />
+      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-[dotbounce_1s_ease-in-out_infinite_450ms]" />
+      <style jsx global>{`
+        @keyframes dotbounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export const TrackCard = ({ track, variant, onPlay, onInfo, isPlaying = false }: TrackCardProps) => {
   const formatDuration = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
@@ -50,6 +67,12 @@ export const TrackCard = ({ track, variant, onPlay, onInfo, isPlaying = false }:
         </div>
 
         <div className="flex items-center space-x-4">
+          {isPlaying && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/30">
+              <AudioWaveformAnimation />
+              <span className="text-xs font-medium text-indigo-200">Playing</span>
+            </div>
+          )}
           <span className="text-sm text-gray-400">
             {formatDuration(track.duration)}
           </span>
@@ -82,6 +105,12 @@ export const TrackCard = ({ track, variant, onPlay, onInfo, isPlaying = false }:
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h3 className="text-lg font-semibold text-white mb-2">{track.title}</h3>
           <div className="flex items-center justify-between">
+            {isPlaying && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/30 mr-2">
+                <AudioWaveformAnimation />
+                <span className="text-xs font-medium text-indigo-200">Playing</span>
+              </div>
+            )}
             <span className="text-sm text-gray-300">
               {formatDuration(track.duration)}
             </span>
