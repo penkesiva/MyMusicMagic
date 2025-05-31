@@ -66,13 +66,12 @@ export default function HomePage() {
   const handlePlay = (track: Track) => {
     if (currentTrack?.id === track.id) {
       setIsPlaying(!isPlaying)
-    } else {
-      setCurrentTrack(track)
-      setShowPlayer(true)
-      setTimeout(() => {
-        setIsPlaying(true)
-      }, 100)
+      return
     }
+
+    setCurrentTrack(track)
+    setShowPlayer(true)
+    setIsPlaying(true)
   }
 
   const handleClose = () => {
@@ -182,7 +181,10 @@ export default function HomePage() {
                 key={track.id}
                 track={track}
                 variant={viewMode}
-                onPlay={() => handlePlay(track)}
+                onPlay={() => {
+                  console.log('TrackCard: Play requested for', track.title);
+                  handlePlay(track);
+                }}
                 onInfo={handleInfo}
                 isPlaying={currentTrack?.id === track.id && isPlaying}
               />
@@ -248,7 +250,10 @@ export default function HomePage() {
                   key={track.id}
                   track={track}
                   variant={viewMode}
-                  onPlay={() => handlePlay(track)}
+                  onPlay={() => {
+                    console.log('TrackCard: Play requested for', track.title);
+                    handlePlay(track);
+                  }}
                   onInfo={handleInfo}
                   isPlaying={currentTrack?.id === track.id && isPlaying}
                 />
@@ -313,9 +318,16 @@ export default function HomePage() {
             <AudioPlayer
               audioUrl={currentTrack.audio_url}
               title={currentTrack.title}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
+              onPlay={() => {
+                console.log('AudioPlayer: Play requested');
+                setIsPlaying(true);
+              }}
+              onPause={() => {
+                console.log('AudioPlayer: Pause requested');
+                setIsPlaying(false);
+              }}
               onClose={handleClose}
+              isPlaying={isPlaying}
             />
           </div>
         </div>
