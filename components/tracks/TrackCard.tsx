@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { FaPlay, FaInfoCircle } from 'react-icons/fa'
+import { FaPlay, FaPause, FaInfoCircle } from 'react-icons/fa'
 import { Database } from '@/types/database'
 
 type Track = Database['public']['Tables']['tracks']['Row']
@@ -55,7 +55,11 @@ export const TrackCard = ({ track, variant, onPlay, onInfo, isPlaying = false }:
               isPlaying ? 'bg-black bg-opacity-50 opacity-100' : 'bg-black bg-opacity-50 opacity-0 group-hover:opacity-100'
             }`}
           >
-            <FaPlay className="text-white text-xl" />
+            {isPlaying ? (
+              <FaPause className="text-white text-xl" />
+            ) : (
+              <FaPlay className="text-white text-xl" />
+            )}
           </button>
         </div>
 
@@ -119,7 +123,11 @@ export const TrackCard = ({ track, variant, onPlay, onInfo, isPlaying = false }:
                 onClick={() => onPlay(track)}
                 className="p-2 rounded-full bg-primary-500 hover:bg-primary-600 transition-colors"
               >
-                <FaPlay className="text-white" />
+                {isPlaying ? (
+                  <FaPause className="text-white" />
+                ) : (
+                  <FaPlay className="text-white" />
+                )}
               </button>
               <button
                 onClick={() => onInfo(track)}
