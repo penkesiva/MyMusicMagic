@@ -6,6 +6,7 @@ import { Database } from '@/types/database'
 import AudioPlayer from '@/app/components/AudioPlayer'
 import { useState, useEffect, useRef } from 'react'
 import { Squares2X2Icon, ListBulletIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { FaPlay, FaPause } from 'react-icons/fa'
 
 type Track = Database['public']['Tables']['tracks']['Row']
 type ViewMode = 'grid' | 'list'
@@ -380,12 +381,20 @@ export default function HomePage() {
                 </span>
                 <button
                   onClick={() => {
-                    handlePlay(selectedTrack)
-                    handleCloseInfo()
+                    if (currentTrack?.id === selectedTrack.id && isPlaying) {
+                      setIsPlaying(false);
+                    } else {
+                      handlePlay(selectedTrack);
+                    }
                   }}
-                  className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                  className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors flex items-center gap-2"
                 >
-                  Play Track
+                  {currentTrack?.id === selectedTrack.id && isPlaying ? (
+                    <FaPause className="text-white" />
+                  ) : (
+                    <FaPlay className="text-white" />
+                  )}
+                  {currentTrack?.id === selectedTrack.id && isPlaying ? 'Pause' : 'Play'}
                 </button>
               </div>
             </div>
