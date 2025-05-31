@@ -108,14 +108,16 @@ export const TrackCard = ({ track, variant, onPlay, onInfo, isPlaying = false }:
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <h3 className="text-lg font-semibold text-white mb-2">{track.title}</h3>
           <div className="flex items-center justify-between">
-            {isPlaying && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/30 mr-2">
-                <AudioWaveformAnimation />
-              </div>
-            )}
             <span className="text-sm text-gray-300">
               {formatDuration(track.duration)}
             </span>
+            {/* Always reserve space for the badge to prevent layout shift */}
+            <div className={
+              `flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/30 ml-2 ` +
+              (isPlaying ? '' : 'invisible')
+            }>
+              <AudioWaveformAnimation />
+            </div>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => onPlay(track)}
