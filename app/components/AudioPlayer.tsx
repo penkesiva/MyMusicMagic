@@ -11,6 +11,7 @@ interface AudioPlayerProps {
   onPause?: () => void;
   onClose: () => void;
   isPlaying?: boolean;
+  onTrackEnd?: () => void;
 }
 
 export default function AudioPlayer({ 
@@ -19,7 +20,8 @@ export default function AudioPlayer({
   onPlay, 
   onPause, 
   onClose,
-  isPlaying: externalIsPlaying = false 
+  isPlaying: externalIsPlaying = false,
+  onTrackEnd
 }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(externalIsPlaying);
   const [duration, setDuration] = useState(0);
@@ -174,6 +176,20 @@ export default function AudioPlayer({
       }
     };
   }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleEnded = () => {
+      onTrackEnd && onTrackEnd();
+    };
+
+    audio.addEventListener('ended', handleEnded);
+    return () => {
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [onTrackEnd]);
 
   const togglePlay = () => {
     const audio = audioRef.current;

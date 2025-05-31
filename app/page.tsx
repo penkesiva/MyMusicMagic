@@ -329,6 +329,7 @@ export default function HomePage() {
               }}
               onClose={handleClose}
               isPlaying={isPlaying}
+              onTrackEnd={() => setIsPlaying(false)}
             />
           </div>
         </div>
