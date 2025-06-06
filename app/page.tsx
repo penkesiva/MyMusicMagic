@@ -9,10 +9,15 @@ import { Squares2X2Icon, ListBulletIcon, XMarkIcon } from '@heroicons/react/24/o
 import { FaPlay, FaPause } from 'react-icons/fa'
 
 type Track = Database['public']['Tables']['tracks']['Row']
-type ViewMode = 'grid' | 'list'
+type ArtistInfo = Database['public']['Tables']['artist_info']['Row']
+type ArtistLink = Database['public']['Tables']['artist_links']['Row']
+
+type ViewMode = 'list' | 'grid'
 
 export default function HomePage() {
   const [tracks, setTracks] = useState<Track[]>([])
+  const [artistInfo, setArtistInfo] = useState<ArtistInfo | null>(null)
+  const [artistLinks, setArtistLinks] = useState<ArtistLink[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
@@ -24,26 +29,54 @@ export default function HomePage() {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const supabase = createClient()
 
-  // Fetch published tracks
+  // Fetch published tracks and artist info
   useEffect(() => {
-    const fetchTracks = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
+        // Fetch tracks
+        const { data: tracksData, error: tracksError } = await supabase
           .from('tracks')
           .select('*')
           .eq('is_published', true)
           .order('created_at', { ascending: false })
 
-        if (error) throw error
-        setTracks(data || [])
+        if (tracksError) throw tracksError
+        setTracks(tracksData || [])
+
+        // Fetch artist info
+        const { data: artistData, error: artistError } = await supabase
+          .from('artist_info')
+          .select('*')
+          .single()
+
+        if (artistError && artistError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+          throw artistError
+        }
+
+        if (artistData) {
+          console.log('Artist data:', artistData);
+          setArtistInfo(artistData)
+          // Fetch artist links
+          const { data: linksData, error: linksError } = await supabase
+            .from('artist_links')
+            .select('*')
+            .eq('artist_info_id', artistData.id)
+
+          if (linksError) {
+            console.error('Error fetching artist links:', linksError);
+            throw linksError
+          }
+          console.log('Artist links data:', linksData);
+          setArtistLinks(linksData || [])
+        }
       } catch (err) {
-        console.error('Error fetching tracks:', err)
+        console.error('Error fetching data:', err)
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchTracks()
+    fetchData()
   }, [supabase])
 
   // Scroll observer for featured section
@@ -202,39 +235,58 @@ export default function HomePage() {
             <div className="w-full md:w-1/4 flex justify-center md:justify-start">
               <div className="w-64 h-64 rounded-lg overflow-hidden">
                 <img
-                  src="/artist-photo.png"
+                  src={artistInfo?.photo_url || '/artist-photo.png'}
                   alt="Artist"
                   className="w-full h-full object-cover"
                 />
               </div>
             </div>
             <div className="w-full md:w-3/4 prose prose-invert">
-              <p className="text-lg text-gray-300 mb-4">
-                A passionate cellist with over a decade of experience, I've dedicated my life to the art of music. From performing in prestigious concert halls to collaborating with renowned orchestras, my journey has been driven by an unwavering love for the cello's rich, emotive voice.
-              </p>
-              <p className="text-lg text-gray-300">
-                Currently pursuing a professional career in music, I blend classical training with contemporary expression, creating performances that bridge traditional and modern musical landscapes. My work reflects a deep commitment to both technical excellence and emotional storytelling through music.
-              </p>
-              <div className="flex items-center space-x-4 mt-6">
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Instagram
-                </a>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  Twitter
-                </a>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  YouTube
-                </a>
-              </div>
+              {artistInfo ? (
+                <>
+                  <p className="text-lg text-gray-300 mb-4 whitespace-pre-wrap">
+                    {artistInfo.about_text}
+                  </p>
+                  {artistLinks.length > 0 && (
+                    <div className="flex items-center space-x-4 mt-6">
+                      {artistLinks.map((link) => {
+                        console.log('Rendering link:', link);
+                        return (
+                          <a
+                            key={link.id}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-400 hover:text-white transition-colors"
+                          >
+                            {link.title}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="text-lg text-gray-300 mb-4">
+                    A passionate cellist with over a decade of experience, I've dedicated my life to the art of music. From performing in prestigious concert halls to collaborating with renowned orchestras, my journey has been driven by an unwavering love for the cello's rich, emotive voice.
+                  </p>
+                  <p className="text-lg text-gray-300">
+                    Currently pursuing a professional career in music, I blend classical training with contemporary expression, creating performances that bridge traditional and modern musical landscapes. My work reflects a deep commitment to both technical excellence and emotional storytelling through music.
+                  </p>
+                  <div className="flex items-center space-x-4 mt-6">
+                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                      Instagram
+                    </a>
+                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                      Twitter
+                    </a>
+                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                      YouTube
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -270,20 +322,45 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="col-span-1 md:col-span-2">
               <h3 className="text-xl font-bold text-white mb-4">About the Artist</h3>
-              <p className="text-gray-400 mb-4">
-                A dedicated cellist with a passion for both classical and contemporary music. With extensive experience in orchestral performances and solo recitals, I strive to create meaningful musical experiences that resonate with audiences. My approach combines technical precision with emotional depth, bringing stories to life through the expressive voice of the cello.
-              </p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Instagram
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Twitter
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  YouTube
-                </a>
-              </div>
+              {artistInfo ? (
+                <>
+                  <p className="text-gray-400 mb-4">
+                    {artistInfo.use_same_text ? artistInfo.about_text : (artistInfo.footer_text || artistInfo.about_text)}
+                  </p>
+                  {artistLinks.length > 0 && (
+                    <div className="flex space-x-4">
+                      {artistLinks.map((link) => (
+                        <a
+                          key={link.id}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-400 hover:text-white transition-colors"
+                        >
+                          {link.title}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-400 mb-4">
+                    A dedicated cellist with a passion for both classical and contemporary music. With extensive experience in orchestral performances and solo recitals, I strive to create meaningful musical experiences that resonate with audiences. My approach combines technical precision with emotional depth, bringing stories to life through the expressive voice of the cello.
+                  </p>
+                  <div className="flex space-x-4">
+                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                      Instagram
+                    </a>
+                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                      Twitter
+                    </a>
+                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                      YouTube
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
             <div>
               <h3 className="text-xl font-bold text-white mb-4">Quick Links</h3>

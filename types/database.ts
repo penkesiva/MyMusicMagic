@@ -82,6 +82,58 @@ export interface Database {
           website?: string | null
         }
       }
+      artist_info: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          about_text: string
+          photo_url: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          about_text: string
+          photo_url: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          about_text?: string
+          photo_url?: string
+          user_id?: string
+        }
+      }
+      artist_links: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          title: string
+          url: string
+          artist_info_id: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          title: string
+          url: string
+          artist_info_id: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          title?: string
+          url?: string
+          artist_info_id?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
