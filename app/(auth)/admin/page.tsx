@@ -6,7 +6,7 @@ import { TrackUploadForm } from '@/components/admin/TrackUploadForm'
 import { TrackEditForm } from '@/components/admin/TrackEditForm'
 import { ArtistInfoForm } from '@/components/admin/ArtistInfoForm'
 import { Database } from '@/types/database'
-import { PencilIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon } from '@heroicons/react/24/outline'
+import { PencilIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, TrashIcon } from '@heroicons/react/24/outline'
 
 type Track = Database['public']['Tables']['tracks']['Row']
 
@@ -16,6 +16,8 @@ export default function AdminPage() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [editingTrack, setEditingTrack] = useState<Track | null>(null)
+  const [deletingTrack, setDeletingTrack] = useState<Track | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [showUploadForm, setShowUploadForm] = useState(false)
   const [showArtistForm, setShowArtistForm] = useState(false)
@@ -52,6 +54,45 @@ export default function AdminPage() {
 
   const handleCancel = () => {
     setEditingTrack(null)
+  }
+
+  const handleDelete = async (track: Track) => {
+    setIsDeleting(true)
+    try {
+      // Delete the track record
+      const { error: deleteError } = await supabase
+        .from('tracks')
+        .delete()
+        .eq('id', track.id)
+
+      if (deleteError) throw deleteError
+
+      // Delete the audio file
+      const audioPath = track.audio_url.split('/').pop()
+      if (audioPath) {
+        const { error: audioError } = await supabase.storage
+          .from('audio')
+          .remove([audioPath])
+        if (audioError) console.error('Error deleting audio file:', audioError)
+      }
+
+      // Delete the thumbnail file
+      const thumbnailPath = track.thumbnail_url.split('/').pop()
+      if (thumbnailPath) {
+        const { error: thumbnailError } = await supabase.storage
+          .from('thumbnails')
+          .remove([thumbnailPath])
+        if (thumbnailError) console.error('Error deleting thumbnail file:', thumbnailError)
+      }
+
+      // Refresh the tracks list
+      await fetchTracks()
+    } catch (err) {
+      console.error('Error deleting track:', err)
+    } finally {
+      setIsDeleting(false)
+      setDeletingTrack(null)
+    }
   }
 
   if (isLoading) {
@@ -168,13 +209,22 @@ export default function AdminPage() {
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleEdit(track)}
-                      className="absolute top-2 right-2 p-2 bg-dark-200/80 rounded-full text-gray-400 hover:text-white transition-colors"
-                      title="Edit track"
-                    >
-                      <PencilIcon className="h-5 w-5" />
-                    </button>
+                    <div className="absolute top-2 right-2 flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(track)}
+                        className="p-2 bg-dark-200/80 rounded-full text-gray-400 hover:text-white transition-colors"
+                        title="Edit track"
+                      >
+                        <PencilIcon className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => setDeletingTrack(track)}
+                        className="p-2 bg-dark-200/80 rounded-full text-gray-400 hover:text-red-400 transition-colors"
+                        title="Delete track"
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
                   <div className={`p-4 ${viewMode === 'list' ? 'flex-grow' : ''}`}>
                     <h4 className="text-lg font-semibold text-white">
@@ -217,6 +267,34 @@ export default function AdminPage() {
                 onSave={handleSave}
                 onCancel={handleCancel}
               />
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deletingTrack && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-dark-200 rounded-lg p-6 max-w-md w-full">
+              <h3 className="text-lg font-medium text-white mb-4">Delete Track</h3>
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to delete "{deletingTrack.title}"? This action cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => setDeletingTrack(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(deletingTrack)}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete Track'}
+                </button>
+              </div>
             </div>
           </div>
         )}
