@@ -7,16 +7,23 @@ import AudioPlayer from '@/app/components/AudioPlayer'
 import { useState, useEffect, useRef } from 'react'
 import { Squares2X2Icon, ListBulletIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { FaPlay, FaPause } from 'react-icons/fa'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 type Track = Database['public']['Tables']['tracks']['Row']
 type ArtistInfo = Database['public']['Tables']['artist_info']['Row']
 type ArtistLink = Database['public']['Tables']['artist_links']['Row']
 
+// Define an extended type for artist info that includes the optional fields
+type ExtendedArtistInfo = Database['public']['Tables']['artist_info']['Row'] & {
+  use_same_text?: boolean;
+  footer_text?: string | null;
+};
+
 type ViewMode = 'list' | 'grid'
 
 export default function HomePage() {
   const [tracks, setTracks] = useState<Track[]>([])
-  const [artistInfo, setArtistInfo] = useState<ArtistInfo | null>(null)
+  const [artistInfo, setArtistInfo] = useState<ExtendedArtistInfo | null>(null)
   const [artistLinks, setArtistLinks] = useState<ArtistLink[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
@@ -27,7 +34,7 @@ export default function HomePage() {
   const [volume, setVolume] = useState(1)
   const [showPlayer, setShowPlayer] = useState(false)
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
-  const supabase = createClient()
+  const supabase = createClientComponentClient<Database>()
 
   // Fetch published tracks and artist info
   useEffect(() => {
@@ -317,74 +324,33 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <footer className="bg-dark-200 border-t border-dark-300">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="col-span-1 md:col-span-2">
-              <h3 className="text-xl font-bold text-white mb-4">About the Artist</h3>
-              {artistInfo ? (
-                <>
-                  <p className="text-gray-400 mb-4">
-                    {artistInfo.use_same_text ? artistInfo.about_text : (artistInfo.footer_text || artistInfo.about_text)}
-                  </p>
-                  {artistLinks.length > 0 && (
-                    <div className="flex space-x-4">
-                      {artistLinks.map((link) => (
-                        <a
-                          key={link.id}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-gray-400 hover:text-white transition-colors"
-                        >
-                          {link.title}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <p className="text-gray-400 mb-4">
-                    A dedicated cellist with a passion for both classical and contemporary music. With extensive experience in orchestral performances and solo recitals, I strive to create meaningful musical experiences that resonate with audiences. My approach combines technical precision with emotional depth, bringing stories to life through the expressive voice of the cello.
-                  </p>
-                  <div className="flex space-x-4">
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                      Instagram
+      <footer className="bg-dark-200 py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="prose prose-invert">
+              <p className="text-gray-400 mb-4">
+                {artistInfo && (
+                  artistInfo.use_same_text === false && artistInfo.footer_text 
+                    ? artistInfo.footer_text 
+                    : artistInfo.about_text
+                )}
+              </p>
+              {artistLinks.length > 0 && (
+                <div className="flex space-x-4">
+                  {artistLinks.map((link) => (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      {link.title}
                     </a>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                      Twitter
-                    </a>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                      YouTube
-                    </a>
-                  </div>
-                </>
+                  ))}
+                </div>
               )}
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-white mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#featured" className="text-gray-400 hover:text-white transition-colors">
-                    Featured Tracks
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    Contact
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-dark-300 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} My Music Magic. All rights reserved.</p>
           </div>
         </div>
       </footer>
