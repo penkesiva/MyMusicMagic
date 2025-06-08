@@ -6,21 +6,28 @@ import { TrackUploadForm } from '@/components/admin/TrackUploadForm'
 import { TrackEditForm } from '@/components/admin/TrackEditForm'
 import { ArtistInfoForm } from '@/components/admin/ArtistInfoForm'
 import { Database } from '@/types/database'
-import { PencilIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, TrashIcon } from '@heroicons/react/24/outline'
+import { 
+  PencilIcon, 
+  XMarkIcon, 
+  ListBulletIcon, 
+  Squares2X2Icon, 
+  TrashIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  PlusIcon
+} from '@heroicons/react/24/outline'
 
 type Track = Database['public']['Tables']['tracks']['Row']
-
-type ViewMode = 'grid' | 'list'
 
 export default function AdminPage() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [editingTrack, setEditingTrack] = useState<Track | null>(null)
-  const [deletingTrack, setDeletingTrack] = useState<Track | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [viewMode, setViewMode] = useState<ViewMode>('list')
-  const [showUploadForm, setShowUploadForm] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [showArtistForm, setShowArtistForm] = useState(false)
+  const [showUploadForm, setShowUploadForm] = useState(false)
+  const [showTracks, setShowTracks] = useState(false)
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
+  const [editingTrack, setEditingTrack] = useState<Track | null>(null)
   const supabase = createClient()
 
   const fetchTracks = async () => {
@@ -57,7 +64,6 @@ export default function AdminPage() {
   }
 
   const handleDelete = async (track: Track) => {
-    setIsDeleting(true)
     try {
       // Delete the track record
       const { error: deleteError } = await supabase
@@ -89,9 +95,6 @@ export default function AdminPage() {
       await fetchTracks()
     } catch (err) {
       console.error('Error deleting track:', err)
-    } finally {
-      setIsDeleting(false)
-      setDeletingTrack(null)
     }
   }
 
@@ -106,194 +109,233 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-dark-100 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setShowArtistForm(!showArtistForm)}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors"
-            >
-              {showArtistForm ? 'Hide Artist Info' : 'Edit Artist Info'}
-            </button>
-            <button
-              onClick={() => setShowUploadForm(!showUploadForm)}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors"
-            >
-              {showUploadForm ? 'Hide Upload Form' : 'Upload New Track'}
-            </button>
+        <h1 className="text-2xl font-bold text-white mb-8">Admin Dashboard</h1>
+
+        {/* Artist Info Section */}
+        <div className="mb-8 bg-dark-200 rounded-lg overflow-hidden">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-white">Artist Info</h2>
+                <p className="text-gray-400 mt-1">
+                  Manage your artist profile, including bio, photo, and social links.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowArtistForm(!showArtistForm)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  showArtistForm 
+                    ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                    : 'bg-primary-500 hover:bg-primary-600 text-white'
+                }`}
+              >
+                {showArtistForm ? (
+                  <>
+                    <ChevronUpIcon className="h-5 w-5" />
+                    Collapse
+                  </>
+                ) : (
+                  <>
+                    <ChevronDownIcon className="h-5 w-5" />
+                    Edit Artist Info
+                  </>
+                )}
+              </button>
+            </div>
+            {showArtistForm && (
+              <div className="mt-4">
+                <ArtistInfoForm onSave={() => setShowArtistForm(false)} />
+              </div>
+            )}
           </div>
         </div>
 
-        {showArtistForm && (
-          <div className="mb-8">
-            <ArtistInfoForm onSave={() => setShowArtistForm(false)} />
+        {/* Track Management Section */}
+        <div className="mb-8 bg-dark-200 rounded-lg overflow-hidden">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-white">Track Management</h2>
+                <p className="text-gray-400 mt-1">
+                  Upload new tracks or edit existing ones in your collection.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowUploadForm(!showUploadForm)}
+                className="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors flex items-center gap-2"
+              >
+                <PlusIcon className="h-5 w-5" />
+                Upload New Track
+              </button>
+            </div>
+            {showUploadForm && (
+              <div className="mt-4">
+                <TrackUploadForm onUploadComplete={() => {
+                  fetchTracks();
+                  setShowUploadForm(false);
+                }} />
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
-        {showUploadForm && (
-          <div className="mb-8">
-            <TrackUploadForm onUploadComplete={fetchTracks} />
-          </div>
-        )}
-
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Track Management</h2>
-            <p className="mt-2 text-sm text-gray-400">
-              Upload new tracks or edit existing ones in your collection.
-            </p>
-          </div>
-
-          <div className="mt-12">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-white">Your Tracks</h3>
-              <div className="flex items-center space-x-2">
+        {/* Your Tracks Section */}
+        <div className="bg-dark-200 rounded-lg overflow-hidden">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-white">Your Tracks</h2>
+                <p className="text-gray-400 mt-1">
+                  View and manage your uploaded tracks.
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-dark-300 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <ListBulletIcon className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === 'grid'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-dark-300 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <Squares2X2Icon className="h-5 w-5" />
+                  </button>
+                </div>
                 <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-primary-500 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-dark-300'
-                  }`}
-                  title="List view"
+                  onClick={() => setShowTracks(!showTracks)}
+                  className="px-4 py-2 bg-dark-300 text-white rounded-lg font-medium hover:bg-dark-400 transition-colors flex items-center gap-2"
                 >
-                  <ListBulletIcon className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'grid'
-                      ? 'bg-primary-500 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-dark-300'
-                  }`}
-                  title="Grid view"
-                >
-                  <Squares2X2Icon className="h-5 w-5" />
+                  {showTracks ? (
+                    <>
+                      <ChevronUpIcon className="h-5 w-5" />
+                      Hide Tracks
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDownIcon className="h-5 w-5" />
+                      Show Tracks
+                    </>
+                  )}
                 </button>
               </div>
             </div>
-            <div className={viewMode === 'grid' 
-              ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3"
-              : "space-y-4"
-            }>
-              {tracks.map((track) => (
-                <div
-                  key={track.id}
-                  className={`bg-dark-200 rounded-lg overflow-hidden ${
-                    viewMode === 'list' ? 'flex' : ''
-                  }`}
-                >
-                  <div className={`relative ${viewMode === 'list' ? 'w-48 flex-shrink-0' : 'aspect-square'}`}>
-                    <img
-                      src={track.thumbnail_url}
-                      alt={track.title}
-                      className={`w-full h-full object-cover ${
-                        viewMode === 'list' ? 'h-48' : ''
-                      }`}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-4">
-                      <div className="w-full">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-white">
-                            {new Date(track.created_at).toLocaleDateString()}
-                          </span>
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs ${
-                              track.is_published
-                                ? 'bg-green-500/20 text-green-400'
-                                : 'bg-yellow-500/20 text-yellow-400'
-                            }`}
+
+            {showTracks && (
+              <div className="mt-4">
+                {isLoading ? (
+                  <div className="text-white">Loading tracks...</div>
+                ) : error ? (
+                  <div className="text-red-500">{error}</div>
+                ) : tracks.length === 0 ? (
+                  <div className="text-gray-400">No tracks uploaded yet.</div>
+                ) : viewMode === 'list' ? (
+                  <div className="space-y-4">
+                    {tracks.map((track) => (
+                      <div
+                        key={track.id}
+                        className="bg-dark-300 p-4 rounded-lg flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-4">
+                          <img
+                            src={track.thumbnail_url}
+                            alt={track.title}
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                          <div>
+                            <h3 className="text-white font-medium">{track.title}</h3>
+                            <p className="text-gray-400 text-sm">
+                              {track.description || 'No description'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setEditingTrack(track)}
+                            className="p-2 text-gray-400 hover:text-white transition-colors"
                           >
-                            {track.is_published ? 'Published' : 'Draft'}
-                          </span>
+                            <PencilIcon className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(track)}
+                            className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
                         </div>
                       </div>
-                    </div>
-                    <div className="absolute top-2 right-2 flex space-x-2">
-                      <button
-                        onClick={() => handleEdit(track)}
-                        className="p-2 bg-dark-200/80 rounded-full text-gray-400 hover:text-white transition-colors"
-                        title="Edit track"
-                      >
-                        <PencilIcon className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => setDeletingTrack(track)}
-                        className="p-2 bg-dark-200/80 rounded-full text-gray-400 hover:text-red-400 transition-colors"
-                        title="Delete track"
-                      >
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </div>
+                    ))}
                   </div>
-                  <div className={`p-4 ${viewMode === 'list' ? 'flex-grow' : ''}`}>
-                    <h4 className="text-lg font-semibold text-white">
-                      {track.title}
-                    </h4>
-                    {track.description && (
-                      <p className={`mt-1 text-sm text-gray-400 ${
-                        viewMode === 'grid' ? 'line-clamp-2' : ''
-                      }`}>
-                        {track.description}
-                      </p>
-                    )}
-                    {viewMode === 'list' && (
-                      <div className="mt-2 space-y-2">
-                        {track.composer_notes && (
-                          <p className="text-sm text-gray-400 line-clamp-2">
-                            <span className="font-medium text-gray-300">Composer Notes:</span> {track.composer_notes}
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {tracks.map((track) => (
+                      <div
+                        key={track.id}
+                        className="bg-dark-300 rounded-lg overflow-hidden"
+                      >
+                        <img
+                          src={track.thumbnail_url}
+                          alt={track.title}
+                          className="w-full h-48 object-cover"
+                        />
+                        <div className="p-4">
+                          <h3 className="text-white font-medium mb-2">{track.title}</h3>
+                          <p className="text-gray-400 text-sm mb-4">
+                            {track.description || 'No description'}
                           </p>
-                        )}
-                        {track.lyrics && (
-                          <p className="text-sm text-gray-400 line-clamp-2">
-                            <span className="font-medium text-gray-300">Lyrics:</span> {track.lyrics}
-                          </p>
-                        )}
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => setEditingTrack(track)}
+                              className="p-2 text-gray-400 hover:text-white transition-colors"
+                            >
+                              <PencilIcon className="h-5 w-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(track)}
+                              className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                            >
+                              <TrashIcon className="h-5 w-5" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    )}
+                    ))}
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Edit Modal */}
+        {/* Track Edit Modal */}
         {editingTrack && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="w-full max-w-2xl">
-              <TrackEditForm
-                track={editingTrack}
-                onSave={handleSave}
-                onCancel={handleCancel}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Delete Confirmation Modal */}
-        {deletingTrack && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-dark-200 rounded-lg p-6 max-w-md w-full">
-              <h3 className="text-lg font-medium text-white mb-4">Delete Track</h3>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to delete "{deletingTrack.title}"? This action cannot be undone.
-              </p>
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={() => setDeletingTrack(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
-                  disabled={isDeleting}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleDelete(deletingTrack)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? 'Deleting...' : 'Delete Track'}
-                </button>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-dark-200 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-semibold text-white">Edit Track</h3>
+                  <button
+                    onClick={() => setEditingTrack(null)}
+                    className="p-2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                </div>
+                <TrackEditForm
+                  track={editingTrack}
+                  onSave={handleSave}
+                  onCancel={handleCancel}
+                />
               </div>
             </div>
           </div>
