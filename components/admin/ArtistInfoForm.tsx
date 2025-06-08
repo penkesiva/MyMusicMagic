@@ -8,6 +8,12 @@ import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
 type ArtistInfo = Database['public']['Tables']['artist_info']['Row']
 type ArtistLink = Database['public']['Tables']['artist_links']['Row']
 
+// Define a type for the form data that includes the new fields
+type ArtistInfoFormData = Omit<ArtistInfo, 'created_at' | 'updated_at' | 'user_id'> & {
+  use_same_text: boolean
+  footer_text: string | null
+}
+
 interface ArtistInfoFormProps {
   onSave: () => void
 }
@@ -17,7 +23,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [artistInfo, setArtistInfo] = useState<Partial<ArtistInfo>>({
+  const [artistInfo, setArtistInfo] = useState<Partial<ArtistInfoFormData>>({
     about_text: '',
     photo_url: '',
     use_same_text: true,
