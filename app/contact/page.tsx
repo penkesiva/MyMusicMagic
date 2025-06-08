@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { HomeButton } from '@/app/components/HomeButton'
 
 export default function ContactPage() {
@@ -10,13 +10,13 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const supabase = createClient()
+  const supabase = createClientComponentClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
     setError(null)
     setSuccess(false)
-    setIsSubmitting(true)
 
     try {
       // Validate email
@@ -32,23 +32,34 @@ export default function ContactPage() {
         throw new Error('Message must be 100 words or less')
       }
 
-      // Store in Supabase
-      const { error: dbError } = await supabase
-        .from('messages')
-        .insert([
-          {
-            email,
-            message,
-            created_at: new Date().toISOString()
-          }
-        ])
+      console.log('Starting form submission...');
+      console.log('Attempting to insert message:', { email, message });
 
-      if (dbError) throw dbError
+      // Store in Supabase using the function
+      const { data, error: dbError } = await supabase
+        .rpc('insert_message', {
+          p_email: email,
+          p_message: message
+        });
 
+      console.log('RPC Response:', { data, error: dbError });
+
+      if (dbError) {
+        console.error('Database error:', {
+          code: dbError.code,
+          message: dbError.message,
+          details: dbError.details,
+          hint: dbError.hint
+        });
+        throw dbError;
+      }
+
+      console.log('Message inserted successfully:', data);
       setSuccess(true)
       setEmail('')
       setMessage('')
     } catch (err) {
+      console.error('Full error object:', err);
       setError(err instanceof Error ? err.message : 'Failed to send message')
     } finally {
       setIsSubmitting(false)
