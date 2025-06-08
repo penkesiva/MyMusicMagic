@@ -1,13 +1,23 @@
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
+// @ts-ignore
 import { Resend } from 'https://esm.sh/resend@2.0.0'
+
+// Add Deno types
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
+  serve(handler: (req: Request) => Promise<Response>): void;
+};
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -15,7 +25,7 @@ Deno.serve(async (req) => {
 
   try {
     // Get the request body
-    const { email, message } = await req.json()
+    const { email, message } = await req.json() as { email: string; message: string }
     console.log('Received contact form submission:', { email, message })
 
     // Get environment variables
@@ -64,12 +74,15 @@ Deno.serve(async (req) => {
         status: 200,
       },
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in send-contact-email function:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+    const errorDetails = error instanceof Error ? error.stack : 'No stack trace'
+    
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: error instanceof Error ? error.stack : 'No stack trace'
+        error: errorMessage,
+        details: errorDetails
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
