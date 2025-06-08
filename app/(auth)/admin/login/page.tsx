@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -12,6 +12,26 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        // Check if user has admin role
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+        
+        if (profile?.role === 'admin') {
+          router.push('/admin')
+        }
+      }
+    }
+    checkUser()
+  }, [supabase, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,10 +47,10 @@ export default function AdminLoginPage() {
         })
         if (error) throw error
         if (data.user) {
-          // Create profile with default role
+          // Create profile with admin role
           const { error: profileError } = await supabase
             .from('profiles')
-            .insert([{ id: data.user.id, role: 'user' }])
+            .insert([{ id: data.user.id, role: 'admin' }])
           if (profileError) throw profileError
           alert('Account created! Please check your email for verification.')
         }
@@ -42,11 +62,25 @@ export default function AdminLoginPage() {
         })
         if (error) throw error
         if (data.user) {
+          // Check if user has admin role
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single()
+          
+          if (profileError) throw profileError
+          if (profile?.role !== 'admin') {
+            throw new Error('You do not have admin privileges')
+          }
+          
           router.push('/admin')
         }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
+      // Sign out if there's an error
+      await supabase.auth.signOut()
     } finally {
       setIsLoading(false)
     }
