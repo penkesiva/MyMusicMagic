@@ -12,6 +12,9 @@ type ArtistLink = Database['public']['Tables']['artist_links']['Row']
 type ArtistInfoFormData = Omit<ArtistInfo, 'created_at' | 'updated_at' | 'user_id'> & {
   use_same_text: boolean
   footer_text: string | null
+  homepage_title: string
+  homepage_description: string
+  homepage_hero_url: string
 }
 
 interface ArtistInfoFormProps {
@@ -28,10 +31,14 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
     photo_url: '',
     use_same_text: true,
     footer_text: '',
+    homepage_title: 'My Music Magic',
+    homepage_description: 'Discover a collection of carefully crafted musical compositions, each telling its own unique story through melody and rhythm.',
+    homepage_hero_url: '/hero-bg.jpg',
   })
   const [links, setLinks] = useState<Array<{ id?: string; title: string; url: string }>>([])
   const [newLink, setNewLink] = useState({ title: '', url: '' })
   const photoFileRef = useRef<HTMLInputElement>(null)
+  const heroImageFileRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -119,11 +126,12 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
       if (!user) throw new Error('Not authenticated')
 
       let photoUrl = artistInfo.photo_url
+      let heroImageUrl = artistInfo.homepage_hero_url
 
       // Upload new photo if one was selected
       if (photoFileRef.current?.files?.[0]) {
         const photoFile = photoFileRef.current.files[0]
-        const photoPath = `${user.id}/${Date.now()}-${photoFile.name}`
+        const photoPath = `${user.id}/artist-photos/${Date.now()}-${photoFile.name}`
         const { error: uploadError } = await supabase.storage
           .from('artist-photos')
           .upload(photoPath, photoFile, {
@@ -140,6 +148,26 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
         photoUrl = urlData.publicUrl
       }
 
+      // Upload new hero image if one was selected
+      if (heroImageFileRef.current?.files?.[0]) {
+        const heroFile = heroImageFileRef.current.files[0]
+        const heroPath = `${user.id}/hero-images/${Date.now()}-${heroFile.name}`
+        const { error: uploadError } = await supabase.storage
+          .from('hero-images')
+          .upload(heroPath, heroFile, {
+            cacheControl: '3600',
+            upsert: false
+          })
+
+        if (uploadError) throw uploadError
+
+        const { data: urlData } = supabase.storage
+          .from('hero-images')
+          .getPublicUrl(heroPath)
+
+        heroImageUrl = urlData.publicUrl
+      }
+
       // Create or update artist info
       const artistInfoData = {
         about_text: artistInfo.about_text,
@@ -147,6 +175,9 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
         user_id: user.id,
         use_same_text: artistInfo.use_same_text ?? true,
         footer_text: artistInfo.use_same_text ? null : artistInfo.footer_text,
+        homepage_title: artistInfo.homepage_title || 'My Music Magic',
+        homepage_description: artistInfo.homepage_description || 'Discover a collection of carefully crafted musical compositions, each telling its own unique story through melody and rhythm.',
+        homepage_hero_url: heroImageUrl,
         updated_at: new Date().toISOString(),
       }
 
@@ -221,152 +252,220 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
       <div>
         <h2 className="text-xl font-semibold text-white mb-4">About the Artist</h2>
         
-        <div className="space-y-4">
-          <div>
-            <label
-              htmlFor="about_text"
-              className="block text-sm font-medium text-gray-300"
-            >
-              About Text
-            </label>
-            <textarea
-              id="about_text"
-              name="about_text"
-              value={artistInfo.about_text || ''}
-              onChange={handleInputChange}
-              rows={6}
-              className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Write about yourself..."
-            />
+        <div className="space-y-6">
+          {/* Homepage Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-white">Homepage Content</h3>
+            <div>
+              <label
+                htmlFor="homepage_title"
+                className="block text-sm font-medium text-gray-300"
+              >
+                Homepage Title
+              </label>
+              <input
+                type="text"
+                id="homepage_title"
+                name="homepage_title"
+                value={artistInfo.homepage_title || ''}
+                onChange={handleInputChange}
+                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter homepage title"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="homepage_description"
+                className="block text-sm font-medium text-gray-300"
+              >
+                Homepage Description
+              </label>
+              <textarea
+                id="homepage_description"
+                name="homepage_description"
+                value={artistInfo.homepage_description || ''}
+                onChange={handleInputChange}
+                rows={3}
+                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Enter homepage description"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="hero_image"
+                className="block text-sm font-medium text-gray-300"
+              >
+                Homepage Hero Image
+              </label>
+              <input
+                type="file"
+                id="hero_image"
+                name="hero_image"
+                ref={heroImageFileRef}
+                accept="image/*"
+                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {artistInfo.homepage_hero_url && (
+                <div className="mt-2">
+                  <img
+                    src={artistInfo.homepage_hero_url}
+                    alt="Current hero image"
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
+          {/* About Text Section */}
           <div className="space-y-4">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="use_same_text"
-                name="use_same_text"
-                checked={artistInfo.use_same_text ?? true}
-                onChange={handleInputChange}
-                className="h-4 w-4 text-primary-500 focus:ring-primary-500 border-dark-400 rounded bg-dark-300"
-              />
+            <h3 className="text-lg font-medium text-white">About Text</h3>
+            <div>
               <label
-                htmlFor="use_same_text"
-                className="ml-2 block text-sm text-gray-300"
+                htmlFor="about_text"
+                className="block text-sm font-medium text-gray-300"
               >
-                Use the same text in the footer
+                About Text
               </label>
+              <textarea
+                id="about_text"
+                name="about_text"
+                value={artistInfo.about_text || ''}
+                onChange={handleInputChange}
+                rows={6}
+                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Write about yourself..."
+              />
             </div>
 
-            {!artistInfo.use_same_text && (
-              <div>
-                <label
-                  htmlFor="footer_text"
-                  className="block text-sm font-medium text-gray-300"
-                >
-                  Footer About Text
-                </label>
-                <textarea
-                  id="footer_text"
-                  name="footer_text"
-                  value={artistInfo.footer_text || ''}
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="use_same_text"
+                  name="use_same_text"
+                  checked={artistInfo.use_same_text ?? true}
                   onChange={handleInputChange}
-                  rows={4}
-                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="Write a shorter version for the footer..."
+                  className="h-4 w-4 text-primary-500 focus:ring-primary-500 border-dark-400 rounded bg-dark-300"
                 />
+                <label
+                  htmlFor="use_same_text"
+                  className="ml-2 block text-sm text-gray-300"
+                >
+                  Use the same text in the footer
+                </label>
               </div>
-            )}
-          </div>
 
-          <div>
-            <label
-              htmlFor="photo"
-              className="block text-sm font-medium text-gray-300"
-            >
-              Artist Photo
-            </label>
-            <input
-              type="file"
-              id="photo"
-              name="photo"
-              ref={photoFileRef}
-              accept="image/*"
-              className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            {artistInfo.photo_url && (
-              <div className="mt-2">
-                <img
-                  src={artistInfo.photo_url}
-                  alt="Current artist photo"
-                  className="w-32 h-32 object-cover rounded-lg"
-                />
-              </div>
-            )}
-          </div>
+              {!artistInfo.use_same_text && (
+                <div>
+                  <label
+                    htmlFor="footer_text"
+                    className="block text-sm font-medium text-gray-300"
+                  >
+                    Footer About Text
+                  </label>
+                  <textarea
+                    id="footer_text"
+                    name="footer_text"
+                    value={artistInfo.footer_text || ''}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Write a shorter version for the footer..."
+                  />
+                </div>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Social Links
-            </label>
-            <div className="space-y-2">
-              {links.map((link, index) => (
-                <div key={index} className="flex items-center gap-2">
+            <div>
+              <label
+                htmlFor="photo"
+                className="block text-sm font-medium text-gray-300"
+              >
+                Artist Photo
+              </label>
+              <input
+                type="file"
+                id="photo"
+                name="photo"
+                ref={photoFileRef}
+                accept="image/*"
+                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {artistInfo.photo_url && (
+                <div className="mt-2">
+                  <img
+                    src={artistInfo.photo_url}
+                    alt="Current artist photo"
+                    className="w-32 h-32 object-cover rounded-lg"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Social Links
+              </label>
+              <div className="space-y-2">
+                {links.map((link, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={link.title}
+                      onChange={(e) => {
+                        const newLinks = [...links]
+                        newLinks[index].title = e.target.value
+                        setLinks(newLinks)
+                      }}
+                      placeholder="Link title (e.g., YouTube)"
+                      className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    <input
+                      type="url"
+                      value={link.url}
+                      onChange={(e) => {
+                        const newLinks = [...links]
+                        newLinks[index].url = e.target.value
+                        setLinks(newLinks)
+                      }}
+                      placeholder="URL"
+                      className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeLink(index)}
+                      className="p-2 text-gray-400 hover:text-white transition-colors"
+                    >
+                      <XMarkIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                ))}
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    value={link.title}
-                    onChange={(e) => {
-                      const newLinks = [...links]
-                      newLinks[index].title = e.target.value
-                      setLinks(newLinks)
-                    }}
-                    placeholder="Link title (e.g., YouTube)"
+                    name="title"
+                    value={newLink.title}
+                    onChange={handleNewLinkChange}
+                    placeholder="New link title"
                     className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
                   <input
                     type="url"
-                    value={link.url}
-                    onChange={(e) => {
-                      const newLinks = [...links]
-                      newLinks[index].url = e.target.value
-                      setLinks(newLinks)
-                    }}
-                    placeholder="URL"
+                    name="url"
+                    value={newLink.url}
+                    onChange={handleNewLinkChange}
+                    placeholder="New link URL"
                     className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
                   <button
                     type="button"
-                    onClick={() => removeLink(index)}
+                    onClick={addLink}
                     className="p-2 text-gray-400 hover:text-white transition-colors"
                   >
-                    <XMarkIcon className="h-5 w-5" />
+                    <PlusIcon className="h-5 w-5" />
                   </button>
                 </div>
-              ))}
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  name="title"
-                  value={newLink.title}
-                  onChange={handleNewLinkChange}
-                  placeholder="New link title"
-                  className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                <input
-                  type="url"
-                  name="url"
-                  value={newLink.url}
-                  onChange={handleNewLinkChange}
-                  placeholder="New link URL"
-                  className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={addLink}
-                  className="p-2 text-gray-400 hover:text-white transition-colors"
-                >
-                  <PlusIcon className="h-5 w-5" />
-                </button>
               </div>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Squares2X2Icon, ListBulletIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { FaPlay, FaPause } from 'react-icons/fa'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import Link from 'next/link'
 
 type Track = Database['public']['Tables']['tracks']['Row']
 type ArtistInfo = Database['public']['Tables']['artist_info']['Row']
@@ -17,6 +18,9 @@ type ArtistLink = Database['public']['Tables']['artist_links']['Row']
 type ExtendedArtistInfo = Database['public']['Tables']['artist_info']['Row'] & {
   use_same_text?: boolean;
   footer_text?: string | null;
+  homepage_title?: string;
+  homepage_description?: string;
+  homepage_hero_url?: string;
 };
 
 type ViewMode = 'list' | 'grid'
@@ -146,34 +150,30 @@ export default function HomePage() {
   const remainingTracks = tracks.slice(3)
 
   return (
-    <div className="min-h-screen bg-dark-100">
+    <main className="min-h-screen bg-dark-100">
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/hero-bg.jpg"
-            alt="Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-dark-100/40 to-dark-100/90" />
-        </div>
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div 
+        className="relative h-[80vh] flex items-center justify-center bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${artistInfo?.homepage_hero_url || '/hero-bg.jpg'})`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
-            My Music Magic
+            {artistInfo?.homepage_title || 'My Music Magic'}
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Discover a collection of carefully crafted musical compositions,
-            each telling its own unique story through melody and rhythm.
+          <p className="text-xl sm:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+            {artistInfo?.homepage_description || 'Discover a collection of carefully crafted musical compositions, each telling its own unique story through melody and rhythm.'}
           </p>
-          <a
-            href="#featured"
-            className="inline-block px-8 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors"
+          <Link
+            href="#music"
+            className="inline-block bg-primary-500 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-600 transition-colors"
           >
-            Explore Tracks
-          </a>
+            Explore Music
+          </Link>
         </div>
-      </section>
+      </div>
 
       {/* Featured Tracks Section */}
       <section 
@@ -496,6 +496,6 @@ export default function HomePage() {
           </div>
         </div>
       )}
-    </div>
+    </main>
   )
 } 
