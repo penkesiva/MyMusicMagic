@@ -324,32 +324,83 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <footer className="bg-dark-200 py-12">
+      <footer className="bg-dark-200 py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="prose prose-invert">
-              <p className="text-gray-400 mb-4">
-                {artistInfo && (
-                  artistInfo.use_same_text === false && artistInfo.footer_text 
-                    ? artistInfo.footer_text 
-                    : artistInfo.about_text
-                )}
-              </p>
-              {artistLinks.length > 0 && (
-                <div className="flex space-x-4">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 max-w-6xl mx-auto">
+            {/* About Section - Takes 7 columns (60%) */}
+            <div className="md:col-span-7 space-y-4">
+              <h3 className="text-xl font-semibold text-white">About the Artist</h3>
+              <div className="prose prose-invert max-w-none">
+                <p className="text-gray-400 text-base leading-relaxed">
+                  {artistInfo && (
+                    artistInfo.use_same_text === false && artistInfo.footer_text 
+                      ? artistInfo.footer_text 
+                      : artistInfo.about_text
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Links - Takes 2 columns */}
+            <div className="md:col-span-2 space-y-4">
+              <h3 className="text-lg font-semibold text-white">Quick Links</h3>
+              <nav className="space-y-3">
+                <a
+                  href="/"
+                  className="block text-gray-400 hover:text-white transition-colors"
+                >
+                  Home
+                </a>
+                <a
+                  href="/tracks"
+                  className="block text-gray-400 hover:text-white transition-colors"
+                >
+                  Tracks
+                </a>
+                <a
+                  href="/gallery"
+                  className="block text-gray-400 hover:text-white transition-colors"
+                >
+                  Gallery
+                </a>
+                <a
+                  href="/contact"
+                  className="block text-gray-400 hover:text-white transition-colors"
+                >
+                  Contact
+                </a>
+              </nav>
+            </div>
+
+            {/* Social Links - Takes 3 columns */}
+            <div className="md:col-span-3 space-y-4">
+              <h3 className="text-lg font-semibold text-white">Connect</h3>
+              {artistLinks.length > 0 ? (
+                <div className="space-y-3">
                   {artistLinks.map((link) => (
                     <a
                       key={link.id}
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="block text-gray-400 hover:text-white transition-colors"
                     >
                       {link.title}
                     </a>
                   ))}
                 </div>
+              ) : (
+                <p className="text-gray-400">No social links available</p>
               )}
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="mt-16 pt-8 border-t border-dark-300">
+            <div className="max-w-6xl mx-auto text-center">
+              <p className="text-gray-400 text-sm">
+                © {new Date().getFullYear()} My Music Magic. All rights reserved.
+              </p>
             </div>
           </div>
         </div>
