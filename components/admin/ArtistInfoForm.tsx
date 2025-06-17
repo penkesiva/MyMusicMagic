@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
-import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, XMarkIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 
 type ArtistInfo = Database['public']['Tables']['artist_info']['Row']
 type ArtistLink = Database['public']['Tables']['artist_links']['Row']
@@ -37,6 +37,8 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
   })
   const [links, setLinks] = useState<Array<{ id?: string; title: string; url: string }>>([])
   const [newLink, setNewLink] = useState({ title: '', url: '' })
+  const [showImageGuidelines, setShowImageGuidelines] = useState(false)
+  const [showPhotoGuidelines, setShowPhotoGuidelines] = useState(false)
   const photoFileRef = useRef<HTMLInputElement>(null)
   const heroImageFileRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
@@ -299,16 +301,38 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
               </label>
               
               {/* Image Guidelines */}
-              <div className="mt-2 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-300 mb-2">📸 Image Guidelines</h4>
-                <ul className="text-xs text-blue-200 space-y-1">
-                  <li>• <strong>Recommended size:</strong> 1920×1080 pixels (16:9 aspect ratio)</li>
-                  <li>• <strong>Minimum size:</strong> 1200×675 pixels</li>
-                  <li>• <strong>File format:</strong> JPG, PNG, or WebP</li>
-                  <li>• <strong>File size:</strong> Under 5MB for fast loading</li>
-                  <li>• <strong>Content:</strong> High contrast, avoid text-heavy images</li>
-                  <li>• <strong>Focus:</strong> Center the main subject for best mobile display</li>
-                </ul>
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowImageGuidelines(!showImageGuidelines)}
+                  className="flex items-center text-sm text-blue-300 hover:text-blue-200 transition-colors mb-2"
+                >
+                  {showImageGuidelines ? (
+                    <>
+                      <ChevronUpIcon className="h-4 w-4 mr-1" />
+                      Hide Image Guidelines
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDownIcon className="h-4 w-4 mr-1" />
+                      Show Image Guidelines
+                    </>
+                  )}
+                </button>
+                
+                {showImageGuidelines && (
+                  <div className="p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                    <h4 className="text-sm font-medium text-blue-300 mb-2">📸 Image Guidelines</h4>
+                    <ul className="text-xs text-blue-200 space-y-1">
+                      <li>• <strong>Recommended size:</strong> 1920×1080 pixels (16:9 aspect ratio)</li>
+                      <li>• <strong>Minimum size:</strong> 1200×675 pixels</li>
+                      <li>• <strong>File format:</strong> JPG, PNG, or WebP</li>
+                      <li>• <strong>File size:</strong> Under 5MB for fast loading</li>
+                      <li>• <strong>Content:</strong> High contrast, avoid text-heavy images</li>
+                      <li>• <strong>Focus:</strong> Center the main subject for best mobile display</li>
+                    </ul>
+                  </div>
+                )}
               </div>
 
               <input
@@ -376,17 +400,6 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                         </button>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Image Optimization Tips */}
-                  <div className="p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
-                    <h4 className="text-sm font-medium text-yellow-300 mb-2">💡 Optimization Tips</h4>
-                    <ul className="text-xs text-yellow-200 space-y-1">
-                      <li>• Use high-quality images with good lighting</li>
-                      <li>• Ensure the image works well with overlaid text</li>
-                      <li>• Test how it looks on both desktop and mobile devices</li>
-                      <li>• Consider the mood and atmosphere it creates</li>
-                    </ul>
                   </div>
                 </div>
               )}
@@ -484,16 +497,38 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
               </label>
               
               {/* Photo Guidelines */}
-              <div className="mt-2 p-4 bg-green-900/20 border border-green-500/30 rounded-lg">
-                <h4 className="text-sm font-medium text-green-300 mb-2">📷 Photo Guidelines</h4>
-                <ul className="text-xs text-green-200 space-y-1">
-                  <li>• <strong>Recommended size:</strong> 800×800 pixels (square format)</li>
-                  <li>• <strong>Minimum size:</strong> 400×400 pixels</li>
-                  <li>• <strong>File format:</strong> JPG, PNG, or WebP</li>
-                  <li>• <strong>File size:</strong> Under 2MB for fast loading</li>
-                  <li>• <strong>Style:</strong> Professional headshot or artistic portrait</li>
-                  <li>• <strong>Background:</strong> Simple, uncluttered background works best</li>
-                </ul>
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPhotoGuidelines(!showPhotoGuidelines)}
+                  className="flex items-center text-sm text-green-300 hover:text-green-200 transition-colors mb-2"
+                >
+                  {showPhotoGuidelines ? (
+                    <>
+                      <ChevronUpIcon className="h-4 w-4 mr-1" />
+                      Hide Photo Guidelines
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDownIcon className="h-4 w-4 mr-1" />
+                      Show Photo Guidelines
+                    </>
+                  )}
+                </button>
+                
+                {showPhotoGuidelines && (
+                  <div className="p-4 bg-green-900/20 border border-green-500/30 rounded-lg">
+                    <h4 className="text-sm font-medium text-green-300 mb-2">📷 Photo Guidelines</h4>
+                    <ul className="text-xs text-green-200 space-y-1">
+                      <li>• <strong>Recommended size:</strong> 800×800 pixels (square format)</li>
+                      <li>• <strong>Minimum size:</strong> 400×400 pixels</li>
+                      <li>• <strong>File format:</strong> JPG, PNG, or WebP</li>
+                      <li>• <strong>File size:</strong> Under 2MB for fast loading</li>
+                      <li>• <strong>Style:</strong> Professional headshot or artistic portrait</li>
+                      <li>• <strong>Background:</strong> Simple, uncluttered background works best</li>
+                    </ul>
+                  </div>
+                )}
               </div>
 
               <input
