@@ -32,6 +32,7 @@ export default function AdminPage() {
   const [deletingTrack, setDeletingTrack] = useState<Track | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [editSuccess, setEditSuccess] = useState(false)
+  const [showGalleryForm, setShowGalleryForm] = useState(false)
   const supabase = createClient()
 
   const fetchTracks = async () => {
@@ -166,13 +167,39 @@ export default function AdminPage() {
         {/* Gallery Management Section */}
         <div className="mb-8 bg-dark-200 rounded-lg overflow-hidden">
           <div className="p-6">
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-2">Gallery Management</h2>
-              <p className="text-gray-400 mb-4">
-                Upload images and add YouTube videos to showcase your musical journey.
-              </p>
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-white">Gallery Management</h2>
+                <p className="text-gray-400 mt-1">
+                  Upload images and add YouTube videos to showcase your musical journey.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowGalleryForm(!showGalleryForm)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  showGalleryForm 
+                    ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                    : 'bg-primary-500 hover:bg-primary-600 text-white'
+                }`}
+              >
+                {showGalleryForm ? (
+                  <>
+                    <ChevronUpIcon className="h-5 w-5" />
+                    Collapse
+                  </>
+                ) : (
+                  <>
+                    <ChevronDownIcon className="h-5 w-5" />
+                    Manage Gallery
+                  </>
+                )}
+              </button>
             </div>
-            <GalleryManagement />
+            {showGalleryForm && (
+              <div className="mt-4">
+                <GalleryManagement />
+              </div>
+            )}
           </div>
         </div>
 
