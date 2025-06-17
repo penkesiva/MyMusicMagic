@@ -269,7 +269,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                 name="homepage_title"
                 value={artistInfo.homepage_title || ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                 placeholder="Enter homepage title"
               />
             </div>
@@ -286,7 +286,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                 value={artistInfo.homepage_description || ''}
                 onChange={handleInputChange}
                 rows={3}
-                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                 placeholder="Enter homepage description"
               />
             </div>
@@ -338,7 +338,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                     reader.readAsDataURL(file)
                   }
                 }}
-                className="mt-3 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="mt-3 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
               
               {/* Current Image Preview with Editing */}
@@ -405,7 +405,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                   name="homepage_hero_url"
                   value={artistInfo.homepage_hero_url || ''}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                   placeholder="https://example.com/image.jpg"
                 />
                 <p className="mt-1 text-xs text-gray-500">
@@ -431,7 +431,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                 value={artistInfo.about_text || ''}
                 onChange={handleInputChange}
                 rows={6}
-                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                 placeholder="Write about yourself..."
               />
             </div>
@@ -468,7 +468,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                     value={artistInfo.footer_text || ''}
                     onChange={handleInputChange}
                     rows={4}
-                    className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                     placeholder="Write a shorter version for the footer..."
                   />
                 </div>
@@ -523,7 +523,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                     reader.readAsDataURL(file)
                   }
                 }}
-                className="mt-3 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="mt-3 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
               
               {/* Current Photo Preview with Editing */}
@@ -579,7 +579,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                   name="photo_url"
                   value={artistInfo.photo_url || ''}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                   placeholder="https://example.com/photo.jpg"
                 />
                 <p className="mt-1 text-xs text-gray-500">
@@ -604,7 +604,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                         setLinks(newLinks)
                       }}
                       placeholder="Link title (e.g., YouTube)"
-                      className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                     />
                     <input
                       type="url"
@@ -615,7 +615,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                         setLinks(newLinks)
                       }}
                       placeholder="URL"
-                      className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                     />
                     <button
                       type="button"
@@ -633,7 +633,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                     value={newLink.title}
                     onChange={handleNewLinkChange}
                     placeholder="New link title"
-                    className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                   />
                   <input
                     type="url"
@@ -641,7 +641,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                     value={newLink.url}
                     onChange={handleNewLinkChange}
                     placeholder="New link URL"
-                    className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                   />
                   <button
                     type="button"

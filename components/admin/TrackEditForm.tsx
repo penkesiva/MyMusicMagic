@@ -199,10 +199,10 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
           <input
             type="text"
             id="title"
-            value={title}
+            name="title"
+            value={track.title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-1 block w-full rounded-md bg-dark-300 border-dark-400 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            required
+            className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           />
         </div>
 
@@ -212,10 +212,11 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
           </label>
           <textarea
             id="description"
-            value={description}
+            name="description"
+            value={track.description || ''}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="mt-1 block w-full rounded-md bg-dark-300 border-dark-400 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           />
         </div>
 
@@ -225,10 +226,11 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
           </label>
           <textarea
             id="composerNotes"
-            value={composerNotes}
+            name="composer_notes"
+            value={track.composer_notes || ''}
             onChange={(e) => setComposerNotes(e.target.value)}
-            rows={4}
-            className="mt-1 block w-full rounded-md bg-dark-300 border-dark-400 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            rows={3}
+            className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           />
         </div>
 
@@ -238,10 +240,11 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
           </label>
           <textarea
             id="lyrics"
-            value={lyrics}
+            name="lyrics"
+            value={track.lyrics || ''}
             onChange={(e) => setLyrics(e.target.value)}
-            rows={6}
-            className="mt-1 block w-full rounded-md bg-dark-300 border-dark-400 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            rows={5}
+            className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
           />
         </div>
 

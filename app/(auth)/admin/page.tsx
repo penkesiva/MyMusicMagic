@@ -146,7 +146,7 @@ export default function AdminPage() {
                 {showArtistForm ? (
                   <>
                     <ChevronUpIcon className="h-4 w-4" />
-                    Collapse
+                    Edit Artist Info
                   </>
                 ) : (
                   <>
@@ -185,7 +185,7 @@ export default function AdminPage() {
                 {showGalleryForm ? (
                   <>
                     <ChevronUpIcon className="h-4 w-4" />
-                    Collapse
+                    Manage Gallery
                   </>
                 ) : (
                   <>
@@ -217,8 +217,17 @@ export default function AdminPage() {
                 onClick={() => setShowUploadForm(!showUploadForm)}
                 className="px-3 py-1.5 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors flex items-center gap-2"
               >
-                <PlusIcon className="h-4 w-4" />
-                Upload New Track
+                {showUploadForm ? (
+                  <>
+                    <ChevronUpIcon className="h-4 w-4" />
+                    Upload Track
+                  </>
+                ) : (
+                  <>
+                    <ChevronDownIcon className="h-4 w-4" />
+                    Upload Track
+                  </>
+                )}
               </button>
             </div>
             {showUploadForm && (
