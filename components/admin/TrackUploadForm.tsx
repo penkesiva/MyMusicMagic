@@ -373,14 +373,14 @@ export function TrackUploadForm({ onUploadComplete }: TrackUploadFormProps) {
             type="button"
             onClick={handleCancel}
             disabled={isUploading}
-            className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+            className="px-3 py-1.5 text-sm font-medium text-gray-300 hover:text-white transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isUploading}
-            className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1.5 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isUploading ? 'Uploading...' : 'Upload Track'}
           </button>

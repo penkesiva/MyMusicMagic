@@ -180,7 +180,7 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
               <button
                 type="button"
                 onClick={() => thumbnailFileRef.current?.click()}
-                className="px-4 py-2 bg-dark-300 text-white rounded-lg hover:bg-dark-400 transition-colors text-sm"
+                className="px-3 py-1.5 bg-dark-300 text-white rounded-lg hover:bg-dark-400 transition-colors text-sm font-medium"
               >
                 Change Thumbnail
               </button>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
 import GalleryUploadForm from './GalleryUploadForm'
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 
 type GalleryItem = Database['public']['Tables']['gallery']['Row']
 
@@ -87,7 +88,7 @@ export default function GalleryManagement() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">Gallery Management</h2>
+          <h2 className="text-2xl font-bold text-white">Add/Edit Gallery Item</h2>
           <button
             onClick={() => setShowForm(false)}
             className="text-gray-400 hover:text-white"
@@ -107,12 +108,11 @@ export default function GalleryManagement() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Gallery Management</h2>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+          className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200"
         >
-          Add Gallery Item
+          Add Item
         </button>
       </div>
 
@@ -190,19 +190,21 @@ export default function GalleryManagement() {
                         {formatDate(item.created_at)}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex space-x-2">
+                        <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleEdit(item)}
-                            className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
+                            className="p-2 text-blue-400 hover:text-blue-300 transition-colors duration-200"
+                            title="Edit gallery item"
                           >
-                            Edit
+                            <PencilIcon className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(item.id)}
                             disabled={deletingItem === item.id}
-                            className="text-red-400 hover:text-red-300 disabled:text-red-600 transition-colors duration-200"
+                            className="p-2 text-red-400 hover:text-red-300 disabled:text-red-600 transition-colors duration-200"
+                            title="Delete gallery item"
                           >
-                            {deletingItem === item.id ? 'Deleting...' : 'Delete'}
+                            <TrashIcon className="h-4 w-4" />
                           </button>
                         </div>
                       </td>

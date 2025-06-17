@@ -121,23 +121,23 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-100 py-8">
+    <div className="min-h-screen bg-dark-100 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold text-white mb-8">Admin Dashboard</h1>
+        <h1 className="text-xl font-bold text-white mb-6">Admin Dashboard</h1>
 
         {/* Artist Info Section */}
-        <div className="mb-8 bg-dark-200 rounded-lg overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
+        <div className="mb-6 bg-dark-200 rounded-lg overflow-hidden">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-3">
               <div>
-                <h2 className="text-xl font-semibold text-white">Artist Info</h2>
-                <p className="text-gray-400 mt-1">
+                <h2 className="text-lg font-semibold text-white">Artist Info</h2>
+                <p className="text-gray-400 text-sm mt-1">
                   Manage your artist profile, including bio, photo, and social links.
                 </p>
               </div>
               <button
                 onClick={() => setShowArtistForm(!showArtistForm)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                   showArtistForm 
                     ? 'bg-gray-600 hover:bg-gray-700 text-white' 
                     : 'bg-primary-500 hover:bg-primary-600 text-white'
@@ -145,19 +145,19 @@ export default function AdminPage() {
               >
                 {showArtistForm ? (
                   <>
-                    <ChevronUpIcon className="h-5 w-5" />
+                    <ChevronUpIcon className="h-4 w-4" />
                     Collapse
                   </>
                 ) : (
                   <>
-                    <ChevronDownIcon className="h-5 w-5" />
+                    <ChevronDownIcon className="h-4 w-4" />
                     Edit Artist Info
                   </>
                 )}
               </button>
             </div>
             {showArtistForm && (
-              <div className="mt-4">
+              <div className="mt-3">
                 <ArtistInfoForm onSave={() => setShowArtistForm(false)} />
               </div>
             )}
@@ -165,18 +165,18 @@ export default function AdminPage() {
         </div>
 
         {/* Gallery Management Section */}
-        <div className="mb-8 bg-dark-200 rounded-lg overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
+        <div className="mb-6 bg-dark-200 rounded-lg overflow-hidden">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-3">
               <div>
-                <h2 className="text-xl font-semibold text-white">Gallery Management</h2>
-                <p className="text-gray-400 mt-1">
+                <h2 className="text-lg font-semibold text-white">Gallery Management</h2>
+                <p className="text-gray-400 text-sm mt-1">
                   Upload images and add YouTube videos to showcase your musical journey.
                 </p>
               </div>
               <button
                 onClick={() => setShowGalleryForm(!showGalleryForm)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                   showGalleryForm 
                     ? 'bg-gray-600 hover:bg-gray-700 text-white' 
                     : 'bg-primary-500 hover:bg-primary-600 text-white'
@@ -184,19 +184,19 @@ export default function AdminPage() {
               >
                 {showGalleryForm ? (
                   <>
-                    <ChevronUpIcon className="h-5 w-5" />
+                    <ChevronUpIcon className="h-4 w-4" />
                     Collapse
                   </>
                 ) : (
                   <>
-                    <ChevronDownIcon className="h-5 w-5" />
+                    <ChevronDownIcon className="h-4 w-4" />
                     Manage Gallery
                   </>
                 )}
               </button>
             </div>
             {showGalleryForm && (
-              <div className="mt-4">
+              <div className="mt-3">
                 <GalleryManagement />
               </div>
             )}
@@ -204,25 +204,25 @@ export default function AdminPage() {
         </div>
 
         {/* Track Management Section */}
-        <div className="mb-8 bg-dark-200 rounded-lg overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
+        <div className="mb-6 bg-dark-200 rounded-lg overflow-hidden">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-3">
               <div>
-                <h2 className="text-xl font-semibold text-white">Track Management</h2>
-                <p className="text-gray-400 mt-1">
+                <h2 className="text-lg font-semibold text-white">Track Management</h2>
+                <p className="text-gray-400 text-sm mt-1">
                   Upload new tracks or edit existing ones in your collection.
                 </p>
               </div>
               <button
                 onClick={() => setShowUploadForm(!showUploadForm)}
-                className="px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors flex items-center gap-2"
+                className="px-3 py-1.5 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors flex items-center gap-2"
               >
-                <PlusIcon className="h-5 w-5" />
+                <PlusIcon className="h-4 w-4" />
                 Upload New Track
               </button>
             </div>
             {showUploadForm && (
-              <div className="mt-4">
+              <div className="mt-3">
                 <TrackUploadForm onUploadComplete={() => {
                   fetchTracks();
                   setShowUploadForm(false);
@@ -234,40 +234,40 @@ export default function AdminPage() {
 
         {/* Your Tracks Section */}
         <div className="bg-dark-200 rounded-lg overflow-hidden">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-3">
               <div>
-                <h2 className="text-xl font-semibold text-white">Your Tracks</h2>
-                <p className="text-gray-400 mt-1">
+                <h2 className="text-lg font-semibold text-white">Your Tracks</h2>
+                <p className="text-gray-400 text-sm mt-1">
                   Manage and organize your music collection.
                 </p>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-lg transition-colors ${
+                    className={`p-1.5 rounded-lg transition-colors ${
                       viewMode === 'list' 
                         ? 'bg-primary-500 text-white' 
                         : 'bg-gray-600 text-gray-300 hover:bg-gray-700'
                     }`}
                   >
-                    <ListBulletIcon className="h-5 w-5" />
+                    <ListBulletIcon className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-lg transition-colors ${
+                    className={`p-1.5 rounded-lg transition-colors ${
                       viewMode === 'grid' 
                         ? 'bg-primary-500 text-white' 
                         : 'bg-gray-600 text-gray-300 hover:bg-gray-700'
                     }`}
                   >
-                    <Squares2X2Icon className="h-5 w-5" />
+                    <Squares2X2Icon className="h-4 w-4" />
                   </button>
                 </div>
                 <button
                   onClick={() => setShowTracks(!showTracks)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                     showTracks 
                       ? 'bg-gray-600 hover:bg-gray-700 text-white' 
                       : 'bg-primary-500 hover:bg-primary-600 text-white'
@@ -275,12 +275,12 @@ export default function AdminPage() {
                 >
                   {showTracks ? (
                     <>
-                      <ChevronUpIcon className="h-5 w-5" />
+                      <ChevronUpIcon className="h-4 w-4" />
                       Hide Tracks
                     </>
                   ) : (
                     <>
-                      <ChevronDownIcon className="h-5 w-5" />
+                      <ChevronDownIcon className="h-4 w-4" />
                       Show Tracks
                     </>
                   )}
@@ -288,38 +288,38 @@ export default function AdminPage() {
               </div>
             </div>
             {showTracks && (
-              <div className="mt-4">
+              <div className="mt-3">
                 {viewMode === 'list' ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {tracks.map((track) => (
-                      <div key={track.id} className="bg-dark-300 rounded-lg p-4">
+                      <div key={track.id} className="bg-dark-300 rounded-lg p-3">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3">
                             <img
                               src={track.thumbnail_url}
                               alt={track.title}
-                              className="w-16 h-16 rounded-lg object-cover"
+                              className="w-12 h-12 rounded-lg object-cover"
                             />
                             <div>
-                              <h3 className="text-white font-medium">{track.title}</h3>
-                              <p className="text-gray-400 text-sm">{track.description}</p>
+                              <h3 className="text-white font-medium text-sm">{track.title}</h3>
+                              <p className="text-gray-400 text-xs">{track.description}</p>
                               <p className="text-gray-500 text-xs">
                                 {new Date(track.created_at).toLocaleDateString()}
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleEdit(track)}
-                              className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
+                              className="p-1.5 text-blue-400 hover:text-blue-300 transition-colors"
                             >
-                              <PencilIcon className="h-5 w-5" />
+                              <PencilIcon className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => setDeletingTrack(track)}
-                              className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                              className="p-1.5 text-red-400 hover:text-red-300 transition-colors"
                             >
-                              <TrashIcon className="h-5 w-5" />
+                              <TrashIcon className="h-4 w-4" />
                             </button>
                           </div>
                         </div>
@@ -327,33 +327,33 @@ export default function AdminPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {tracks.map((track) => (
                       <div key={track.id} className="bg-dark-300 rounded-lg overflow-hidden">
                         <img
                           src={track.thumbnail_url}
                           alt={track.title}
-                          className="w-full h-48 object-cover"
+                          className="w-full h-32 object-cover"
                         />
-                        <div className="p-4">
-                          <h3 className="text-white font-medium mb-2">{track.title}</h3>
-                          <p className="text-gray-400 text-sm mb-3">{track.description}</p>
+                        <div className="p-3">
+                          <h3 className="text-white font-medium text-sm mb-1">{track.title}</h3>
+                          <p className="text-gray-400 text-xs mb-2">{track.description}</p>
                           <div className="flex items-center justify-between">
                             <p className="text-gray-500 text-xs">
                               {new Date(track.created_at).toLocaleDateString()}
                             </p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                               <button
                                 onClick={() => handleEdit(track)}
-                                className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
+                                className="p-1.5 text-blue-400 hover:text-blue-300 transition-colors"
                               >
-                                <PencilIcon className="h-5 w-5" />
+                                <PencilIcon className="h-4 w-4" />
                               </button>
                               <button
                                 onClick={() => setDeletingTrack(track)}
-                                className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                                className="p-1.5 text-red-400 hover:text-red-300 transition-colors"
                               >
-                                <TrashIcon className="h-5 w-5" />
+                                <TrashIcon className="h-4 w-4" />
                               </button>
                             </div>
                           </div>
@@ -369,14 +369,14 @@ export default function AdminPage() {
 
         {/* Success Message */}
         {editSuccess && (
-          <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+          <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm">
             Track updated successfully!
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+          <div className="fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm">
             {error}
           </div>
         )}
@@ -384,14 +384,14 @@ export default function AdminPage() {
         {/* Edit Track Modal */}
         {editingTrack && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-dark-200 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-white">Edit Track</h2>
+            <div className="bg-dark-200 rounded-lg p-4 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="text-lg font-semibold text-white">Edit Track</h2>
                 <button
                   onClick={handleCancel}
                   className="text-gray-400 hover:text-white"
                 >
-                  <XMarkIcon className="h-6 w-6" />
+                  <XMarkIcon className="h-5 w-5" />
                 </button>
               </div>
               <TrackEditForm
@@ -406,22 +406,22 @@ export default function AdminPage() {
         {/* Delete Confirmation Modal */}
         {deletingTrack && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-dark-200 rounded-lg p-6 w-full max-w-md">
-              <h2 className="text-xl font-semibold text-white mb-4">Delete Track</h2>
-              <p className="text-gray-300 mb-6">
+            <div className="bg-dark-200 rounded-lg p-4 w-full max-w-md">
+              <h2 className="text-lg font-semibold text-white mb-3">Delete Track</h2>
+              <p className="text-gray-300 text-sm mb-4">
                 Are you sure you want to delete "{deletingTrack.title}"? This action cannot be undone.
               </p>
-              <div className="flex justify-end gap-4">
+              <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setDeletingTrack(null)}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm hover:bg-gray-700 transition-colors"
                   disabled={isDeleting}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleDelete(deletingTrack)}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                  className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors"
                   disabled={isDeleting}
                 >
                   {isDeleting ? 'Deleting...' : 'Delete'}
