@@ -134,6 +134,61 @@ export interface Database {
           artist_info_id?: string
         }
       }
+      gallery: {
+        Row: {
+          id: string
+          title: string
+          image_url: string
+          video_url: string | null
+          media_type: string
+          description: string | null
+          date: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          image_url: string
+          video_url?: string | null
+          media_type?: string
+          description?: string | null
+          date?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          image_url?: string
+          video_url?: string | null
+          media_type?: string
+          description?: string | null
+          date?: string
+          created_at?: string
+        }
+      }
+      messages: {
+        Row: {
+          id: string
+          email: string
+          message: string
+          created_at: string
+          is_read: boolean
+        }
+        Insert: {
+          id?: string
+          email: string
+          message: string
+          created_at?: string
+          is_read?: boolean
+        }
+        Update: {
+          id?: string
+          email?: string
+          message?: string
+          created_at?: string
+          is_read?: boolean
+        }
+      }
     }
     Views: {
       [_ in never]: never
