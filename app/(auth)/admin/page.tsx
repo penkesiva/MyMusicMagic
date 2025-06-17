@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { TrackUploadForm } from '@/components/admin/TrackUploadForm'
 import { TrackEditForm } from '@/components/admin/TrackEditForm'
 import { ArtistInfoForm } from '@/components/admin/ArtistInfoForm'
+import GalleryManagement from '@/components/admin/GalleryManagement'
 import { Database } from '@/types/database'
 import { 
   PencilIcon, 
@@ -162,6 +163,19 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Gallery Management Section */}
+        <div className="mb-8 bg-dark-200 rounded-lg overflow-hidden">
+          <div className="p-6">
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-2">Gallery Management</h2>
+              <p className="text-gray-400 mb-4">
+                Upload images and add YouTube videos to showcase your musical journey.
+              </p>
+            </div>
+            <GalleryManagement />
+          </div>
+        </div>
+
         {/* Track Management Section */}
         <div className="mb-8 bg-dark-200 rounded-lg overflow-hidden">
           <div className="p-6">
@@ -198,7 +212,7 @@ export default function AdminPage() {
               <div>
                 <h2 className="text-xl font-semibold text-white">Your Tracks</h2>
                 <p className="text-gray-400 mt-1">
-                  View and manage your uploaded tracks.
+                  Manage and organize your music collection.
                 </p>
               </div>
               <div className="flex items-center gap-4">
@@ -206,9 +220,9 @@ export default function AdminPage() {
                   <button
                     onClick={() => setViewMode('list')}
                     className={`p-2 rounded-lg transition-colors ${
-                      viewMode === 'list'
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-dark-300 text-gray-400 hover:text-white'
+                      viewMode === 'list' 
+                        ? 'bg-primary-500 text-white' 
+                        : 'bg-gray-600 text-gray-300 hover:bg-gray-700'
                     }`}
                   >
                     <ListBulletIcon className="h-5 w-5" />
@@ -216,9 +230,9 @@ export default function AdminPage() {
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`p-2 rounded-lg transition-colors ${
-                      viewMode === 'grid'
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-dark-300 text-gray-400 hover:text-white'
+                      viewMode === 'grid' 
+                        ? 'bg-primary-500 text-white' 
+                        : 'bg-gray-600 text-gray-300 hover:bg-gray-700'
                     }`}
                   >
                     <Squares2X2Icon className="h-5 w-5" />
@@ -226,7 +240,11 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={() => setShowTracks(!showTracks)}
-                  className="px-4 py-2 bg-dark-300 text-white rounded-lg font-medium hover:bg-dark-400 transition-colors flex items-center gap-2"
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                    showTracks 
+                      ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                      : 'bg-primary-500 hover:bg-primary-600 text-white'
+                  }`}
                 >
                   {showTracks ? (
                     <>
@@ -242,73 +260,31 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
-
             {showTracks && (
               <div className="mt-4">
-                {isLoading ? (
-                  <div className="text-white">Loading tracks...</div>
-                ) : error ? (
-                  <div className="text-red-500">{error}</div>
-                ) : tracks.length === 0 ? (
-                  <div className="text-gray-400">No tracks uploaded yet.</div>
-                ) : viewMode === 'list' ? (
+                {viewMode === 'list' ? (
                   <div className="space-y-4">
                     {tracks.map((track) => (
-                      <div
-                        key={track.id}
-                        className="bg-dark-300 p-4 rounded-lg flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={track.thumbnail_url}
-                            alt={track.title}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                          <div>
-                            <h3 className="text-white font-medium">{track.title}</h3>
-                            <p className="text-gray-400 text-sm">
-                              {track.description || 'No description'}
-                            </p>
+                      <div key={track.id} className="bg-dark-300 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <img
+                              src={track.thumbnail_url}
+                              alt={track.title}
+                              className="w-16 h-16 rounded-lg object-cover"
+                            />
+                            <div>
+                              <h3 className="text-white font-medium">{track.title}</h3>
+                              <p className="text-gray-400 text-sm">{track.description}</p>
+                              <p className="text-gray-500 text-xs">
+                                {new Date(track.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setEditingTrack(track)}
-                            className="p-2 text-gray-400 hover:text-white transition-colors"
-                          >
-                            <PencilIcon className="h-5 w-5" />
-                          </button>
-                          <button
-                            onClick={() => setDeletingTrack(track)}
-                            className="p-2 text-red-400 hover:text-red-300 transition-colors"
-                          >
-                            <TrashIcon className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {tracks.map((track) => (
-                      <div
-                        key={track.id}
-                        className="bg-dark-300 rounded-lg overflow-hidden"
-                      >
-                        <img
-                          src={track.thumbnail_url}
-                          alt={track.title}
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="p-4">
-                          <h3 className="text-white font-medium mb-2">{track.title}</h3>
-                          <p className="text-gray-400 text-sm mb-4">
-                            {track.description || 'No description'}
-                          </p>
-                          <div className="flex justify-end gap-2">
+                          <div className="flex items-center gap-2">
                             <button
-                              onClick={() => setEditingTrack(track)}
-                              className="p-2 text-gray-400 hover:text-white transition-colors"
+                              onClick={() => handleEdit(track)}
+                              className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
                             >
                               <PencilIcon className="h-5 w-5" />
                             </button>
@@ -323,68 +299,105 @@ export default function AdminPage() {
                       </div>
                     ))}
                   </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {tracks.map((track) => (
+                      <div key={track.id} className="bg-dark-300 rounded-lg overflow-hidden">
+                        <img
+                          src={track.thumbnail_url}
+                          alt={track.title}
+                          className="w-full h-48 object-cover"
+                        />
+                        <div className="p-4">
+                          <h3 className="text-white font-medium mb-2">{track.title}</h3>
+                          <p className="text-gray-400 text-sm mb-3">{track.description}</p>
+                          <div className="flex items-center justify-between">
+                            <p className="text-gray-500 text-xs">
+                              {new Date(track.created_at).toLocaleDateString()}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleEdit(track)}
+                                className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
+                              >
+                                <PencilIcon className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => setDeletingTrack(track)}
+                                className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                              >
+                                <TrashIcon className="h-5 w-5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
           </div>
         </div>
 
-        {/* Track Edit Modal */}
-        {editingTrack && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-dark-200 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold text-white">Edit Track</h3>
-                  <button
-                    onClick={() => setEditingTrack(null)}
-                    className="p-2 text-gray-400 hover:text-white transition-colors"
-                  >
-                    <XMarkIcon className="h-5 w-5" />
-                  </button>
-                </div>
-                <TrackEditForm
-                  track={editingTrack}
-                  onSave={handleSave}
-                  onCancel={handleCancel}
-                />
-              </div>
-            </div>
+        {/* Success Message */}
+        {editSuccess && (
+          <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            Track updated successfully!
           </div>
         )}
 
-        {/* Success Message */}
-        {editSuccess && (
-          <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Track updated successfully
+        {/* Error Message */}
+        {error && (
+          <div className="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            {error}
+          </div>
+        )}
+
+        {/* Edit Track Modal */}
+        {editingTrack && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-dark-200 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-white">Edit Track</h2>
+                <button
+                  onClick={handleCancel}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
+              <TrackEditForm
+                track={editingTrack}
+                onSave={handleSave}
+                onCancel={handleCancel}
+              />
+            </div>
           </div>
         )}
 
         {/* Delete Confirmation Modal */}
         {deletingTrack && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-dark-200 rounded-lg p-6 max-w-md w-full">
-              <h3 className="text-xl font-semibold text-white mb-4">Delete Track</h3>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-dark-200 rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-xl font-semibold text-white mb-4">Delete Track</h2>
               <p className="text-gray-300 mb-6">
                 Are you sure you want to delete "{deletingTrack.title}"? This action cannot be undone.
               </p>
               <div className="flex justify-end gap-4">
                 <button
                   onClick={() => setDeletingTrack(null)}
-                  className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                   disabled={isDeleting}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleDelete(deletingTrack)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                   disabled={isDeleting}
                 >
-                  {isDeleting ? 'Deleting...' : 'Delete Track'}
+                  {isDeleting ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
             </div>
