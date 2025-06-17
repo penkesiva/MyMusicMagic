@@ -295,25 +295,123 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                 htmlFor="hero_image"
                 className="block text-sm font-medium text-gray-300"
               >
-                Homepage Hero Image
+                Homepage Hero Image *
               </label>
+              
+              {/* Image Guidelines */}
+              <div className="mt-2 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                <h4 className="text-sm font-medium text-blue-300 mb-2">📸 Image Guidelines</h4>
+                <ul className="text-xs text-blue-200 space-y-1">
+                  <li>• <strong>Recommended size:</strong> 1920×1080 pixels (16:9 aspect ratio)</li>
+                  <li>• <strong>Minimum size:</strong> 1200×675 pixels</li>
+                  <li>• <strong>File format:</strong> JPG, PNG, or WebP</li>
+                  <li>• <strong>File size:</strong> Under 5MB for fast loading</li>
+                  <li>• <strong>Content:</strong> High contrast, avoid text-heavy images</li>
+                  <li>• <strong>Focus:</strong> Center the main subject for best mobile display</li>
+                </ul>
+              </div>
+
               <input
                 type="file"
                 id="hero_image"
                 name="hero_image"
                 ref={heroImageFileRef}
                 accept="image/*"
-                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    // Validate file size
+                    if (file.size > 5 * 1024 * 1024) {
+                      alert('File size must be under 5MB')
+                      e.target.value = ''
+                      return
+                    }
+                    
+                    // Preview image
+                    const reader = new FileReader()
+                    reader.onload = (event) => {
+                      setArtistInfo(prev => ({
+                        ...prev,
+                        homepage_hero_url: event.target?.result as string
+                      }))
+                    }
+                    reader.readAsDataURL(file)
+                  }
+                }}
+                className="mt-3 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
+              
+              {/* Current Image Preview with Editing */}
               {artistInfo.homepage_hero_url && (
-                <div className="mt-2">
-                  <img
-                    src={artistInfo.homepage_hero_url}
-                    alt="Current hero image"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
+                <div className="mt-4 space-y-4">
+                  <div className="relative group">
+                    <div className="relative">
+                      <img
+                        src={artistInfo.homepage_hero_url}
+                        alt="Current hero image"
+                        className="w-full h-64 object-cover rounded-lg border-2 border-gray-600"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <span className="text-white text-sm font-medium">Current Hero Image</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Image Info */}
+                    <div className="mt-2 p-3 bg-dark-300 rounded-lg">
+                      <div className="flex items-center justify-between text-xs text-gray-400">
+                        <span>Hero Image Preview</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setArtistInfo(prev => ({ ...prev, homepage_hero_url: '/hero-bg.jpg' }))
+                            if (heroImageFileRef.current) {
+                              heroImageFileRef.current.value = ''
+                            }
+                          }}
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          Reset to Default
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Image Optimization Tips */}
+                  <div className="p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
+                    <h4 className="text-sm font-medium text-yellow-300 mb-2">💡 Optimization Tips</h4>
+                    <ul className="text-xs text-yellow-200 space-y-1">
+                      <li>• Use high-quality images with good lighting</li>
+                      <li>• Ensure the image works well with overlaid text</li>
+                      <li>• Test how it looks on both desktop and mobile devices</li>
+                      <li>• Consider the mood and atmosphere it creates</li>
+                    </ul>
+                  </div>
                 </div>
               )}
+              
+              {/* URL Input Alternative */}
+              <div className="mt-4">
+                <label
+                  htmlFor="hero_image_url"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Or enter image URL
+                </label>
+                <input
+                  type="url"
+                  id="hero_image_url"
+                  name="homepage_hero_url"
+                  value={artistInfo.homepage_hero_url || ''}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  You can also paste an image URL instead of uploading a file
+                </p>
+              </div>
             </div>
           </div>
 
@@ -384,23 +482,110 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
               >
                 Artist Photo
               </label>
+              
+              {/* Photo Guidelines */}
+              <div className="mt-2 p-4 bg-green-900/20 border border-green-500/30 rounded-lg">
+                <h4 className="text-sm font-medium text-green-300 mb-2">📷 Photo Guidelines</h4>
+                <ul className="text-xs text-green-200 space-y-1">
+                  <li>• <strong>Recommended size:</strong> 800×800 pixels (square format)</li>
+                  <li>• <strong>Minimum size:</strong> 400×400 pixels</li>
+                  <li>• <strong>File format:</strong> JPG, PNG, or WebP</li>
+                  <li>• <strong>File size:</strong> Under 2MB for fast loading</li>
+                  <li>• <strong>Style:</strong> Professional headshot or artistic portrait</li>
+                  <li>• <strong>Background:</strong> Simple, uncluttered background works best</li>
+                </ul>
+              </div>
+
               <input
                 type="file"
                 id="photo"
                 name="photo"
                 ref={photoFileRef}
                 accept="image/*"
-                className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    // Validate file size
+                    if (file.size > 2 * 1024 * 1024) {
+                      alert('File size must be under 2MB')
+                      e.target.value = ''
+                      return
+                    }
+                    
+                    // Preview image
+                    const reader = new FileReader()
+                    reader.onload = (event) => {
+                      setArtistInfo(prev => ({
+                        ...prev,
+                        photo_url: event.target?.result as string
+                      }))
+                    }
+                    reader.readAsDataURL(file)
+                  }
+                }}
+                className="mt-3 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
+              
+              {/* Current Photo Preview with Editing */}
               {artistInfo.photo_url && (
-                <div className="mt-2">
-                  <img
-                    src={artistInfo.photo_url}
-                    alt="Current artist photo"
-                    className="w-32 h-32 object-cover rounded-lg"
-                  />
+                <div className="mt-4 space-y-4">
+                  <div className="relative group">
+                    <div className="relative inline-block">
+                      <img
+                        src={artistInfo.photo_url}
+                        alt="Current artist photo"
+                        className="w-40 h-40 object-cover rounded-lg border-2 border-gray-600"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <span className="text-white text-sm font-medium">Artist Photo</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Photo Info */}
+                    <div className="mt-2 p-3 bg-dark-300 rounded-lg">
+                      <div className="flex items-center justify-between text-xs text-gray-400">
+                        <span>Artist Photo Preview</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setArtistInfo(prev => ({ ...prev, photo_url: '' }))
+                            if (photoFileRef.current) {
+                              photoFileRef.current.value = ''
+                            }
+                          }}
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          Remove Photo
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
+              
+              {/* URL Input Alternative */}
+              <div className="mt-4">
+                <label
+                  htmlFor="photo_url"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Or enter photo URL
+                </label>
+                <input
+                  type="url"
+                  id="photo_url"
+                  name="photo_url"
+                  value={artistInfo.photo_url || ''}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="https://example.com/photo.jpg"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  You can also paste a photo URL instead of uploading a file
+                </p>
+              </div>
             </div>
 
             <div>
