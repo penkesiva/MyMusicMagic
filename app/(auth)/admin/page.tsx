@@ -6,6 +6,7 @@ import { TrackUploadForm } from '@/components/admin/TrackUploadForm'
 import { TrackEditForm } from '@/components/admin/TrackEditForm'
 import { ArtistInfoForm } from '@/components/admin/ArtistInfoForm'
 import GalleryManagement from '@/components/admin/GalleryManagement'
+import PageVisibility from '@/components/admin/PageVisibility'
 import { Database } from '@/types/database'
 import { 
   PencilIcon, 
@@ -34,6 +35,11 @@ export default function AdminPage() {
   const [editSuccess, setEditSuccess] = useState(false)
   const [showGalleryForm, setShowGalleryForm] = useState(false)
   const supabase = createClient()
+
+  // State for expand/collapse
+  const [artistInfoOpen, setArtistInfoOpen] = useState(true)
+  const [galleryOpen, setGalleryOpen] = useState(true)
+  const [trackMgmtOpen, setTrackMgmtOpen] = useState(true)
 
   const fetchTracks = async () => {
     try {
@@ -125,10 +131,13 @@ export default function AdminPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-xl font-bold text-white mb-6">Admin Dashboard</h1>
 
+        {/* Page Visibility Section */}
+        <PageVisibility />
+
         {/* Artist Info Section */}
         <div className="mb-6 bg-dark-200 rounded-lg overflow-hidden">
           <div className="p-4">
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center justify-between mb-2">
               <div>
                 <h2 className="text-lg font-semibold text-white">Artist Info</h2>
                 <p className="text-gray-400 text-sm mt-1">
@@ -136,29 +145,21 @@ export default function AdminPage() {
                 </p>
               </div>
               <button
-                onClick={() => setShowArtistForm(!showArtistForm)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                  showArtistForm 
-                    ? 'bg-gray-600 hover:bg-gray-700 text-white' 
-                    : 'bg-primary-500 hover:bg-primary-600 text-white'
-                }`}
+                type="button"
+                onClick={() => setArtistInfoOpen(v => !v)}
+                className="flex items-center text-sm text-blue-300 hover:text-blue-200 transition-colors"
+                aria-label={artistInfoOpen ? 'Collapse' : 'Expand'}
               >
-                {showArtistForm ? (
-                  <>
-                    <ChevronUpIcon className="h-4 w-4" />
-                    Edit Artist Info
-                  </>
+                {artistInfoOpen ? (
+                  <><ChevronUpIcon className="h-4 w-4 mr-1" /> Collapse</>
                 ) : (
-                  <>
-                    <ChevronDownIcon className="h-4 w-4" />
-                    Edit Artist Info
-                  </>
+                  <><ChevronDownIcon className="h-4 w-4 mr-1" /> Expand</>
                 )}
               </button>
             </div>
-            {showArtistForm && (
+            {artistInfoOpen && (
               <div className="mt-3">
-                <ArtistInfoForm onSave={() => setShowArtistForm(false)} />
+                <ArtistInfoForm onSave={() => {}} />
               </div>
             )}
           </div>
@@ -167,7 +168,7 @@ export default function AdminPage() {
         {/* Gallery Management Section */}
         <div className="mb-6 bg-dark-200 rounded-lg overflow-hidden">
           <div className="p-4">
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center justify-between mb-2">
               <div>
                 <h2 className="text-lg font-semibold text-white">Gallery Management</h2>
                 <p className="text-gray-400 text-sm mt-1">
@@ -175,27 +176,19 @@ export default function AdminPage() {
                 </p>
               </div>
               <button
-                onClick={() => setShowGalleryForm(!showGalleryForm)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                  showGalleryForm 
-                    ? 'bg-gray-600 hover:bg-gray-700 text-white' 
-                    : 'bg-primary-500 hover:bg-primary-600 text-white'
-                }`}
+                type="button"
+                onClick={() => setGalleryOpen(v => !v)}
+                className="flex items-center text-sm text-blue-300 hover:text-blue-200 transition-colors"
+                aria-label={galleryOpen ? 'Collapse' : 'Expand'}
               >
-                {showGalleryForm ? (
-                  <>
-                    <ChevronUpIcon className="h-4 w-4" />
-                    Manage Gallery
-                  </>
+                {galleryOpen ? (
+                  <><ChevronUpIcon className="h-4 w-4 mr-1" /> Collapse</>
                 ) : (
-                  <>
-                    <ChevronDownIcon className="h-4 w-4" />
-                    Manage Gallery
-                  </>
+                  <><ChevronDownIcon className="h-4 w-4 mr-1" /> Expand</>
                 )}
               </button>
             </div>
-            {showGalleryForm && (
+            {galleryOpen && (
               <div className="mt-3">
                 <GalleryManagement />
               </div>
@@ -206,7 +199,7 @@ export default function AdminPage() {
         {/* Track Management Section */}
         <div className="mb-6 bg-dark-200 rounded-lg overflow-hidden">
           <div className="p-4">
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center justify-between mb-2">
               <div>
                 <h2 className="text-lg font-semibold text-white">Track Management</h2>
                 <p className="text-gray-400 text-sm mt-1">
@@ -214,28 +207,21 @@ export default function AdminPage() {
                 </p>
               </div>
               <button
-                onClick={() => setShowUploadForm(!showUploadForm)}
-                className="px-3 py-1.5 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors flex items-center gap-2"
+                type="button"
+                onClick={() => setTrackMgmtOpen(v => !v)}
+                className="flex items-center text-sm text-blue-300 hover:text-blue-200 transition-colors"
+                aria-label={trackMgmtOpen ? 'Collapse' : 'Expand'}
               >
-                {showUploadForm ? (
-                  <>
-                    <ChevronUpIcon className="h-4 w-4" />
-                    Upload Track
-                  </>
+                {trackMgmtOpen ? (
+                  <><ChevronUpIcon className="h-4 w-4 mr-1" /> Collapse</>
                 ) : (
-                  <>
-                    <ChevronDownIcon className="h-4 w-4" />
-                    Upload Track
-                  </>
+                  <><ChevronDownIcon className="h-4 w-4 mr-1" /> Expand</>
                 )}
               </button>
             </div>
-            {showUploadForm && (
+            {trackMgmtOpen && (
               <div className="mt-3">
-                <TrackUploadForm onUploadComplete={() => {
-                  fetchTracks();
-                  setShowUploadForm(false);
-                }} />
+                <TrackUploadForm onUploadComplete={() => { fetchTracks(); }} />
               </div>
             )}
           </div>
