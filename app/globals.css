@@ -90,8 +90,23 @@
   }
 }
 
+@keyframes slideIn {
+  0% {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+    opacity: 1;
+  }
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+.animate-slideIn {
+  animation: slideIn 1s ease-out forwards;
 }
 
 /* Transitions */

@@ -81,7 +81,8 @@ function MusicNote({ delay, duration, startX, startY, isExiting, noteType }: {
 
 export default function QuotesPage() {
   const [currentQuote, setCurrentQuote] = useState<Quote>(quotes[0])
-  const [isVisible, setIsVisible] = useState(true)
+  const [isVisible, setIsVisible] = useState(false) // Start invisible
+  const [isAnimating, setIsAnimating] = useState(false) // Track if card is animating in
   const [position, setPosition] = useState({ x: 20, y: 20 })
   const [musicNotes, setMusicNotes] = useState<Array<{
     id: number;
@@ -171,17 +172,33 @@ export default function QuotesPage() {
 
   const showNextQuote = useCallback(() => {
     setIsVisible(false)
+    setIsAnimating(true)
     
     setTimeout(() => {
       const nextQuote = getNextQuote()
       setCurrentQuote(nextQuote)
       setPosition(getRandomPosition())
       setIsVisible(true)
+      
+      // After the slide-in animation completes, mark as not animating
+      setTimeout(() => {
+        setIsAnimating(false)
+      }, 1000) // Match the transition duration
     }, 500)
   }, [getNextQuote, getRandomPosition])
 
-  // Start quote rotation
+  // Start quote rotation and initial animation
   useEffect(() => {
+    // Start with first quote animation
+    setTimeout(() => {
+      setIsVisible(true)
+      setIsAnimating(true)
+      setTimeout(() => {
+        setIsAnimating(false)
+      }, 1000)
+    }, 500)
+
+    // Start the rotation interval
     const interval = setInterval(showNextQuote, 6000)
     return () => clearInterval(interval)
   }, [showNextQuote])
@@ -212,7 +229,7 @@ export default function QuotesPage() {
         className={`fixed transition-all duration-1000 ${
           isVisible 
             ? 'opacity-100 transform scale-100' 
-            : 'opacity-0 transform scale-95'
+            : 'opacity-0 transform scale-95 translate-y-8'
         }`}
         style={{
           left: `${position.x}px`,
@@ -220,7 +237,9 @@ export default function QuotesPage() {
           maxWidth: '500px',
         }}
       >
-        <div className="bg-dark-200/90 backdrop-blur-sm rounded-lg p-6 shadow-xl">
+        <div className={`bg-dark-200/90 backdrop-blur-sm rounded-lg p-6 shadow-xl transition-transform duration-1000 ${
+          isAnimating ? 'animate-slideIn' : ''
+        }`}>
           <p className="text-lg text-white/90 font-light leading-relaxed mb-4 italic text-center">
             "{currentQuote.text}"
           </p>
