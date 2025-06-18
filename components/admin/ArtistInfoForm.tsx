@@ -123,9 +123,13 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
     setSuccess(false)
 
     try {
+      console.log('Starting save process...')
+      
       const { data: { user }, error: userError } = await supabase.auth.getUser()
       if (userError) throw userError
       if (!user) throw new Error('Not authenticated')
+      
+      console.log('User authenticated:', user.id)
 
       let photoUrl = artistInfo.photo_url
       let heroImageUrl = artistInfo.homepage_hero_url
@@ -133,42 +137,70 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
       // Upload new photo if one was selected
       if (photoFileRef.current?.files?.[0]) {
         const photoFile = photoFileRef.current.files[0]
-        const photoPath = `${user.id}/artist-photos/${Date.now()}-${photoFile.name}`
+        const fileExt = photoFile.name.split('.').pop()
+        const fileName = `${Math.random()}.${fileExt}`
+        const filePath = `artist-photos/${fileName}`
+        
+        console.log('Uploading photo to path:', filePath)
+        
         const { error: uploadError } = await supabase.storage
           .from('artist-photos')
-          .upload(photoPath, photoFile, {
+          .upload(filePath, photoFile, {
             cacheControl: '3600',
             upsert: false
           })
 
-        if (uploadError) throw uploadError
+        if (uploadError) {
+          console.error('Photo upload error:', uploadError)
+          console.error('Error details:', JSON.stringify(uploadError, null, 2))
+          throw uploadError
+        }
+
+        console.log('Photo uploaded successfully')
 
         const { data: urlData } = supabase.storage
           .from('artist-photos')
-          .getPublicUrl(photoPath)
+          .getPublicUrl(filePath)
 
+        console.log('Photo public URL:', urlData.publicUrl)
         photoUrl = urlData.publicUrl
       }
 
       // Upload new hero image if one was selected
       if (heroImageFileRef.current?.files?.[0]) {
         const heroFile = heroImageFileRef.current.files[0]
-        const heroPath = `${user.id}/hero-images/${Date.now()}-${heroFile.name}`
+        const fileExt = heroFile.name.split('.').pop()
+        const fileName = `${Math.random()}.${fileExt}`
+        const filePath = `site-bg-images/${fileName}`
+        
+        console.log('Uploading hero image to path:', filePath)
+        
         const { error: uploadError } = await supabase.storage
-          .from('hero-images')
-          .upload(heroPath, heroFile, {
+          .from('site-bg-images')
+          .upload(filePath, heroFile, {
             cacheControl: '3600',
             upsert: false
           })
 
-        if (uploadError) throw uploadError
+        if (uploadError) {
+          console.error('Hero image upload error:', uploadError)
+          console.error('Error details:', JSON.stringify(uploadError, null, 2))
+          throw uploadError
+        }
+
+        console.log('Hero image uploaded successfully')
 
         const { data: urlData } = supabase.storage
-          .from('hero-images')
-          .getPublicUrl(heroPath)
+          .from('site-bg-images')
+          .getPublicUrl(filePath)
 
+        console.log('Hero image public URL:', urlData.publicUrl)
         heroImageUrl = urlData.publicUrl
       }
+
+      console.log('Preparing artist info data...')
+      console.log('Photo URL:', photoUrl)
+      console.log('Hero Image URL:', heroImageUrl)
 
       // Create or update artist info
       const artistInfoData = {
@@ -183,18 +215,26 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
         updated_at: new Date().toISOString(),
       }
 
+      console.log('Artist info data to save:', artistInfoData)
+
       let artistInfoId: string
 
       if (artistInfo.id) {
+        console.log('Updating existing artist info with ID:', artistInfo.id)
         // Update existing artist info
         const { error: updateError } = await supabase
           .from('artist_info')
           .update(artistInfoData)
           .eq('id', artistInfo.id)
 
-        if (updateError) throw updateError
+        if (updateError) {
+          console.error('Update error:', updateError)
+          throw updateError
+        }
         artistInfoId = artistInfo.id
+        console.log('Artist info updated successfully')
       } else {
+        console.log('Creating new artist info')
         // Create new artist info
         const { data, error: insertError } = await supabase
           .from('artist_info')
@@ -202,23 +242,33 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
           .select()
           .single()
 
-        if (insertError) throw insertError
+        if (insertError) {
+          console.error('Insert error:', insertError)
+          throw insertError
+        }
         if (!data) throw new Error('Failed to create artist info')
         artistInfoId = data.id
+        console.log('Artist info created successfully with ID:', artistInfoId)
       }
 
       // Delete existing links
       if (artistInfo.id) {
+        console.log('Deleting existing links...')
         const { error: deleteError } = await supabase
           .from('artist_links')
           .delete()
           .eq('artist_info_id', artistInfo.id)
 
-        if (deleteError) throw deleteError
+        if (deleteError) {
+          console.error('Delete links error:', deleteError)
+          throw deleteError
+        }
+        console.log('Existing links deleted')
       }
 
       // Insert new links
       if (links.length > 0) {
+        console.log('Inserting new links:', links.length)
         const linksData = links.map(link => ({
           title: link.title,
           url: link.url,
@@ -230,13 +280,19 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
           .from('artist_links')
           .insert(linksData)
 
-        if (linksError) throw linksError
+        if (linksError) {
+          console.error('Insert links error:', linksError)
+          throw linksError
+        }
+        console.log('New links inserted successfully')
       }
 
+      console.log('Save process completed successfully')
       setSuccess(true)
       onSave()
     } catch (err) {
       console.error('Error saving artist info:', err)
+      console.error('Full error details:', JSON.stringify(err, null, 2))
       setError(err instanceof Error ? err.message : 'An error occurred while saving')
     } finally {
       setIsSaving(false)

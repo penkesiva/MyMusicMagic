@@ -87,7 +87,7 @@ export function TrackUploadForm({ onUploadComplete }: TrackUploadFormProps) {
 
       // Upload thumbnail if provided
       if (thumbnailFile) {
-        const thumbnailPath = `${user.id}/thumbnails/${Date.now()}-${thumbnailFile.name}`
+        const thumbnailPath = `${user.id}/track-thumbnails/${Date.now()}-${thumbnailFile.name}`
         const { error: thumbnailError } = await supabase.storage
           .from('track-thumbnails')
           .upload(thumbnailPath, thumbnailFile, {

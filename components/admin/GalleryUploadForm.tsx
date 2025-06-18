@@ -30,7 +30,7 @@ export default function GalleryUploadForm({ onSuccess, onCancel, editItem }: Gal
     const filePath = `gallery/${fileName}`
 
     const { error: uploadError, data } = await supabase.storage
-      .from('images')
+      .from('gallery-images')
       .upload(filePath, file)
 
     if (uploadError) {
@@ -38,7 +38,7 @@ export default function GalleryUploadForm({ onSuccess, onCancel, editItem }: Gal
     }
 
     const { data: { publicUrl } } = supabase.storage
-      .from('images')
+      .from('gallery-images')
       .getPublicUrl(filePath)
 
     return publicUrl

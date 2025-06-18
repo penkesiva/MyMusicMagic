@@ -58,9 +58,9 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
         if (userError) throw userError;
         if (!user) throw new Error('Not authenticated');
 
-        const thumbnailPath = `${user.id}/${Date.now()}-${thumbnailFile.name}`;
+        const thumbnailPath = `${user.id}/track-thumbnails/${Date.now()}-${thumbnailFile.name}`;
         const { error: uploadError } = await supabase.storage
-          .from('thumbnails')
+          .from('track-thumbnails')
           .upload(thumbnailPath, thumbnailFile, {
             cacheControl: '3600',
             upsert: false
@@ -69,7 +69,7 @@ export function TrackEditForm({ track, onSave, onCancel }: TrackEditFormProps) {
         if (uploadError) throw uploadError;
 
         const { data: urlData } = supabase.storage
-          .from('thumbnails')
+          .from('track-thumbnails')
           .getPublicUrl(thumbnailPath);
 
         thumbnailUrl = urlData.publicUrl;
