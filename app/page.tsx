@@ -138,6 +138,15 @@ export default function HomePage() {
     setViewMode(mode)
   }
 
+  const scrollToFeatured = () => {
+    if (featuredRef.current) {
+      featuredRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-dark-100">
@@ -167,12 +176,12 @@ export default function HomePage() {
           <p className="text-xl sm:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
             {artistInfo?.homepage_description || 'Discover a collection of carefully crafted musical compositions, each telling its own unique story through melody and rhythm.'}
           </p>
-          <Link
-            href="#music"
+          <button
+            onClick={scrollToFeatured}
             className="inline-block bg-primary-500 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-600 transition-colors"
           >
             Explore Music
-          </Link>
+          </button>
         </div>
       </div>
 
