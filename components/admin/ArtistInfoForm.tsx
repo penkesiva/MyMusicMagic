@@ -349,13 +349,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
               />
             </div>
             <div>
-              <label
-                htmlFor="hero_image"
-                className="block text-sm font-medium text-gray-300"
-              >
-                Homepage Hero Image *
-              </label>
-              
+              <label htmlFor="hero_image" className="block text-sm font-medium text-gray-300">Homepage Hero Image *</label>
               {/* Image Guidelines */}
               <div className="mt-2">
                 <button
@@ -391,35 +385,50 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                 )}
               </div>
 
-              <input
-                type="file"
-                id="hero_image"
-                name="hero_image"
-                ref={heroImageFileRef}
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) {
-                    // Validate file size
-                    if (file.size > 5 * 1024 * 1024) {
-                      alert('File size must be under 5MB')
-                      e.target.value = ''
-                      return
+              <div className="mt-3 flex flex-col md:flex-row gap-3 items-start md:items-end">
+                <input
+                  type="file"
+                  id="hero_image"
+                  name="hero_image"
+                  ref={heroImageFileRef}
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      // Validate file size
+                      if (file.size > 5 * 1024 * 1024) {
+                        alert('File size must be under 5MB')
+                        e.target.value = ''
+                        return
+                      }
+                      
+                      // Preview image
+                      const reader = new FileReader()
+                      reader.onload = (event) => {
+                        setArtistInfo(prev => ({
+                          ...prev,
+                          homepage_hero_url: event.target?.result as string
+                        }))
+                      }
+                      reader.readAsDataURL(file)
                     }
-                    
-                    // Preview image
-                    const reader = new FileReader()
-                    reader.onload = (event) => {
-                      setArtistInfo(prev => ({
-                        ...prev,
-                        homepage_hero_url: event.target?.result as string
-                      }))
-                    }
-                    reader.readAsDataURL(file)
-                  }
-                }}
-                className="mt-3 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-              />
+                  }}
+                  className="file:rounded-lg file:bg-primary-500 file:text-white file:px-4 file:py-2 file:border-0 file:font-medium file:cursor-pointer file:mr-4 block w-full md:w-auto px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                />
+                <div className="flex-1 w-full">
+                  <label htmlFor="hero_image_url" className="sr-only">Or enter image URL</label>
+                  <input
+                    type="url"
+                    id="hero_image_url"
+                    name="homepage_hero_url"
+                    value={artistInfo.homepage_hero_url || ''}
+                    onChange={handleInputChange}
+                    className="block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">You can also paste an image URL instead of uploading a file</p>
+                </div>
+              </div>
               
               {/* Current Image Preview with Editing */}
               {artistInfo.homepage_hero_url && (
@@ -459,28 +468,6 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                   </div>
                 </div>
               )}
-              
-              {/* URL Input Alternative */}
-              <div className="mt-4">
-                <label
-                  htmlFor="hero_image_url"
-                  className="block text-sm font-medium text-gray-300"
-                >
-                  Or enter image URL
-                </label>
-                <input
-                  type="url"
-                  id="hero_image_url"
-                  name="homepage_hero_url"
-                  value={artistInfo.homepage_hero_url || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-                  placeholder="https://example.com/image.jpg"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  You can also paste an image URL instead of uploading a file
-                </p>
-              </div>
             </div>
           </div>
 
@@ -545,13 +532,7 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
             </div>
 
             <div>
-              <label
-                htmlFor="photo"
-                className="block text-sm font-medium text-gray-300"
-              >
-                Artist Photo
-              </label>
-              
+              <label htmlFor="photo" className="block text-sm font-medium text-gray-300">Artist Photo</label>
               {/* Photo Guidelines */}
               <div className="mt-2">
                 <button
@@ -587,35 +568,50 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                 )}
               </div>
 
-              <input
-                type="file"
-                id="photo"
-                name="photo"
-                ref={photoFileRef}
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) {
-                    // Validate file size
-                    if (file.size > 2 * 1024 * 1024) {
-                      alert('File size must be under 2MB')
-                      e.target.value = ''
-                      return
+              <div className="mt-3 flex flex-col md:flex-row gap-3 items-start md:items-end">
+                <input
+                  type="file"
+                  id="photo"
+                  name="photo"
+                  ref={photoFileRef}
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      // Validate file size
+                      if (file.size > 2 * 1024 * 1024) {
+                        alert('File size must be under 2MB')
+                        e.target.value = ''
+                        return
+                      }
+                      
+                      // Preview image
+                      const reader = new FileReader()
+                      reader.onload = (event) => {
+                        setArtistInfo(prev => ({
+                          ...prev,
+                          photo_url: event.target?.result as string
+                        }))
+                      }
+                      reader.readAsDataURL(file)
                     }
-                    
-                    // Preview image
-                    const reader = new FileReader()
-                    reader.onload = (event) => {
-                      setArtistInfo(prev => ({
-                        ...prev,
-                        photo_url: event.target?.result as string
-                      }))
-                    }
-                    reader.readAsDataURL(file)
-                  }
-                }}
-                className="mt-3 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-              />
+                  }}
+                  className="file:rounded-lg file:bg-primary-500 file:text-white file:px-4 file:py-2 file:border-0 file:font-medium file:cursor-pointer file:mr-4 block w-full md:w-auto px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                />
+                <div className="flex-1 w-full">
+                  <label htmlFor="photo_url" className="sr-only">Or enter photo URL</label>
+                  <input
+                    type="url"
+                    id="photo_url"
+                    name="photo_url"
+                    value={artistInfo.photo_url || ''}
+                    onChange={handleInputChange}
+                    className="block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    placeholder="https://example.com/photo.jpg"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">You can also paste a photo URL instead of uploading a file</p>
+                </div>
+              </div>
               
               {/* Current Photo Preview with Editing */}
               {artistInfo.photo_url && (
@@ -655,28 +651,6 @@ export function ArtistInfoForm({ onSave }: ArtistInfoFormProps) {
                   </div>
                 </div>
               )}
-              
-              {/* URL Input Alternative */}
-              <div className="mt-4">
-                <label
-                  htmlFor="photo_url"
-                  className="block text-sm font-medium text-gray-300"
-                >
-                  Or enter photo URL
-                </label>
-                <input
-                  type="url"
-                  id="photo_url"
-                  name="photo_url"
-                  value={artistInfo.photo_url || ''}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-                  placeholder="https://example.com/photo.jpg"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  You can also paste a photo URL instead of uploading a file
-                </p>
-              </div>
             </div>
 
             <div>

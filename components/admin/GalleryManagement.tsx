@@ -108,6 +108,7 @@ export default function GalleryManagement() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
+        <div></div>
         <button
           onClick={() => setShowForm(true)}
           className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200"

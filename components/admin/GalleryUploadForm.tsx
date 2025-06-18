@@ -174,15 +174,29 @@ export default function GalleryUploadForm({ onSuccess, onCancel, editItem }: Gal
             {mediaType === 'video' ? 'Thumbnail Image' : 'Image'} *
           </label>
           <div className="space-y-3">
-            <input
-              type="file"
-              id="image"
-              accept="image/*"
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-              className="w-full px-4 py-3 bg-dark-300 border border-gray-600 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-500 file:text-white hover:file:bg-primary-600 text-sm"
-            />
+            <div className="flex items-center">
+              <input
+                type="file"
+                id="image"
+                accept="image/*"
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => document.getElementById('image')?.click()}
+                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-semibold transition-colors duration-200"
+              >
+                Upload
+              </button>
+              {imageFile && (
+                <span className="ml-3 text-sm text-gray-300">
+                  {imageFile.name}
+                </span>
+              )}
+            </div>
             <div className="text-sm text-gray-400">
-              Or enter image URL:
+              Image URL:
             </div>
             <input
               type="url"
@@ -191,6 +205,9 @@ export default function GalleryUploadForm({ onSuccess, onCancel, editItem }: Gal
               className="w-full px-4 py-3 bg-dark-300 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               placeholder="https://example.com/image.jpg"
             />
+            <div className="text-xs text-gray-500">
+              You can also paste an image URL instead of uploading a file
+            </div>
             {mediaType === 'video' && (
               <div className="text-xs text-gray-500">
                 For YouTube videos, you can leave this empty to automatically use the video thumbnail.
