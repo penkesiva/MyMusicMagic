@@ -90,6 +90,12 @@ export interface Database {
           about_text: string
           photo_url: string
           user_id: string
+          use_same_text: boolean
+          footer_text: string | null
+          homepage_title: string
+          homepage_description: string
+          homepage_hero_url: string
+          about_artist_title: string
         }
         Insert: {
           id?: string
@@ -98,6 +104,12 @@ export interface Database {
           about_text: string
           photo_url: string
           user_id: string
+          use_same_text?: boolean
+          footer_text?: string | null
+          homepage_title?: string
+          homepage_description?: string
+          homepage_hero_url?: string
+          about_artist_title?: string
         }
         Update: {
           id?: string
@@ -106,6 +118,12 @@ export interface Database {
           about_text?: string
           photo_url?: string
           user_id?: string
+          use_same_text?: boolean
+          footer_text?: string | null
+          homepage_title?: string
+          homepage_description?: string
+          homepage_hero_url?: string
+          about_artist_title?: string
         }
       }
       artist_links: {

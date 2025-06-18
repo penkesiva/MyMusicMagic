@@ -21,6 +21,7 @@ type ExtendedArtistInfo = Database['public']['Tables']['artist_info']['Row'] & {
   homepage_title?: string;
   homepage_description?: string;
   homepage_hero_url?: string;
+  about_artist_title?: string;
 };
 
 type ViewMode = 'list' | 'grid'
@@ -237,7 +238,7 @@ export default function HomePage() {
       {/* About Artist Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-dark-200">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center">About the Artist</h2>
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">{artistInfo?.about_artist_title || 'About the Artist'}</h2>
           <div className="flex flex-col md:flex-row items-start gap-8">
             <div className="w-full md:w-1/4 flex justify-center md:justify-start">
               <div className="w-64 h-64 rounded-lg overflow-hidden">
@@ -329,7 +330,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 max-w-6xl mx-auto">
             {/* About Section - Takes 7 columns (60%) */}
             <div className="md:col-span-7 space-y-4">
-              <h3 className="text-xl font-semibold text-white">About the Artist</h3>
+              <h3 className="text-xl font-semibold text-white">{artistInfo?.about_artist_title || 'About the Artist'}</h3>
               <div className="prose prose-invert max-w-none">
                 <p className="text-gray-400 text-base leading-relaxed">
                   {artistInfo && (
