@@ -82,6 +82,114 @@ export interface Database {
           website?: string | null
         }
       }
+      user_profiles: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          username: string | null
+          avatar_url: string | null
+          bio: string | null
+          website_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          username?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          website_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          username?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          website_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      user_subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          plan_type: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          current_period_start: string | null
+          current_period_end: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_type?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_type?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      user_portfolio_settings: {
+        Row: {
+          id: string
+          user_id: string
+          portfolio_title: string
+          portfolio_description: string | null
+          theme_color: string
+          custom_domain: string | null
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          portfolio_title?: string
+          portfolio_description?: string | null
+          theme_color?: string
+          custom_domain?: string | null
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          portfolio_title?: string
+          portfolio_description?: string | null
+          theme_color?: string
+          custom_domain?: string | null
+          is_published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       artist_info: {
         Row: {
           id: string
