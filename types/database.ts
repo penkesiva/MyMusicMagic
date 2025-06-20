@@ -190,6 +190,76 @@ export interface Database {
           updated_at?: string
         }
       }
+      portfolio_templates: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          industry: string
+          style: string
+          preview_image_url: string | null
+          theme_colors: Json | null
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          industry: string
+          style: string
+          preview_image_url?: string | null
+          theme_colors?: Json | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          industry?: string
+          style?: string
+          preview_image_url?: string | null
+          theme_colors?: Json | null
+          is_active?: boolean
+          created_at?: string
+        }
+      }
+      user_portfolios: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          slug: string
+          template_id: string | null
+          is_published: boolean
+          is_default: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          slug: string
+          template_id?: string | null
+          is_published?: boolean
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          slug?: string
+          template_id?: string | null
+          is_published?: boolean
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       artist_info: {
         Row: {
           id: string
