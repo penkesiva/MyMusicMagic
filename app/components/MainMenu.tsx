@@ -92,33 +92,6 @@ export function MainMenu() {
               <TrebleClefIcon className="h-4 w-4 text-primary-400" />
               <span>Home</span>
             </button>
-            {pageSettings.gallery && (
-              <button
-                onClick={() => handleLinkClick('/gallery')}
-                className="w-full flex items-center gap-1.5 px-3 py-1.5 text-sm text-white hover:bg-dark-300 transition-colors whitespace-nowrap"
-              >
-                <BassClefIcon className="h-4 w-4 text-primary-400" />
-                <span>Gallery</span>
-              </button>
-            )}
-            {pageSettings.quotes && (
-              <button
-                onClick={() => handleLinkClick('/quotes')}
-                className="w-full flex items-center gap-1.5 px-3 py-1.5 text-sm text-white hover:bg-dark-300 transition-colors whitespace-nowrap"
-              >
-                <SharpIcon className="h-4 w-4 text-primary-400" />
-                <span>Musical Quotes</span>
-              </button>
-            )}
-            {pageSettings.contact && (
-              <button
-                onClick={() => handleLinkClick('/contact')}
-                className="w-full flex items-center gap-1.5 px-3 py-1.5 text-sm text-white hover:bg-dark-300 transition-colors whitespace-nowrap"
-              >
-                <FlatIcon className="h-4 w-4 text-primary-400" />
-                <span>Post Me</span>
-              </button>
-            )}
           </nav>
         </div>
       )}

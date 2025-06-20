@@ -13,6 +13,7 @@ import Link from 'next/link'
 type Track = Database['public']['Tables']['tracks']['Row']
 type ArtistInfo = Database['public']['Tables']['artist_info']['Row']
 type ArtistLink = Database['public']['Tables']['artist_links']['Row']
+type GalleryItem = Database['public']['Tables']['gallery']['Row']
 
 // Define an extended type for artist info that includes the optional fields
 type ExtendedArtistInfo = Database['public']['Tables']['artist_info']['Row'] & {
@@ -30,6 +31,7 @@ export default function HomePage() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [artistInfo, setArtistInfo] = useState<ExtendedArtistInfo | null>(null)
   const [artistLinks, setArtistLinks] = useState<ArtistLink[]>([])
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
@@ -39,9 +41,21 @@ export default function HomePage() {
   const [volume, setVolume] = useState(1)
   const [showPlayer, setShowPlayer] = useState(false)
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
+  
+  // Gallery state
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'images' | 'videos'>('images')
+  
+  // Contact state
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+  
   const supabase = createClientComponentClient<Database>()
 
-  // Fetch published tracks and artist info
+  // Fetch published tracks, artist info, and gallery items
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -80,6 +94,18 @@ export default function HomePage() {
           }
           console.log('Artist links data:', linksData);
           setArtistLinks(linksData || [])
+        }
+
+        // Fetch gallery items
+        const { data: galleryData, error: galleryError } = await supabase
+          .from('gallery')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (galleryError) {
+          console.error('Error fetching gallery items:', galleryError)
+        } else {
+          setGalleryItems(galleryData || [])
         }
       } catch (err) {
         console.error('Error fetching data:', err)
@@ -147,6 +173,75 @@ export default function HomePage() {
     }
   }
 
+  // Gallery functions
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1]
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null
+  }
+
+  const openVideoModal = (videoUrl: string) => {
+    setSelectedVideo(videoUrl)
+  }
+
+  const closeVideoModal = () => {
+    setSelectedVideo(null)
+  }
+
+  // Contact functions
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
+    setSuccess(false)
+
+    try {
+      // Validate email
+      if (!email || !email.includes('@')) {
+        throw new Error('Please enter a valid email address')
+      }
+
+      // Validate message length
+      if (!message.trim()) {
+        throw new Error('Please enter a message')
+      }
+      if (message.length > 100) {
+        throw new Error('Message must be 100 words or less')
+      }
+
+      console.log('Starting form submission...');
+      console.log('Attempting to insert message:', { email, message });
+
+      // Store in Supabase using the function
+      const { data, error: dbError } = await supabase
+        .rpc('insert_message', {
+          p_email: email,
+          p_message: message
+        });
+
+      console.log('RPC Response:', { data, error: dbError });
+
+      if (dbError) {
+        console.error('Database error:', {
+          code: dbError.code,
+          message: dbError.message,
+          details: dbError.details,
+          hint: dbError.hint
+        });
+        throw dbError;
+      }
+
+      console.log('Message inserted successfully:', data);
+      setSuccess(true)
+      setEmail('')
+      setMessage('')
+    } catch (err) {
+      console.error('Full error object:', err);
+      setError(err instanceof Error ? err.message : 'Failed to send message')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-dark-100">
@@ -158,6 +253,10 @@ export default function HomePage() {
   // Split tracks into featured and remaining
   const featuredTracks = tracks.slice(0, 3)
   const remainingTracks = tracks.slice(3)
+
+  // Filter gallery items
+  const images = galleryItems.filter(item => item.media_type === 'image')
+  const videos = galleryItems.filter(item => item.media_type === 'video')
 
   return (
     <main className="min-h-screen bg-dark-100">
@@ -309,6 +408,192 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Gallery Section */}
+      <section id="gallery" className="py-16 px-4 sm:px-6 lg:px-8 bg-dark-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">Gallery</h2>
+            <p className="text-gray-300">A collection of musical moments and performances</p>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="flex justify-center space-x-1 bg-dark-200/50 backdrop-blur-sm rounded-lg p-1 border border-white/10 max-w-md mx-auto mb-8">
+            <button
+              onClick={() => setActiveTab('images')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                activeTab === 'images'
+                  ? 'bg-primary-500 text-white shadow-lg'
+                  : 'text-gray-300 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              Images ({images.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('videos')}
+              className={`px-6 py-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                activeTab === 'videos'
+                  ? 'bg-primary-500 text-white shadow-lg'
+                  : 'text-gray-300 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              Videos ({videos.length})
+            </button>
+          </div>
+
+          {/* Gallery Content */}
+          {activeTab === 'images' && (
+            <div className="space-y-8">
+              {images.length === 0 ? (
+                <div className="text-center py-20">
+                  <div className="text-gray-400 text-lg mb-2">No images yet</div>
+                  <p className="text-gray-500">Check back soon for musical moments captured in time.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {images.map((item) => (
+                    <div key={item.id} className="group">
+                      <div className="relative aspect-square rounded-lg overflow-hidden bg-dark-200/50 backdrop-blur-sm border border-white/10 hover:border-primary-400/50 transition-all duration-300">
+                        <img
+                          src={item.image_url}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 className="text-white font-medium text-lg mb-1">{item.title}</h3>
+                            {item.description && (
+                              <p className="text-gray-200 text-sm">{item.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'videos' && (
+            <div className="space-y-8">
+              {videos.length === 0 ? (
+                <div className="text-center py-20">
+                  <div className="text-gray-400 text-lg mb-2">No videos yet</div>
+                  <p className="text-gray-500">Check back soon for musical performances and behind-the-scenes content.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {videos.map((item) => {
+                    const embedUrl = getYouTubeEmbedUrl(item.video_url || '')
+                    return (
+                      <div key={item.id} className="group">
+                        <div 
+                          className="relative aspect-video rounded-lg overflow-hidden bg-dark-200/50 backdrop-blur-sm border border-white/10 hover:border-primary-400/50 transition-all duration-300 cursor-pointer"
+                          onClick={() => embedUrl && openVideoModal(embedUrl)}
+                        >
+                          <img
+                            src={item.image_url}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                              <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="absolute bottom-0 left-0 right-0 p-4">
+                              <h3 className="text-white font-medium text-lg mb-1">{item.title}</h3>
+                              {item.description && (
+                                <p className="text-gray-200 text-sm">{item.description}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-16 px-4 sm:px-6 lg:px-8 bg-dark-200">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-md mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-4">Post Me</h2>
+              <p className="text-gray-300">Share your musical thoughts</p>
+            </div>
+            
+            <div className="bg-dark-300/80 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+              <form onSubmit={handleContactSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-2 bg-dark-400/50 border border-white/10 rounded-lg text-white placeholder-gray-400 
+                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent backdrop-blur-sm"
+                    placeholder="your@email.com"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">
+                    Message (max 100 words) *
+                  </label>
+                  <textarea
+                    id="message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="w-full px-4 py-2 bg-dark-400/50 border border-white/10 rounded-lg text-white placeholder-gray-400 
+                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent backdrop-blur-sm resize-none"
+                    rows={4}
+                    placeholder="Your message here..."
+                    required
+                    maxLength={100}
+                  />
+                  <p className="mt-1 text-sm text-gray-400">
+                    {message.length}/100 words
+                  </p>
+                </div>
+
+                {error && (
+                  <p className="text-red-400 text-sm">{error}</p>
+                )}
+
+                {success && (
+                  <p className="text-green-400 text-sm">
+                    Message sent successfully! I'll get back to you soon.
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 
+                    transition-colors disabled:opacity-50 disabled:cursor-not-allowed 
+                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-300"
+                >
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* More Tracks Section */}
       {remainingTracks.length > 0 && (
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-dark-100">
@@ -356,25 +641,19 @@ export default function HomePage() {
               <h3 className="text-lg font-semibold text-white">Quick Links</h3>
               <nav className="space-y-3">
                 <a
-                  href="/"
+                  href="#featured"
                   className="block text-gray-400 hover:text-white transition-colors"
                 >
-                  Home
+                  Featured Tracks
                 </a>
                 <a
-                  href="/tracks"
-                  className="block text-gray-400 hover:text-white transition-colors"
-                >
-                  Tracks
-                </a>
-                <a
-                  href="/gallery"
+                  href="#gallery"
                   className="block text-gray-400 hover:text-white transition-colors"
                 >
                   Gallery
                 </a>
                 <a
-                  href="/contact"
+                  href="#contact"
                   className="block text-gray-400 hover:text-white transition-colors"
                 >
                   Contact
@@ -503,6 +782,27 @@ export default function HomePage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="relative w-full max-w-4xl aspect-video bg-dark-200 rounded-lg overflow-hidden">
+            <button
+              onClick={closeVideoModal}
+              className="absolute top-4 right-4 z-10 p-2 bg-dark-200/80 rounded-full text-white hover:bg-dark-300 transition-colors"
+            >
+              <XMarkIcon className="h-5 w-5" />
+            </button>
+            <iframe
+              src={selectedVideo}
+              title="YouTube video"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
         </div>
       )}
