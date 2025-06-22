@@ -1,12 +1,24 @@
 "use client"
 
 import * as React from "react"
-import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
+import { Collapse, CollapseProps } from "@chakra-ui/react"
+import { cn } from "@/lib/utils"
 
-const Collapsible = CollapsiblePrimitive.Root
+export type CollapsibleProps = CollapseProps
 
-const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger
+const Collapsible = React.forwardRef<HTMLDivElement, CollapsibleProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <Collapse
+        ref={ref}
+        className={cn("", className)}
+        {...props}
+      >
+        {children}
+      </Collapse>
+    )
+  }
+)
+Collapsible.displayName = "Collapsible"
 
-const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent
-
-export { Collapsible, CollapsibleTrigger, CollapsibleContent } 
+export { Collapsible } 

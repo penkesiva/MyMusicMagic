@@ -370,9 +370,9 @@ const PortfolioEditorPage = () => {
               </Label>
               <Switch
                 id={`enable-${key}`}
-                checked={(portfolio.sections_config as any)?.[key]?.enabled ?? false}
-                onCheckedChange={(checked) =>
-                  handleSectionConfigChange(key as any, "enabled", checked)
+                isChecked={(portfolio.sections_config as any)?.[key]?.enabled ?? false}
+                onChange={(e) =>
+                  handleSectionConfigChange(key as any, "enabled", e.target.checked)
                 }
               />
             </div>
@@ -640,7 +640,8 @@ const PortfolioEditorPage = () => {
                                     <Button 
                                         size="sm" 
                                         onClick={() => {
-                                            const currentTestimonials = portfolio.testimonials_json ? JSON.parse(portfolio.testimonials_json) : [];
+                                            const currentTestimonials = portfolio.testimonials_json ? 
+                                                (typeof portfolio.testimonials_json === 'string' ? JSON.parse(portfolio.testimonials_json) : portfolio.testimonials_json) : [];
                                             const newTestimonial = {
                                                 id: Date.now(),
                                                 author: '',
@@ -1093,6 +1094,24 @@ const PortfolioEditorPage = () => {
                                         rows={2}
                                         className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
                                     />
+                                </div>
+
+                                <div>
+                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                        News Section
+                                    </label>
+                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-2`}>
+                                        Add news items below to share updates, announcements, and industry insights.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                        News Section
+                                    </label>
+                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-2`}>
+                                        Add news items below to share updates, announcements, and industry insights.
+                                    </p>
                                 </div>
 
                                 {(() => {
