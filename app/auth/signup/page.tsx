@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('')
@@ -35,8 +36,6 @@ export default function SignUpPage() {
 
       if (data.user) {
         setSuccess(true)
-        // User will receive confirmation email
-        // They can sign in after confirming their email
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -46,120 +45,135 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-dark-200 rounded-lg shadow-lg">
-        <div>
-          <h2 className="text-2xl font-bold text-white text-center">
-            Create Your Portfolio
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md">
+         <div className="text-center mb-8">
+            <Link href="/welcome">
+                <h1 className="text-3xl font-bold text-gray-900">MyMusicMagic</h1>
+            </Link>
+          <h2 className="mt-4 text-2xl font-bold text-gray-900">
+            Create your account
           </h2>
-          <p className="mt-2 text-sm text-gray-400 text-center">
-            Join HeroPortfolio and showcase your work
+          <p className="mt-2 text-sm text-gray-600">
+            Get started with your professional portfolio today.
           </p>
         </div>
 
-        {success ? (
-          <div className="text-center space-y-4">
-            <div className="p-3 bg-green-500/10 border border-green-500 rounded-lg">
-              <p className="text-sm text-green-400">
-                Check your email for a confirmation link to complete your registration.
-              </p>
-            </div>
-            <Link
-              href="/auth/signin"
-              className="text-sm text-primary-400 hover:text-primary-300 transition-colors"
-            >
-              Already confirmed? Sign in here
-            </Link>
-          </div>
-        ) : (
-          <form className="mt-8 space-y-6" onSubmit={handleSignUp}>
-            {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500 rounded-lg">
-                <p className="text-sm text-red-500">{error}</p>
+        <div className="bg-white p-8 rounded-2xl shadow-lg">
+            {success ? (
+              <div className="text-center space-y-4">
+                <div className="p-4 bg-green-100 border border-green-300 rounded-lg">
+                  <h3 className="text-lg font-medium text-green-800">Check your email</h3>
+                  <p className="mt-2 text-sm text-green-700">
+                    We've sent a confirmation link to your email address. Please click the link to complete your registration.
+                  </p>
+                </div>
+                <Link
+                  href="/auth/signin"
+                  className="inline-block font-medium text-indigo-600 hover:text-indigo-500"
+                >
+                  Back to Sign In
+                </Link>
               </div>
+            ) : (
+              <form className="space-y-6" onSubmit={handleSignUp}>
+                {error && (
+                  <div className="p-3 bg-red-100 border border-red-300 rounded-lg">
+                    <p className="text-sm text-red-700">{error}</p>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="fullName"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Full Name
+                    </label>
+                    <input
+                      id="fullName"
+                      name="fullName"
+                      type="text"
+                      autoComplete="name"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="mt-1 block w-full px-4 py-3 bg-gray-100 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                      placeholder="John Doe"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Email address
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="mt-1 block w-full px-4 py-3 bg-gray-100 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                      placeholder="you@example.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="password"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Password
+                    </label>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="new-password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="mt-1 block w-full px-4 py-3 bg-gray-100 border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                      placeholder="••••••••"
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75 disabled:cursor-not-allowed transition-all"
+                >
+                  {isLoading ? 'Creating account...' : 'Create Account'}
+                </button>
+
+                <div className="text-center">
+                   <p className="text-sm text-gray-600">
+                      Already have an account?{' '}
+                      <Link
+                        href="/auth/signin"
+                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                      >
+                        Sign in
+                      </Link>
+                    </p>
+                </div>
+              </form>
             )}
-
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="fullName"
-                  className="block text-sm font-medium text-gray-300"
-                >
-                  Full Name
-                </label>
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  autoComplete="name"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="John Doe"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-300"
-                >
-                  Email address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="john@example.com"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-300"
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="••••••••"
-                  minLength={6}
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isLoading ? 'Creating account...' : 'Create account'}
-            </button>
-
-            <div className="text-center">
-              <Link
-                href="/auth/signin"
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                Already have an account? Sign in
-              </Link>
-            </div>
-          </form>
-        )}
+        </div>
+        <div className="mt-8 text-center">
+            <Link href="/welcome" className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900">
+                <ArrowLeft className="w-4 h-4 mr-1.5" />
+                Back to Home
+            </Link>
+        </div>
       </div>
     </div>
   )

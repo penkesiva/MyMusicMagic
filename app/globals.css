@@ -4,56 +4,132 @@
 
 @layer base {
   :root {
-    --scrollbar-thumb: theme('colors.dark.300');
-    --scrollbar-track: theme('colors.dark.100');
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
   }
 
-  /* Custom scrollbar styles */
-  ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-  }
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-  ::-webkit-scrollbar-track {
-    background: var(--scrollbar-track);
-  }
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-  ::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
-    border-radius: 6px;
-    border: 3px solid var(--scrollbar-track);
-  }
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: theme('colors.dark.400');
-  }
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-  /* Custom range input styles */
-  input[type='range'] {
-    @apply appearance-none bg-dark-300 rounded-lg h-1;
-  }
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-  input[type='range']::-webkit-slider-thumb {
-    @apply appearance-none w-4 h-4 rounded-full bg-primary-500 cursor-pointer;
-    @apply hover:bg-primary-600 transition-colors;
-  }
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-  input[type='range']::-moz-range-thumb {
-    @apply appearance-none w-4 h-4 rounded-full bg-primary-500 cursor-pointer border-0;
-    @apply hover:bg-primary-600 transition-colors;
-  }
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-  /* Custom focus styles */
-  *:focus-visible {
-    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-dark-100;
-  }
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-  /* Custom selection styles */
-  ::selection {
-    @apply bg-primary-500/20 text-white;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 210 40% 98%;
   }
 }
 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar styles */
+:root {
+  --scrollbar-thumb: hsl(222.2 84% 4.9% / 0.5); /* Example color */
+  --scrollbar-track: hsl(222.2 84% 4.9% / 0.1); /* Example color */
+}
+.dark {
+    --scrollbar-thumb: hsl(210 40% 98% / 0.2);
+    --scrollbar-track: hsl(210 40% 98% / 0.1);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 6px;
+  border: 3px solid var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: hsl(210 40% 98% / 0.4);
+}
+
+/* Custom focus styles */
+*:focus-visible {
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+}
+
+/* Custom selection styles */
+::selection {
+  @apply bg-primary/20 text-foreground;
+}
+
+/* Custom range input - Note: This might need theme adjustments */
+input[type='range'] {
+    @apply appearance-none bg-muted rounded-lg h-1;
+}
+
+input[type='range']::-webkit-slider-thumb {
+    @apply appearance-none w-4 h-4 rounded-full bg-primary cursor-pointer;
+    @apply hover:bg-primary/90 transition-colors;
+}
+
+input[type='range']::-moz-range-thumb {
+    @apply appearance-none w-4 h-4 rounded-full bg-primary cursor-pointer border-0;
+    @apply hover:bg-primary/90 transition-colors;
+}
+
+/*
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors;
@@ -78,6 +154,7 @@
 }
 
 /* Animations */
+/*
 @keyframes float {
   0% {
     transform: translateY(0px);
@@ -108,8 +185,10 @@
 .animate-slideIn {
   animation: slideIn 1s ease-out forwards;
 }
+*/
 
 /* Transitions */
+/*
 .fade-enter {
   opacity: 0;
 }
@@ -126,4 +205,5 @@
 .fade-exit-active {
   opacity: 0;
   transition: opacity 200ms ease-out;
-} 
+}
+*/ 

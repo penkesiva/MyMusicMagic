@@ -10,7 +10,8 @@ import {
   EyeIcon, 
   TrashIcon,
   CheckIcon,
-  XMarkIcon
+  XMarkIcon,
+  EyeSlashIcon
 } from '@heroicons/react/24/outline'
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
@@ -45,7 +46,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      
+      console.log('User auth check:', { user, userError })
       
       if (!user) {
         router.push('/auth/signin')
@@ -54,12 +57,20 @@ export default function DashboardPage() {
 
       setUser(user)
 
+      // Ensure user profile exists
+      const { error: ensureProfileError } = await supabase
+        .rpc('ensure_user_profile', { user_uuid: user.id })
+
+      console.log('Ensure profile:', { ensureProfileError })
+
       // Fetch user profile
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
         .single()
+
+      console.log('Profile fetch:', { profileData, profileError })
 
       if (profileData) {
         setProfile(profileData)
@@ -71,36 +82,53 @@ export default function DashboardPage() {
         })
       }
 
+      // Ensure user subscription exists
+      const { error: ensureSubscriptionError } = await supabase
+        .rpc('ensure_user_subscription', { user_uuid: user.id })
+
+      console.log('Ensure subscription:', { ensureSubscriptionError })
+
       // Fetch user subscription
-      const { data: subscriptionData } = await supabase
+      const { data: subscriptionData, error: subscriptionError } = await supabase
         .from('user_subscriptions')
         .select('*')
         .eq('user_id', user.id)
         .single()
+
+      console.log('Subscription fetch:', { subscriptionData, subscriptionError })
 
       if (subscriptionData) {
         setSubscription(subscriptionData)
       }
 
       // Fetch user portfolios
-      const { data: portfoliosData } = await supabase
+      const { data: portfoliosData, error: portfoliosError } = await supabase
         .from('user_portfolios')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
+
+      console.log('Portfolios fetch:', { portfoliosData, portfoliosError })
 
       if (portfoliosData) {
         setPortfolios(portfoliosData)
       }
 
       // Fetch portfolio templates
-      const { data: templatesData } = await supabase
+      const { data: templatesData, error: templatesError } = await supabase
         .from('portfolio_templates')
         .select('*')
         .eq('is_active', true)
         .order('name', { ascending: true })
 
-      if (templatesData) {
+      console.log('Templates data:', templatesData)
+      console.log('Templates error:', templatesError)
+
+      // Temporarily set empty templates array if there's an error
+      if (templatesError) {
+        console.warn('Templates not available:', templatesError.message)
+        setTemplates([])
+      } else if (templatesData) {
         setTemplates(templatesData)
       }
 
@@ -137,7 +165,7 @@ export default function DashboardPage() {
   }
 
   const handleCreatePortfolio = async () => {
-    if (!newPortfolioName.trim() || !selectedTemplate) return
+    if (!newPortfolioName.trim()) return
 
     try {
       const slug = newPortfolioName.toLowerCase().replace(/[^a-z0-9]/g, '-')
@@ -148,7 +176,8 @@ export default function DashboardPage() {
           user_id: user.id,
           name: newPortfolioName,
           slug: slug,
-          template_id: selectedTemplate,
+          template_id: selectedTemplate || null,
+          is_published: true, // Make portfolios published by default
           is_default: portfolios.length === 0 // First portfolio is default
         })
         .select()
@@ -163,6 +192,7 @@ export default function DashboardPage() {
       setSuccess('Portfolio created successfully!')
       setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
+      console.error('Portfolio creation error:', err)
       setError('Failed to create portfolio')
       setTimeout(() => setError(null), 3000)
     }
@@ -188,6 +218,28 @@ export default function DashboardPage() {
     }
   }
 
+  const handleTogglePublish = async (portfolioId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('user_portfolios')
+        .update({ is_published: !currentStatus })
+        .eq('id', portfolioId)
+
+      if (error) throw error
+
+      setPortfolios(portfolios.map(p => 
+        p.id === portfolioId 
+          ? { ...p, is_published: !currentStatus }
+          : p
+      ))
+      setSuccess(`Portfolio ${!currentStatus ? 'published' : 'unpublished'} successfully!`)
+      setTimeout(() => setSuccess(null), 3000)
+    } catch (err) {
+      setError('Failed to update portfolio status')
+      setTimeout(() => setError(null), 3000)
+    }
+  }
+
   const getPlanFeatures = (planType: string) => {
     switch (planType) {
       case 'free':
@@ -201,36 +253,20 @@ export default function DashboardPage() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-dark-100">
-        <div className="text-white">Loading...</div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-dark-100">
+    <div className="min-h-screen bg-gray-900 text-gray-200">
       {/* Header */}
-      <header className="bg-dark-200 border-b border-dark-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-white">
-                HeroPortfolio Dashboard
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-300">
-                Welcome, {profile?.full_name || user?.email}
-              </span>
-              <button
-                onClick={handleSignOut}
-                className="text-sm text-gray-300 hover:text-white transition-colors"
-              >
-                Sign out
-              </button>
-            </div>
+      <header className="bg-gray-800 shadow-md">
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+          <div className="flex items-center space-x-4">
+            <span className="text-gray-400">Welcome, {profile?.username || user?.email}</span>
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </header>
@@ -248,273 +284,250 @@ export default function DashboardPage() {
       )}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0 space-y-8">
-          
-          {/* Subscription Section */}
-          <div className="bg-dark-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-white mb-4">Subscription</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-medium text-white capitalize">
-                      {subscription?.plan_type || 'Free'} Plan
-                    </h3>
-                    <p className="text-gray-400">
-                      Status: <span className="text-green-400 capitalize">{subscription?.status || 'Active'}</span>
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-gray-400">Loading your dashboard...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column */}
+            <div className="lg:col-span-1 space-y-8">
+              {/* Subscription Status */}
+              <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
+                <h2 className="text-xl font-semibold text-white mb-4">Subscription Status</h2>
+                {subscription ? (
+                  <>
+                    <p className="capitalize">
+                      <span className="font-medium text-gray-400">Plan:</span> {subscription.plan_type}
                     </p>
-                  </div>
-                  <button className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors">
-                    Upgrade
-                  </button>
-                </div>
-                <ul className="space-y-2">
-                  {getPlanFeatures(subscription?.plan_type || 'free').map((feature, index) => (
-                    <li key={index} className="flex items-center text-gray-300">
-                      <CheckIcon className="h-4 w-4 text-green-400 mr-2" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Profile Section */}
-          <div className="bg-dark-200 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-white">Profile</h2>
-              {!isEditingProfile ? (
-                <button
-                  onClick={() => setIsEditingProfile(true)}
-                  className="flex items-center text-primary-400 hover:text-primary-300 transition-colors"
-                >
-                  <PencilIcon className="h-4 w-4 mr-1" />
-                  Edit
-                </button>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handleSaveProfile}
-                    className="flex items-center text-green-400 hover:text-green-300 transition-colors"
-                  >
-                    <CheckIcon className="h-4 w-4 mr-1" />
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsEditingProfile(false)
-                      setEditingProfile({
-                        full_name: profile?.full_name || '',
-                        username: profile?.username || '',
-                        bio: profile?.bio || '',
-                        website_url: profile?.website_url || ''
-                      })
-                    }}
-                    className="flex items-center text-red-400 hover:text-red-300 transition-colors"
-                  >
-                    <XMarkIcon className="h-4 w-4 mr-1" />
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            {isEditingProfile ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
-                  <input
-                    type="text"
-                    value={editingProfile.full_name}
-                    onChange={(e) => setEditingProfile({...editingProfile, full_name: e.target.value})}
-                    className="w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Username</label>
-                  <input
-                    type="text"
-                    value={editingProfile.username}
-                    onChange={(e) => setEditingProfile({...editingProfile, username: e.target.value})}
-                    className="w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Bio</label>
-                  <textarea
-                    value={editingProfile.bio}
-                    onChange={(e) => setEditingProfile({...editingProfile, bio: e.target.value})}
-                    rows={3}
-                    className="w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">Website URL</label>
-                  <input
-                    type="url"
-                    value={editingProfile.website_url}
-                    onChange={(e) => setEditingProfile({...editingProfile, website_url: e.target.value})}
-                    className="w-full px-3 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-sm text-gray-400">Name</label>
-                  <p className="text-white">{profile?.full_name || 'Not set'}</p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400">Username</label>
-                  <p className="text-white">{profile?.username || 'Not set'}</p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400">Email</label>
-                  <p className="text-white">{profile?.email}</p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400">Website</label>
-                  <p className="text-white">{profile?.website_url || 'Not set'}</p>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="text-sm text-gray-400">Bio</label>
-                  <p className="text-white">{profile?.bio || 'No bio added yet'}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Portfolios Section */}
-          <div className="bg-dark-200 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">My Portfolios</h2>
-              <button
-                onClick={() => setIsCreatingPortfolio(true)}
-                className="flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
-              >
-                <PlusIcon className="h-4 w-4 mr-2" />
-                Create Portfolio
-              </button>
-            </div>
-
-            {/* Create Portfolio Modal */}
-            {isCreatingPortfolio && (
-              <div className="mb-6 p-4 bg-dark-300 rounded-lg">
-                <h3 className="text-lg font-medium text-white mb-4">Create New Portfolio</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Portfolio Name</label>
-                    <input
-                      type="text"
-                      value={newPortfolioName}
-                      onChange={(e) => setNewPortfolioName(e.target.value)}
-                      placeholder="My Awesome Portfolio"
-                      className="w-full px-3 py-2 bg-dark-400 border border-dark-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Template</label>
-                    <select
-                      value={selectedTemplate}
-                      onChange={(e) => setSelectedTemplate(e.target.value)}
-                      className="w-full px-3 py-2 bg-dark-400 border border-dark-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="">Select a template</option>
-                      {templates.map((template) => (
-                        <option key={template.id} value={template.id}>
-                          {template.name} - {template.industry} ({template.style})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={handleCreatePortfolio}
-                      disabled={!newPortfolioName.trim() || !selectedTemplate}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      Create Portfolio
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsCreatingPortfolio(false)
-                        setNewPortfolioName('')
-                        setSelectedTemplate('')
-                      }}
-                      className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Portfolio List */}
-            {portfolios.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-400 mb-4">You haven't created any portfolios yet.</p>
-                <p className="text-gray-500">Click "Create Portfolio" to get started!</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {portfolios.map((portfolio) => (
-                  <div key={portfolio.id} className="bg-dark-300 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="text-white font-medium">{portfolio.name}</h3>
-                        <p className="text-gray-400 text-sm">{portfolio.slug}</p>
-                      </div>
-                      {portfolio.is_default && (
-                        <span className="px-2 py-1 bg-primary-500 text-white text-xs rounded-full">
-                          Default
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 mb-3">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        portfolio.is_published 
-                          ? 'bg-green-500/20 text-green-400' 
-                          : 'bg-yellow-500/20 text-yellow-400'
-                      }`}>
-                        {portfolio.is_published ? 'Published' : 'Draft'}
+                    <p className="capitalize">
+                      <span className="font-medium text-gray-400">Status:</span> 
+                      <span className={subscription.status === 'active' ? 'text-green-400' : 'text-yellow-400'}>
+                        {` ${subscription.status}`}
                       </span>
-                    </div>
+                    </p>
+                    <ul className="mt-4 space-y-2 text-gray-300">
+                      {getPlanFeatures(subscription.plan_type).map((feature, i) => (
+                        <li key={i} className="flex items-center">
+                          <CheckIcon className="h-5 w-5 text-green-400 mr-2" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <p>No subscription details found.</p>
+                )}
+              </div>
 
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => router.push(`/dashboard/portfolio/${portfolio.id}/edit`)}
-                        className="flex items-center text-blue-400 hover:text-blue-300 transition-colors"
-                      >
+              {/* User Profile */}
+              <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-white">My Profile</h2>
+                  <button
+                    onClick={() => setIsEditingProfile(!isEditingProfile)}
+                    className="flex items-center text-blue-400 hover:text-blue-300"
+                  >
+                    {isEditingProfile ? (
+                      <>
+                        <XMarkIcon className="h-4 w-4 mr-1" />
+                        Cancel
+                      </>
+                    ) : (
+                      <>
                         <PencilIcon className="h-4 w-4 mr-1" />
                         Edit
-                      </button>
-                      <button
-                        onClick={() => router.push(`/portfolio/${portfolio.slug}`)}
-                        className="flex items-center text-green-400 hover:text-green-300 transition-colors"
-                      >
-                        <EyeIcon className="h-4 w-4 mr-1" />
-                        Preview
-                      </button>
-                      {!portfolio.is_default && (
-                        <button
-                          onClick={() => handleDeletePortfolio(portfolio.id)}
-                          className="flex items-center text-red-400 hover:text-red-300 transition-colors"
+                      </>
+                    )}
+                  </button>
+                </div>
+                {isEditingProfile ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
+                      <input
+                        type="text"
+                        value={editingProfile.full_name}
+                        onChange={(e) => setEditingProfile({...editingProfile, full_name: e.target.value})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Username</label>
+                      <input
+                        type="text"
+                        value={editingProfile.username}
+                        onChange={(e) => setEditingProfile({...editingProfile, username: e.target.value})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Bio</label>
+                      <textarea
+                        value={editingProfile.bio}
+                        onChange={(e) => setEditingProfile({...editingProfile, bio: e.target.value})}
+                        rows={3}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Website</label>
+                      <input
+                        type="text"
+                        value={editingProfile.website_url}
+                        onChange={(e) => setEditingProfile({...editingProfile, website_url: e.target.value})}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <button
+                      onClick={handleSaveProfile}
+                      className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Save Profile
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3 text-gray-300">
+                    <p><span className="font-semibold text-gray-400">Name:</span> {profile?.full_name || 'Not set'}</p>
+                    <p><span className="font-semibold text-gray-400">Username:</span> {profile?.username || 'Not set'}</p>
+                    <p><span className="font-semibold text-gray-400">Email:</span> {user?.email}</p>
+                    <p><span className="font-semibold text-gray-400">Website:</span> {profile?.website_url || 'Not set'}</p>
+                    <p><span className="font-semibold text-gray-400">Bio:</span> {profile?.bio || 'Not set'}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="lg:col-span-2">
+              <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-semibold text-white">My Portfolios</h2>
+                  <button
+                    onClick={() => setIsCreatingPortfolio(true)}
+                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <PlusIcon className="h-4 w-4 mr-2" />
+                    Create Portfolio
+                  </button>
+                </div>
+
+                {/* Create Portfolio Modal */}
+                {isCreatingPortfolio && (
+                  <div className="mb-6 p-4 bg-gray-700 rounded-lg">
+                    <h3 className="text-lg font-medium text-white mb-4">Create New Portfolio</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Portfolio Name</label>
+                        <input
+                          type="text"
+                          value={newPortfolioName}
+                          onChange={(e) => setNewPortfolioName(e.target.value)}
+                          placeholder="My Awesome Portfolio"
+                          className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Template (Optional)</label>
+                        <select
+                          value={selectedTemplate}
+                          onChange={(e) => setSelectedTemplate(e.target.value)}
+                          className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          <TrashIcon className="h-4 w-4 mr-1" />
-                          Delete
+                          <option value="">No template (Custom portfolio)</option>
+                          {templates.length === 0 ? (
+                            <option value="" disabled>No templates available</option>
+                          ) : (
+                            templates.map((template) => (
+                              <option key={template.id} value={template.id}>
+                                {template.name} - {template.industry} ({template.style})
+                              </option>
+                            ))
+                          )}
+                        </select>
+                        {templates.length === 0 && (
+                          <p className="mt-1 text-sm text-gray-400">
+                            Templates will be available soon. You can create a custom portfolio now.
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={handleCreatePortfolio}
+                          disabled={!newPortfolioName.trim()}
+                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Create
                         </button>
-                      )}
+                        <button
+                          onClick={() => {
+                            setIsCreatingPortfolio(false);
+                            setNewPortfolioName('');
+                            setSelectedTemplate('');
+                          }}
+                          className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ))}
+                )}
+
+                {/* Portfolio List */}
+                {portfolios.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400 mb-4">You haven't created any portfolios yet.</p>
+                    <p className="text-gray-500">Click "Create Portfolio" to get started!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {portfolios.map((portfolio) => (
+                      <div key={portfolio.id} className="bg-gray-700 rounded-lg p-4 flex items-center justify-between">
+                        <div>
+                          <h3 className="text-white font-medium">{portfolio.name}</h3>
+                          <p className="text-gray-400 text-sm">/{portfolio.slug}</p>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            portfolio.is_published 
+                              ? 'bg-green-500/20 text-green-400' 
+                              : 'bg-yellow-500/20 text-yellow-400'
+                          }`}>
+                            {portfolio.is_published ? 'Published' : 'Draft'}
+                          </span>
+                          <button
+                            onClick={() => handleTogglePublish(portfolio.id, portfolio.is_published)}
+                            className="flex items-center text-sm text-gray-300 hover:text-white"
+                            title={portfolio.is_published ? 'Unpublish' : 'Publish'}
+                          >
+                            {portfolio.is_published ? <EyeSlashIcon className="h-5 w-5 text-yellow-400" /> : <EyeIcon className="h-5 w-5 text-green-400" />}
+                          </button>
+                          <a href={`/dashboard/portfolio/${portfolio.id}/edit`} className="flex items-center text-sm text-blue-400 hover:text-blue-300" title="Edit">
+                            <PencilIcon className="h-5 w-5" />
+                          </a>
+                           <a href={`/portfolio/${portfolio.slug}`} target="_blank" className="flex items-center text-sm text-gray-300 hover:text-white" title="Preview">
+                            <EyeIcon className="h-5 w-5" />
+                          </a>
+                          {!portfolio.is_default && (
+                            <button
+                              onClick={() => handleDeletePortfolio(portfolio.id)}
+                              className="flex items-center text-red-400 hover:text-red-300"
+                              title="Delete"
+                            >
+                              <TrashIcon className="h-5 w-5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   )

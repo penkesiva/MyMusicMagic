@@ -23,6 +23,7 @@ export interface Database {
           release_date: string | null
           is_published: boolean
           user_id: string
+          portfolio_id: string | null
         }
         Insert: {
           id?: string
@@ -37,6 +38,7 @@ export interface Database {
           release_date?: string | null
           is_published?: boolean
           user_id: string
+          portfolio_id?: string | null
         }
         Update: {
           id?: string
@@ -51,6 +53,7 @@ export interface Database {
           release_date?: string | null
           is_published?: boolean
           user_id?: string
+          portfolio_id?: string | null
         }
       }
       profiles: {
@@ -236,6 +239,39 @@ export interface Database {
           is_default: boolean
           created_at: string
           updated_at: string
+          subtitle: string | null
+          hero_image_url: string | null
+          about_title: string | null
+          about_text: string | null
+          profile_photo_url: string | null
+          instagram_url: string | null
+          twitter_url: string | null
+          youtube_url: string | null
+          linkedin_url: string | null
+          website_url: string | null
+          testimonials_title: string | null
+          testimonials_json: Json | null
+          blog_title: string | null
+          blog_description: string | null
+          blog_posts_json: Json | null
+          news_title: string | null
+          news_items_json: Json | null
+          skills_title: string | null
+          skills_json: Json | null
+          status_title: string | null
+          current_status: string | null
+          status_description: string | null
+          ai_advantage_title: string | null
+          ai_advantages_json: Json | null
+          contact_title: string | null
+          contact_description: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          contact_location: string | null
+          footer_text: string | null
+          footer_links_json: Json | null
+          sections_config: Json | null
+          theme_name: string | null
         }
         Insert: {
           id?: string
@@ -247,6 +283,39 @@ export interface Database {
           is_default?: boolean
           created_at?: string
           updated_at?: string
+          subtitle?: string | null
+          hero_image_url?: string | null
+          about_title?: string | null
+          about_text?: string | null
+          profile_photo_url?: string | null
+          instagram_url?: string | null
+          twitter_url?: string | null
+          youtube_url?: string | null
+          linkedin_url?: string | null
+          website_url?: string | null
+          testimonials_title?: string | null
+          testimonials_json?: Json | null
+          blog_title?: string | null
+          blog_description?: string | null
+          blog_posts_json?: Json | null
+          news_title?: string | null
+          news_items_json?: Json | null
+          skills_title?: string | null
+          skills_json?: Json | null
+          status_title?: string | null
+          current_status?: string | null
+          status_description?: string | null
+          ai_advantage_title?: string | null
+          ai_advantages_json?: Json | null
+          contact_title?: string | null
+          contact_description?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_location?: string | null
+          footer_text?: string | null
+          footer_links_json?: Json | null
+          sections_config?: Json | null
+          theme_name?: string | null
         }
         Update: {
           id?: string
@@ -258,6 +327,39 @@ export interface Database {
           is_default?: boolean
           created_at?: string
           updated_at?: string
+          subtitle?: string | null
+          hero_image_url?: string | null
+          about_title?: string | null
+          about_text?: string | null
+          profile_photo_url?: string | null
+          instagram_url?: string | null
+          twitter_url?: string | null
+          youtube_url?: string | null
+          linkedin_url?: string | null
+          website_url?: string | null
+          testimonials_title?: string | null
+          testimonials_json?: Json | null
+          blog_title?: string | null
+          blog_description?: string | null
+          blog_posts_json?: Json | null
+          news_title?: string | null
+          news_items_json?: Json | null
+          skills_title?: string | null
+          skills_json?: Json | null
+          status_title?: string | null
+          current_status?: string | null
+          status_description?: string | null
+          ai_advantage_title?: string | null
+          ai_advantages_json?: Json | null
+          contact_title?: string | null
+          contact_description?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_location?: string | null
+          footer_text?: string | null
+          footer_links_json?: Json | null
+          sections_config?: Json | null
+          theme_name?: string | null
         }
       }
       artist_info: {
@@ -340,6 +442,7 @@ export interface Database {
           description: string | null
           date: string
           created_at: string
+          portfolio_id: string | null
         }
         Insert: {
           id?: string
@@ -350,6 +453,7 @@ export interface Database {
           description?: string | null
           date?: string
           created_at?: string
+          portfolio_id?: string | null
         }
         Update: {
           id?: string
@@ -360,6 +464,7 @@ export interface Database {
           description?: string | null
           date?: string
           created_at?: string
+          portfolio_id?: string | null
         }
       }
       messages: {
