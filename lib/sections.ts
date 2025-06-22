@@ -11,6 +11,11 @@ export const SECTIONS_CONFIG: Record<string, Section> = {
     gallery: { defaultName: 'Photo Gallery', defaultEnabled: true, defaultOrder: 4 },
     testimonials: { defaultName: 'Testimonials', defaultEnabled: false, defaultOrder: 5 },
     social_links: { defaultName: 'Social Links', defaultEnabled: true, defaultOrder: 6 },
-    contact: { defaultName: 'Contact', defaultEnabled: true, defaultOrder: 7 },
-    footer: { defaultName: 'Footer', defaultEnabled: true, defaultOrder: 8 },
+    skills: { defaultName: 'Skills & Instruments', defaultEnabled: false, defaultOrder: 7 },
+    status: { defaultName: 'Current Status', defaultEnabled: false, defaultOrder: 8 },
+    blog: { defaultName: 'Blog', defaultEnabled: false, defaultOrder: 9 },
+    news: { defaultName: 'News & Updates', defaultEnabled: false, defaultOrder: 10 },
+    ai_advantage: { defaultName: 'AI Advantage', defaultEnabled: false, defaultOrder: 11 },
+    contact: { defaultName: 'Contact', defaultEnabled: true, defaultOrder: 12 },
+    footer: { defaultName: 'Footer', defaultEnabled: true, defaultOrder: 13 },
 }; 

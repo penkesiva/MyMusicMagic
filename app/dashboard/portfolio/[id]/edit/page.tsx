@@ -293,8 +293,297 @@ const PortfolioEditorPage = () => {
                             </div>
                         )}
                         
-                        {key === 'testimonials' && <div><p className="text-gray-400">Testimonials editor coming soon.</p></div>}
-                        {key === 'blog' && <div><p className="text-gray-400">Blog editor coming soon.</p></div>}
+                        {key === 'testimonials' && (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                                            <EditableField 
+                                                value={portfolio.testimonials_title || 'Testimonials'} 
+                                                onSave={(newValue) => handleFieldChange('testimonials_title', newValue)} 
+                                                theme={selectedTheme} 
+                                            />
+                                        </h3>
+                                        <p className={`text-sm ${selectedTheme.colors.text} opacity-75 mt-2`}>
+                                            Showcase reviews and feedback from fans, critics, and collaborators.
+                                        </p>
+                                    </div>
+                                    <Button 
+                                        size="sm" 
+                                        onClick={() => {
+                                            const currentTestimonials = portfolio.testimonials_json ? JSON.parse(portfolio.testimonials_json) : [];
+                                            const newTestimonial = {
+                                                id: Date.now(),
+                                                author: '',
+                                                content: '',
+                                                rating: 5,
+                                                date: new Date().toISOString().split('T')[0]
+                                            };
+                                            const updatedTestimonials = [...currentTestimonials, newTestimonial];
+                                            handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
+                                        }}
+                                    >
+                                        <PlusCircle className="mr-2 h-4 w-4" /> Add Testimonial
+                                    </Button>
+                                </div>
+
+                                {(portfolio.testimonials_json || portfolio.testimonials_json === '') && (() => {
+                                    try {
+                                        const testimonialsJson = typeof portfolio.testimonials_json === 'string' 
+                                            ? portfolio.testimonials_json 
+                                            : JSON.stringify(portfolio.testimonials_json || []);
+                                        const testimonials = JSON.parse(testimonialsJson);
+                                        if (!Array.isArray(testimonials) || testimonials.length === 0) {
+                                            return (
+                                                <div className="text-center py-8">
+                                                    <p className={`text-gray-400 ${selectedTheme.colors.text}`}>
+                                                        No testimonials yet. Click "Add Testimonial" to get started.
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <div className="space-y-4">
+                                                {testimonials.map((testimonial: any, index: number) => (
+                                                    <div key={testimonial.id || index} className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <div className="flex-1 space-y-2">
+                                                                <input
+                                                                    type="text"
+                                                                    value={testimonial.author || ''}
+                                                                    onChange={(e) => {
+                                                                        const updatedTestimonials = testimonials.map((t: any, i: number) => 
+                                                                            i === index ? { ...t, author: e.target.value } : t
+                                                                        );
+                                                                        handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
+                                                                    }}
+                                                                    placeholder="Author name"
+                                                                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm font-medium"
+                                                                />
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span className={`text-xs ${selectedTheme.colors.text} opacity-75`}>Rating:</span>
+                                                                    <div className="flex space-x-1">
+                                                                        {[1, 2, 3, 4, 5].map((star) => (
+                                                                            <button
+                                                                                key={star}
+                                                                                onClick={() => {
+                                                                                    const updatedTestimonials = testimonials.map((t: any, i: number) => 
+                                                                                        i === index ? { ...t, rating: star } : t
+                                                                                    );
+                                                                                    handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
+                                                                                }}
+                                                                                className={`text-lg ${testimonial.rating >= star ? 'text-yellow-400' : 'text-gray-500'}`}
+                                                                            >
+                                                                                ★
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => {
+                                                                        const updatedTestimonials = testimonials.filter((_: any, i: number) => i !== index);
+                                                                        handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
+                                                                    }}
+                                                                className="text-red-400 hover:text-red-300 p-1"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                        <textarea
+                                                            value={testimonial.content || ''}
+                                                            onChange={(e) => {
+                                                                const updatedTestimonials = testimonials.map((t: any, i: number) => 
+                                                                    i === index ? { ...t, content: e.target.value } : t
+                                                                );
+                                                                handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
+                                                            }}
+                                                            placeholder="Write the testimonial content here..."
+                                                            rows={3}
+                                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                    } catch (error) {
+                                        return (
+                                            <div className="text-center py-8">
+                                                <p className={`text-red-400 ${selectedTheme.colors.text}`}>
+                                                    Error loading testimonials. Please try refreshing the page.
+                                                </p>
+                                            </div>
+                                        );
+                                    }
+                                })()}
+                            </div>
+                        )}
+
+                        {key === 'blog' && (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                                            <EditableField 
+                                                value={portfolio.blog_title || 'Blog'} 
+                                                onSave={(newValue) => handleFieldChange('blog_title', newValue)} 
+                                                theme={selectedTheme} 
+                                            />
+                                        </h3>
+                                        <p className={`text-sm ${selectedTheme.colors.text} opacity-75 mt-2`}>
+                                            Share your thoughts, behind-the-scenes stories, and musical insights.
+                                        </p>
+                                    </div>
+                                    <Button 
+                                        size="sm" 
+                                        onClick={() => {
+                                            const currentPosts = portfolio.blog_posts_json ? 
+                                                (typeof portfolio.blog_posts_json === 'string' ? JSON.parse(portfolio.blog_posts_json) : portfolio.blog_posts_json) : [];
+                                            const newPost = {
+                                                id: Date.now(),
+                                                title: '',
+                                                content: '',
+                                                excerpt: '',
+                                                published_date: new Date().toISOString().split('T')[0],
+                                                is_published: false
+                                            };
+                                            const updatedPosts = [...currentPosts, newPost];
+                                            handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
+                                        }}
+                                    >
+                                        <PlusCircle className="mr-2 h-4 w-4" /> Add Post
+                                    </Button>
+                                </div>
+
+                                <div>
+                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                        Blog Description
+                                    </label>
+                                    <textarea
+                                        value={portfolio.blog_description || ''}
+                                        onChange={(e) => handleFieldChange('blog_description', e.target.value)}
+                                        placeholder="Describe what your blog is about..."
+                                        rows={2}
+                                        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                    />
+                                </div>
+
+                                {(() => {
+                                    try {
+                                        const postsJson = typeof portfolio.blog_posts_json === 'string' 
+                                            ? portfolio.blog_posts_json 
+                                            : JSON.stringify(portfolio.blog_posts_json || []);
+                                        const posts = JSON.parse(postsJson);
+                                        
+                                        if (!Array.isArray(posts) || posts.length === 0) {
+                                            return (
+                                                <div className="text-center py-8">
+                                                    <p className={`text-gray-400 ${selectedTheme.colors.text}`}>
+                                                        No blog posts yet. Click "Add Post" to get started.
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <div className="space-y-4">
+                                                {posts.map((post: any, index: number) => (
+                                                    <div key={post.id || index} className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <div className="flex-1 space-y-3">
+                                                                <input
+                                                                    type="text"
+                                                                    value={post.title || ''}
+                                                                    onChange={(e) => {
+                                                                        const updatedPosts = posts.map((p: any, i: number) => 
+                                                                            i === index ? { ...p, title: e.target.value } : p
+                                                                        );
+                                                                        handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
+                                                                    }}
+                                                                    placeholder="Post title"
+                                                                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm font-medium"
+                                                                />
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={post.published_date || ''}
+                                                                        onChange={(e) => {
+                                                                            const updatedPosts = posts.map((p: any, i: number) => 
+                                                                                i === index ? { ...p, published_date: e.target.value } : p
+                                                                            );
+                                                                            handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
+                                                                        }}
+                                                                        className="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                                    />
+                                                                    <div className="flex items-center space-x-2">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={post.is_published || false}
+                                                                            onChange={(e) => {
+                                                                                const updatedPosts = posts.map((p: any, i: number) => 
+                                                                                    i === index ? { ...p, is_published: e.target.checked } : p
+                                                                                );
+                                                                                handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
+                                                                            }}
+                                                                            className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
+                                                                        />
+                                                                        <span className={`text-xs ${selectedTheme.colors.text} opacity-75`}>Published</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => {
+                                                                        const updatedPosts = posts.filter((_: any, i: number) => i !== index);
+                                                                        handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
+                                                                    }}
+                                                                className="text-red-400 hover:text-red-300 p-1"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <textarea
+                                                                value={post.excerpt || ''}
+                                                                onChange={(e) => {
+                                                                    const updatedPosts = posts.map((p: any, i: number) => 
+                                                                        i === index ? { ...p, excerpt: e.target.value } : p
+                                                                    );
+                                                                    handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
+                                                                }}
+                                                                placeholder="Brief excerpt (optional)"
+                                                                rows={2}
+                                                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                            />
+                                                            <textarea
+                                                                value={post.content || ''}
+                                                                onChange={(e) => {
+                                                                    const updatedPosts = posts.map((p: any, i: number) => 
+                                                                        i === index ? { ...p, content: e.target.value } : p
+                                                                    );
+                                                                    handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
+                                                                }}
+                                                                placeholder="Write your blog post content here..."
+                                                                rows={4}
+                                                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                    } catch (error) {
+                                        return (
+                                            <div className="text-center py-8">
+                                                <p className={`text-red-400 ${selectedTheme.colors.text}`}>
+                                                    Error loading blog posts. Please try refreshing the page.
+                                                </p>
+                                            </div>
+                                        );
+                                    }
+                                })()}
+                            </div>
+                        )}
                         
                         {key === 'tracks' && (
                             <>
@@ -356,11 +645,595 @@ const PortfolioEditorPage = () => {
                             </>
                         )}
 
-                        {key === 'social_links' && <div><p className="text-gray-400">Social links editor coming soon.</p></div>}
-                        {key === 'news' && <div><p className="text-gray-400">News editor coming soon.</p></div>}
-                        {key === 'skills' && <div><p className="text-gray-400">Skills editor coming soon.</p></div>}
-                        {key === 'status' && <div><p className="text-gray-400">Status editor coming soon.</p></div>}
-                        {key === 'ai_advantage' && <div><p className="text-gray-400">AI advantage editor coming soon.</p></div>}
+                        {key === 'social_links' && (
+                            <div className="space-y-6">
+                                <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                                    Social Media Links
+                                </h3>
+                                <p className={`text-sm ${selectedTheme.colors.text} opacity-75`}>
+                                    Add your social media profiles to help fans connect with you across platforms.
+                                </p>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Instagram */}
+                                    <div className="space-y-2">
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                            Instagram
+                                        </label>
+                                        <input
+                                            type="url"
+                                            value={portfolio.instagram_url || ''}
+                                            onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
+                                            placeholder="https://instagram.com/yourusername"
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                        />
+                                    </div>
+
+                                    {/* Twitter/X */}
+                                    <div className="space-y-2">
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                            Twitter/X
+                                        </label>
+                                        <input
+                                            type="url"
+                                            value={portfolio.twitter_url || ''}
+                                            onChange={(e) => handleFieldChange('twitter_url', e.target.value)}
+                                            placeholder="https://twitter.com/yourusername"
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                        />
+                                    </div>
+
+                                    {/* YouTube */}
+                                    <div className="space-y-2">
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                            YouTube
+                                        </label>
+                                        <input
+                                            type="url"
+                                            value={portfolio.youtube_url || ''}
+                                            onChange={(e) => handleFieldChange('youtube_url', e.target.value)}
+                                            placeholder="https://youtube.com/@yourchannel"
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                        />
+                                    </div>
+
+                                    {/* LinkedIn */}
+                                    <div className="space-y-2">
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                            LinkedIn
+                                        </label>
+                                        <input
+                                            type="url"
+                                            value={portfolio.linkedin_url || ''}
+                                            onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
+                                            placeholder="https://linkedin.com/in/yourprofile"
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                        />
+                                    </div>
+
+                                    {/* Website */}
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                            Personal Website
+                                        </label>
+                                        <input
+                                            type="url"
+                                            value={portfolio.website_url || ''}
+                                            onChange={(e) => handleFieldChange('website_url', e.target.value)}
+                                            placeholder="https://yourwebsite.com"
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                                    <h4 className={`text-sm font-semibold ${selectedTheme.colors.text} mb-2`}>
+                                        💡 Tips for Social Links
+                                    </h4>
+                                    <ul className={`text-xs space-y-1 ${selectedTheme.colors.text} opacity-75`}>
+                                        <li>• Use the full URL (including https://)</li>
+                                        <li>• Make sure your profiles are public</li>
+                                        <li>• Keep your links up to date</li>
+                                        <li>• Consider adding your most active platforms first</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
+
+                        {key === 'news' && (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                                            <EditableField 
+                                                value={portfolio.news_title || 'News & Updates'} 
+                                                onSave={(newValue) => handleFieldChange('news_title', newValue)} 
+                                                theme={selectedTheme} 
+                                            />
+                                        </h3>
+                                        <p className={`text-sm ${selectedTheme.colors.text} opacity-75 mt-2`}>
+                                            Share your latest news, announcements, and updates with your audience.
+                                        </p>
+                                    </div>
+                                    <Button 
+                                        size="sm" 
+                                        onClick={() => {
+                                            const currentNews = portfolio.news_items_json ? 
+                                                (typeof portfolio.news_items_json === 'string' ? JSON.parse(portfolio.news_items_json) : portfolio.news_items_json) : [];
+                                            const newItem = {
+                                                id: Date.now(),
+                                                title: '',
+                                                content: '',
+                                                published_date: new Date().toISOString().split('T')[0],
+                                                is_published: false,
+                                                is_featured: false
+                                            };
+                                            const updatedNews = [...currentNews, newItem];
+                                            handleFieldChange('news_items_json', JSON.stringify(updatedNews));
+                                        }}
+                                    >
+                                        <PlusCircle className="mr-2 h-4 w-4" /> Add News
+                                    </Button>
+                                </div>
+
+                                <div>
+                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                        News Description
+                                    </label>
+                                    <textarea
+                                        value={portfolio.news_description || ''}
+                                        onChange={(e) => handleFieldChange('news_description', e.target.value)}
+                                        placeholder="Describe what kind of news you'll be sharing..."
+                                        rows={2}
+                                        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                    />
+                                </div>
+
+                                {(() => {
+                                    try {
+                                        const newsJson = typeof portfolio.news_items_json === 'string' 
+                                            ? portfolio.news_items_json 
+                                            : JSON.stringify(portfolio.news_items_json || []);
+                                        const newsItems = JSON.parse(newsJson);
+                                        
+                                        if (!Array.isArray(newsItems) || newsItems.length === 0) {
+                                            return (
+                                                <div className="text-center py-8">
+                                                    <p className={`text-gray-400 ${selectedTheme.colors.text}`}>
+                                                        No news items yet. Click "Add News" to get started.
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <div className="space-y-4">
+                                                {newsItems.map((item: any, index: number) => (
+                                                    <div key={item.id || index} className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <div className="flex-1 space-y-3">
+                                                                <input
+                                                                    type="text"
+                                                                    value={item.title || ''}
+                                                                    onChange={(e) => {
+                                                                        const updatedNews = newsItems.map((n: any, i: number) => 
+                                                                            i === index ? { ...n, title: e.target.value } : n
+                                                                        );
+                                                                        handleFieldChange('news_items_json', JSON.stringify(updatedNews));
+                                                                    }}
+                                                                    placeholder="News title"
+                                                                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm font-medium"
+                                                                />
+                                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={item.published_date || ''}
+                                                                        onChange={(e) => {
+                                                                            const updatedNews = newsItems.map((n: any, i: number) => 
+                                                                                i === index ? { ...n, published_date: e.target.value } : n
+                                                                            );
+                                                                            handleFieldChange('news_items_json', JSON.stringify(updatedNews));
+                                                                        }}
+                                                                        className="px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                                    />
+                                                                    <div className="flex items-center space-x-2">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={item.is_published || false}
+                                                                            onChange={(e) => {
+                                                                                const updatedNews = newsItems.map((n: any, i: number) => 
+                                                                                    i === index ? { ...n, is_published: e.target.checked } : n
+                                                                                );
+                                                                                handleFieldChange('news_items_json', JSON.stringify(updatedNews));
+                                                                            }}
+                                                                            className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
+                                                                        />
+                                                                        <span className={`text-xs ${selectedTheme.colors.text} opacity-75`}>Published</span>
+                                                                    </div>
+                                                                    <div className="flex items-center space-x-2">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={item.is_featured || false}
+                                                                            onChange={(e) => {
+                                                                                const updatedNews = newsItems.map((n: any, i: number) => 
+                                                                                    i === index ? { ...n, is_featured: e.target.checked } : n
+                                                                                );
+                                                                                handleFieldChange('news_items_json', JSON.stringify(updatedNews));
+                                                                            }}
+                                                                            className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
+                                                                        />
+                                                                        <span className={`text-xs ${selectedTheme.colors.text} opacity-75`}>Featured</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => {
+                                                                        const updatedNews = newsItems.filter((_: any, i: number) => i !== index);
+                                                                        handleFieldChange('news_items_json', JSON.stringify(updatedNews));
+                                                                    }}
+                                                                className="text-red-400 hover:text-red-300 p-1"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                        <textarea
+                                                            value={item.content || ''}
+                                                            onChange={(e) => {
+                                                                const updatedNews = newsItems.map((n: any, i: number) => 
+                                                                    i === index ? { ...n, content: e.target.value } : n
+                                                                );
+                                                                handleFieldChange('news_items_json', JSON.stringify(updatedNews));
+                                                            }}
+                                                            placeholder="Write your news content here..."
+                                                            rows={4}
+                                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                    } catch (error) {
+                                        return (
+                                            <div className="text-center py-8">
+                                                <p className={`text-red-400 ${selectedTheme.colors.text}`}>
+                                                    Error loading news items. Please try refreshing the page.
+                                                </p>
+                                            </div>
+                                        );
+                                    }
+                                })()}
+                            </div>
+                        )}
+
+                        {key === 'skills' && (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                                            <EditableField 
+                                                value={portfolio.skills_title || 'Skills & Instruments'} 
+                                                onSave={(newValue) => handleFieldChange('skills_title', newValue)} 
+                                                theme={selectedTheme} 
+                                            />
+                                        </h3>
+                                        <p className={`text-sm ${selectedTheme.colors.text} opacity-75 mt-2`}>
+                                            Showcase your musical abilities, instruments, and other relevant skills.
+                                        </p>
+                                    </div>
+                                    <Button 
+                                        size="sm" 
+                                        onClick={() => {
+                                            const currentSkills = portfolio.skills_json ? 
+                                                (typeof portfolio.skills_json === 'string' ? JSON.parse(portfolio.skills_json) : portfolio.skills_json) : [];
+                                            const newSkill = {
+                                                id: Date.now(),
+                                                name: '',
+                                                category: 'Instrument',
+                                                level: 'Intermediate',
+                                                description: ''
+                                            };
+                                            const updatedSkills = [...currentSkills, newSkill];
+                                            handleFieldChange('skills_json', JSON.stringify(updatedSkills));
+                                        }}
+                                    >
+                                        <PlusCircle className="mr-2 h-4 w-4" /> Add Skill
+                                    </Button>
+                                </div>
+
+                                {(() => {
+                                    try {
+                                        const skillsJson = typeof portfolio.skills_json === 'string' 
+                                            ? portfolio.skills_json 
+                                            : JSON.stringify(portfolio.skills_json || []);
+                                        const skills = JSON.parse(skillsJson);
+                                        
+                                        if (!Array.isArray(skills) || skills.length === 0) {
+                                            return (
+                                                <div className="text-center py-8">
+                                                    <p className={`text-gray-400 ${selectedTheme.colors.text}`}>
+                                                        No skills added yet. Click "Add Skill" to get started.
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <div className="space-y-4">
+                                                {skills.map((skill: any, index: number) => (
+                                                    <div key={skill.id || index} className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <div className="flex-1 space-y-3">
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={skill.name || ''}
+                                                                        onChange={(e) => {
+                                                                            const updatedSkills = skills.map((s: any, i: number) => 
+                                                                                i === index ? { ...s, name: e.target.value } : s
+                                                                            );
+                                                                            handleFieldChange('skills_json', JSON.stringify(updatedSkills));
+                                                                        }}
+                                                                        placeholder="Skill name (e.g., Piano, Music Production)"
+                                                                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm font-medium"
+                                                                    />
+                                                                    <select
+                                                                        value={skill.category || 'Instrument'}
+                                                                        onChange={(e) => {
+                                                                            const updatedSkills = skills.map((s: any, i: number) => 
+                                                                                i === index ? { ...s, category: e.target.value } : s
+                                                                            );
+                                                                            handleFieldChange('skills_json', JSON.stringify(updatedSkills));
+                                                                        }}
+                                                                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                                    >
+                                                                        <option value="Instrument">Instrument</option>
+                                                                        <option value="Production">Production</option>
+                                                                        <option value="Composition">Composition</option>
+                                                                        <option value="Performance">Performance</option>
+                                                                        <option value="Technical">Technical</option>
+                                                                        <option value="Other">Other</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div className="flex items-center space-x-3">
+                                                                    <span className={`text-xs ${selectedTheme.colors.text} opacity-75`}>Level:</span>
+                                                                    <select
+                                                                        value={skill.level || 'Intermediate'}
+                                                                        onChange={(e) => {
+                                                                            const updatedSkills = skills.map((s: any, i: number) => 
+                                                                                i === index ? { ...s, level: e.target.value } : s
+                                                                            );
+                                                                            handleFieldChange('skills_json', JSON.stringify(updatedSkills));
+                                                                        }}
+                                                                        className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                                    >
+                                                                        <option value="Beginner">Beginner</option>
+                                                                        <option value="Intermediate">Intermediate</option>
+                                                                        <option value="Advanced">Advanced</option>
+                                                                        <option value="Expert">Expert</option>
+                                                                        <option value="Professional">Professional</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => {
+                                                                        const updatedSkills = skills.filter((_: any, i: number) => i !== index);
+                                                                        handleFieldChange('skills_json', JSON.stringify(updatedSkills));
+                                                                    }}
+                                                                className="text-red-400 hover:text-red-300 p-1"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                        <textarea
+                                                            value={skill.description || ''}
+                                                            onChange={(e) => {
+                                                                const updatedSkills = skills.map((s: any, i: number) => 
+                                                                    i === index ? { ...s, description: e.target.value } : s
+                                                                );
+                                                                handleFieldChange('skills_json', JSON.stringify(updatedSkills));
+                                                            }}
+                                                            placeholder="Describe your experience with this skill..."
+                                                            rows={2}
+                                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                    } catch (error) {
+                                        return (
+                                            <div className="text-center py-8">
+                                                <p className={`text-red-400 ${selectedTheme.colors.text}`}>
+                                                    Error loading skills. Please try refreshing the page.
+                                                </p>
+                                            </div>
+                                        );
+                                    }
+                                })()}
+                            </div>
+                        )}
+                        {key === 'status' && (
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                                        <EditableField 
+                                            value={portfolio.status_title || 'Current Status'} 
+                                            onSave={(newValue) => handleFieldChange('status_title', newValue)} 
+                                            theme={selectedTheme} 
+                                        />
+                                    </h3>
+                                    <p className={`text-sm ${selectedTheme.colors.text} opacity-75 mt-2`}>
+                                        Let visitors know about your current availability and upcoming projects.
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                Current Status
+                                            </label>
+                                            <select
+                                                value={portfolio.current_status || 'Available'}
+                                                onChange={(e) => handleFieldChange('current_status', e.target.value)}
+                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            >
+                                                <option value="Available">Available for Work</option>
+                                                <option value="Busy">Currently Busy</option>
+                                                <option value="Limited">Limited Availability</option>
+                                                <option value="Unavailable">Unavailable</option>
+                                                <option value="On Tour">On Tour</option>
+                                                <option value="Recording">In Studio Recording</option>
+                                                <option value="Writing">Writing New Music</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                Status Description
+                                            </label>
+                                            <textarea
+                                                value={portfolio.status_description || ''}
+                                                onChange={(e) => handleFieldChange('status_description', e.target.value)}
+                                                placeholder="Describe your current situation, upcoming projects, or availability details..."
+                                                rows={4}
+                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                                            <h4 className={`text-sm font-semibold ${selectedTheme.colors.text} mb-3`}>
+                                                💡 Status Tips
+                                            </h4>
+                                            <ul className={`text-xs space-y-2 ${selectedTheme.colors.text} opacity-75`}>
+                                                <li>• Keep your status updated regularly</li>
+                                                <li>• Mention specific projects or timeframes</li>
+                                                <li>• Let people know how to reach you</li>
+                                                <li>• Be honest about your availability</li>
+                                                <li>• Update when you're back available</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-700/30">
+                                            <h4 className={`text-sm font-semibold text-blue-300 mb-2`}>
+                                                🎵 Musician Status Ideas
+                                            </h4>
+                                            <ul className={`text-xs space-y-1 text-blue-200/75`}>
+                                                <li>• "Recording new album - available for sessions"</li>
+                                                <li>• "On tour until June - booking for fall"</li>
+                                                <li>• "Writing new material - open to collaborations"</li>
+                                                <li>• "Studio sessions available - DM for rates"</li>
+                                                <li>• "Taking a break - back in September"</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {key === 'ai_advantage' && (
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                                            <EditableField 
+                                                value={portfolio.ai_advantage_title || 'AI-Powered Features'} 
+                                                onSave={(newValue) => handleFieldChange('ai_advantage_title', newValue)} 
+                                                theme={selectedTheme} 
+                                            />
+                                        </h3>
+                                        <p className={`text-sm ${selectedTheme.colors.text} opacity-75 mt-2`}>
+                                            Highlight your AI-powered capabilities and how they enhance your music.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                            Main Description
+                                        </label>
+                                        <textarea
+                                            value={portfolio.ai_advantage_description || ''}
+                                            onChange={(e) => handleFieldChange('ai_advantage_description', e.target.value)}
+                                            placeholder="Describe how AI enhances your music creation process..."
+                                            rows={4}
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                            Key Benefits
+                                        </label>
+                                        <textarea
+                                            value={portfolio.ai_advantage_benefits || ''}
+                                            onChange={(e) => handleFieldChange('ai_advantage_benefits', e.target.value)}
+                                            placeholder="List the key benefits of your AI-powered approach..."
+                                            rows={4}
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                        AI Features List
+                                    </label>
+                                    <textarea
+                                        value={portfolio.ai_advantage_features || ''}
+                                        onChange={(e) => handleFieldChange('ai_advantage_features', e.target.value)}
+                                        placeholder="List specific AI features you use (e.g., AI composition, smart mixing, automated mastering)..."
+                                        rows={3}
+                                        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                    />
+                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
+                                        Separate features with commas or line breaks
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                            Technology Stack
+                                        </label>
+                                        <textarea
+                                            value={portfolio.ai_advantage_tech_stack || ''}
+                                            onChange={(e) => handleFieldChange('ai_advantage_tech_stack', e.target.value)}
+                                            placeholder="List the AI tools and technologies you use..."
+                                            rows={3}
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                            Call to Action
+                                        </label>
+                                        <textarea
+                                            value={portfolio.ai_advantage_cta || ''}
+                                            onChange={(e) => handleFieldChange('ai_advantage_cta', e.target.value)}
+                                            placeholder="Encourage visitors to explore your AI-powered music..."
+                                            rows={3}
+                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                                    <h4 className={`text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                        Preview
+                                    </h4>
+                                    <div className={`text-sm ${selectedTheme.colors.text} space-y-2`}>
+                                        <p><strong>Title:</strong> {portfolio.ai_advantage_title || 'AI-Powered Features'}</p>
+                                        <p><strong>Description:</strong> {portfolio.ai_advantage_description || 'No description yet'}</p>
+                                        <p><strong>Benefits:</strong> {portfolio.ai_advantage_benefits || 'No benefits listed yet'}</p>
+                                        <p><strong>Features:</strong> {portfolio.ai_advantage_features || 'No features listed yet'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         
                         {key === 'contact' && (
                             <div>
