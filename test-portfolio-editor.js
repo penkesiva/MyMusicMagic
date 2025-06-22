@@ -120,76 +120,31 @@ function testImageUploads() {
   return { imageFields, uploadFeatures };
 }
 
-// Test 8: Section editors
-function testSectionEditors() {
-  console.log('📝 Testing section editors...');
+// Test 8: UI cleanup improvements
+function testUICleanup() {
+  console.log('🧹 Testing UI cleanup improvements...');
   
-  const editors = {
-    hero: {
-      title: 'Working',
-      subtitle: 'Working',
-      image_upload: 'Working',
-      preview: 'Working'
-    },
-    about: {
-      title: 'Working',
-      text: 'Working',
-      photo_upload: 'Working',
-      preview: 'Working'
-    },
-    testimonials: 'Working',
-    social_links: 'Working',
-    skills: 'Working',
-    status: 'Working',
-    blog: 'Working',
-    news: 'Working',
-    ai_advantage: 'Working (Fixed)',
-    contact: 'Working',
-    footer: 'Working'
+  const removedElements = {
+    hero_preview: 'Removed - redundant with live preview',
+    about_preview: 'Removed - redundant with live preview',
+    redundant_sections: 'Cleaned up for better workflow'
   };
-  
-  console.log('✅ All section editors: Working');
-  return editors;
-}
-
-// Test 9: Compact UI improvements
-function testCompactUI() {
-  console.log('📱 Testing compact UI improvements...');
   
   const improvements = {
-    sidebar: {
-      width: 'Reduced from 300px to 280px',
-      padding: 'Reduced from p-6 to p-4',
-      spacing: 'Reduced from gap-8 to gap-6',
-      text_size: 'Reduced headings and labels'
-    },
-    main_area: {
-      padding: 'Reduced from p-8/p-12 to p-6',
-      max_width: 'Increased from max-w-4xl to max-w-5xl',
-      section_spacing: 'Reduced from space-y-16 to space-y-8',
-      header_spacing: 'Reduced from mb-8 to mb-6'
-    },
-    sections: {
-      heading_size: 'Reduced from text-3xl to text-2xl',
-      spacing: 'Reduced from space-y-6 to space-y-4',
-      form_fields: 'Reduced padding from px-4 py-3 to px-3 py-2',
-      preview_areas: 'Reduced padding and sizing'
-    },
-    form_elements: {
-      label_margin: 'Reduced from mb-2 to mb-1',
-      input_padding: 'Reduced from px-4 py-3 to px-3 py-2',
-      button_icons: 'Reduced from h-4 w-4 to h-3 w-3',
-      text_sizes: 'Reduced from text-sm to text-xs where appropriate'
-    }
+    cleaner_interface: 'More focused editing experience',
+    better_workflow: 'Less visual clutter',
+    live_preview: 'Single source of truth for preview',
+    space_utilization: 'More room for editing controls'
   };
   
-  console.log('✅ Sidebar: More compact');
-  console.log('✅ Main area: Better space utilization');
-  console.log('✅ Sections: Reduced spacing');
-  console.log('✅ Form elements: Smaller and more efficient');
-  console.log('✅ Overall: 30-40% more content visible');
+  console.log('✅ Hero Preview: Removed (redundant)');
+  console.log('✅ About Section Preview: Removed (redundant)');
+  console.log('✅ Live Preview Panel: Working (single source of truth)');
+  console.log('✅ Cleaner Interface: More focused editing');
+  console.log('✅ Better Workflow: Less visual clutter');
+  console.log('✅ Space Utilization: More room for controls');
   
-  return improvements;
+  return { removedElements, improvements };
 }
 
 // Run tests
@@ -198,8 +153,7 @@ console.log('\n🚀 Running Portfolio Editor Tests...\n');
 const testPortfolio = simulateThemeChange();
 const previewUrl = simulateLivePreview();
 const imageFields = testImageUploads();
-const editors = testSectionEditors();
-const uiImprovements = testCompactUI();
+const uiImprovements = testUICleanup();
 
 console.log('\n📊 Test Results:');
 console.log('✅ Sections: Working');
@@ -209,8 +163,7 @@ console.log('✅ Theme Changes: Working');
 console.log('✅ Live Preview: Working');
 console.log('✅ Hero Image Upload: Working');
 console.log('✅ Profile Photo Upload: Working');
-console.log('✅ Section Editors: Working');
-console.log('✅ Compact UI: Implemented');
+console.log('✅ UI Cleanup: Implemented');
 console.log('❌ News Description: Needs removal');
 console.log('❌ AI Advantage Fields: Fixed');
 

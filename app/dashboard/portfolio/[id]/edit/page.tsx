@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Eye, PlusCircle, Trash2, Edit, Upload, Image, X } from "lucide-react";
+import { Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
 import { PortfolioTrackForm } from "@/components/portfolio/PortfolioTrackForm";
@@ -79,6 +79,7 @@ const PortfolioEditorPage = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
   const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [previewMode, setPreviewMode] = useState<'fullscreen' | 'side-by-side'>('side-by-side');
 
 
   const supabase = useMemo(() => createClient(), []);
@@ -398,6 +399,15 @@ const PortfolioEditorPage = () => {
                 >
                     <Eye className="mr-2 h-3 w-3" /> {showPreview ? 'Hide Preview' : 'Live Preview'}
                 </Button>
+                {showPreview && (
+                    <Button 
+                        onClick={() => setPreviewMode(previewMode === 'fullscreen' ? 'side-by-side' : 'fullscreen')} 
+                        variant="outline" 
+                        size="sm"
+                    >
+                        {previewMode === 'fullscreen' ? 'Side-by-Side' : 'Fullscreen'}
+                    </Button>
+                )}
                 <Button onClick={() => window.open(`/portfolio/${portfolio.slug}`, "_blank")} variant="outline" size="sm">
                     Open in New Tab
                 </Button>
@@ -450,110 +460,48 @@ const PortfolioEditorPage = () => {
                                     </div>
 
                                     {/* Hero Image Upload */}
-                                    <div className="space-y-3">
-                                        <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
-                                            Hero Background Image
-                                        </h3>
-                                        <div className="space-y-3">
-                                            {portfolio.hero_image_url ? (
-                                                <div className="relative">
-                                                    <img
-                                                        src={portfolio.hero_image_url}
-                                                        alt="Hero background"
-                                                        className="w-full h-32 object-cover rounded-lg border border-gray-600"
-                                                    />
-                                                    <button
-                                                        onClick={() => handleFieldChange('hero_image_url', '')}
-                                                        className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
-                                                    >
-                                                        <X className="h-3 w-3" />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
-                                                    <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                                    <p className={`text-xs ${selectedTheme.colors.text} mb-1`}>
-                                                        No hero image uploaded
-                                                    </p>
-                                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-75`}>
-                                                        Upload a background image for your hero section
-                                                    </p>
-                                                </div>
-                                            )}
-                                            
-                                            <div>
-                                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
-                                                    Image URL
-                                                </label>
-                                                <div className="flex gap-2">
-                                                    <input
-                                                        type="url"
-                                                        value={portfolio.hero_image_url || ''}
-                                                        onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
-                                                        placeholder="https://example.com/image.jpg"
-                                                        className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                                                    />
-                                                    <input
-                                                        type="file"
-                                                        id="hero-upload"
-                                                        accept="image/*"
-                                                        onChange={(e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) {
-                                                                uploadHeroImage(file);
-                                                                e.target.value = '';
-                                                            }
-                                                        }}
-                                                        className="hidden"
-                                                    />
-                                                    <Button
-                                                        onClick={() => document.getElementById('hero-upload')?.click()}
-                                                        variant="outline"
-                                                        size="sm"
-                                                        disabled={uploadingHero}
-                                                    >
-                                                        {uploadingHero ? (
-                                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
-                                                        ) : (
-                                                            <Upload className="h-3 w-3 mr-1" />
-                                                        )}
-                                                        {uploadingHero ? 'Uploading...' : 'Upload'}
-                                                    </Button>
-                                                </div>
-                                                <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
-                                                    Enter an image URL or upload a file (recommended: 1920x1080 or larger)
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Hero Preview */}
-                                <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700">
-                                    <h4 className={`text-xs font-medium ${selectedTheme.colors.text} mb-2`}>
-                                        Hero Preview
-                                    </h4>
-                                    <div className="relative w-full h-24 rounded-lg overflow-hidden">
-                                        {portfolio.hero_image_url && (
-                                            <img
-                                                src={portfolio.hero_image_url}
-                                                alt="Hero preview"
-                                                className="w-full h-full object-cover"
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
+                                            Image URL
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="url"
+                                                value={portfolio.hero_image_url || ''}
+                                                onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
+                                                placeholder="https://example.com/image.jpg"
+                                                className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                             />
-                                        )}
-                                        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black opacity-60"></div>
-                                        <div className="absolute inset-0 flex items-center justify-center text-center p-2">
-                                            <div>
-                                                <h1 className={`text-lg font-bold ${selectedTheme.colors.heading} mb-1`}>
-                                                    {portfolio.name || 'Your Portfolio Title'}
-                                                </h1>
-                                                {portfolio.subtitle && (
-                                                    <p className={`text-xs ${selectedTheme.colors.primaryStrong}`}>
-                                                        {portfolio.subtitle}
-                                                    </p>
+                                            <input
+                                                type="file"
+                                                id="hero-upload"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        uploadHeroImage(file);
+                                                        e.target.value = '';
+                                                    }
+                                                }}
+                                                className="hidden"
+                                            />
+                                            <Button
+                                                onClick={() => document.getElementById('hero-upload')?.click()}
+                                                variant="outline"
+                                                size="sm"
+                                                disabled={uploadingHero}
+                                            >
+                                                {uploadingHero ? (
+                                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                                ) : (
+                                                    <Upload className="h-3 w-3 mr-1" />
                                                 )}
-                                            </div>
+                                                {uploadingHero ? 'Uploading...' : 'Upload'}
+                                            </Button>
                                         </div>
+                                        <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
+                                            Enter an image URL or upload a file (recommended: 1920x1080 or larger)
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -668,32 +616,6 @@ const PortfolioEditorPage = () => {
                                                     Enter an image URL or upload a file (recommended: square image, 400x400 or larger)
                                                 </p>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* About Preview */}
-                                <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700">
-                                    <h4 className={`text-xs font-medium ${selectedTheme.colors.text} mb-2`}>
-                                        About Section Preview
-                                    </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
-                                        {portfolio.profile_photo_url && (
-                                            <div className="flex justify-center">
-                                                <img
-                                                    src={portfolio.profile_photo_url}
-                                                    alt="Profile preview"
-                                                    className="w-16 h-16 object-cover rounded-lg"
-                                                />
-                                            </div>
-                                        )}
-                                        <div className={portfolio.profile_photo_url ? "md:col-span-2" : "md:col-span-3"}>
-                                            <h3 className={`text-sm font-semibold ${selectedTheme.colors.heading} mb-1`}>
-                                                {portfolio.about_title || 'About Me'}
-                                            </h3>
-                                            <p className={`text-xs ${selectedTheme.colors.text} line-clamp-2`}>
-                                                {portfolio.about_text || 'No about text yet. Add your story to connect with your audience.'}
-                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -1689,7 +1611,7 @@ const PortfolioEditorPage = () => {
       </main>
 
       {/* Live Preview Panel */}
-      {showPreview && (
+      {showPreview && previewMode === 'fullscreen' && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col">
             <div className="flex justify-between items-center p-4 border-b">
@@ -1700,6 +1622,167 @@ const PortfolioEditorPage = () => {
             </div>
             <div className="flex-1 overflow-hidden">
               <iframe
+                src={`/portfolio/${portfolio.slug}?preview=true&t=${Date.now()}`}
+                className="w-full h-full border-0"
+                title="Portfolio Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Side-by-Side Live Preview */}
+      {showPreview && previewMode === 'side-by-side' && (
+        <div className="fixed inset-0 z-50 bg-gray-900 flex">
+          {/* Editor Panel */}
+          <div className="w-1/2 bg-gray-800 overflow-y-auto">
+            <div className="sticky top-0 z-10 bg-gray-800 border-b border-gray-700 p-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <h3 className="text-lg font-semibold text-white">Editor</h3>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    savingStatus === 'saved' ? 
+                    "bg-green-900/50 text-green-300" : 
+                    savingStatus === 'saving' ? 
+                    "bg-yellow-900/50 text-yellow-300" : 
+                    "bg-red-900/50 text-red-300"
+                  }`}>
+                    {savingStatus === 'saving' ? 'Saving...' : savingStatus === 'error' ? 'Error' : 'Saved'}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button 
+                    onClick={() => {
+                      const iframe = document.getElementById('side-preview-iframe') as HTMLIFrameElement;
+                      if (iframe) {
+                        iframe.src = iframe.src;
+                      }
+                    }} 
+                    variant="outline" 
+                    size="sm"
+                  >
+                    <RefreshCw className="mr-1 h-3 w-3" /> Refresh
+                  </Button>
+                  <Button onClick={() => setShowPreview(false)} variant="outline" size="sm">
+                    <X className="mr-1 h-3 w-3" /> Close
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Editor Content */}
+            <div className="p-4">
+              <div className="max-w-4xl mx-auto space-y-6">
+                {sortedEditorSections.filter(key => (portfolio.sections_config as any)?.[key]?.enabled).map(key => {
+                  const sectionConfig = SECTIONS_CONFIG[key];
+                  if (!sectionConfig) return null;
+                  
+                  return (
+                    <section key={key} id={key}>
+                      <h2 className={`text-xl font-bold mb-3 border-b pb-2 ${selectedTheme.colors.heading} border-white/10`}>
+                         <EditableField value={(portfolio.sections_config as any)?.[key]?.name} onSave={(newValue) => handleSectionConfigChange(key as any, "name", newValue)} theme={selectedTheme} />
+                      </h2>
+                      
+                      {/* Section content - simplified for side-by-side view */}
+                      <div className="space-y-3">
+                        {key === 'hero' && (
+                          <div className="space-y-3">
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>Title</label>
+                              <input
+                                type="text"
+                                value={portfolio.name}
+                                onChange={(e) => handleFieldChange('name', e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>Subtitle</label>
+                              <input
+                                type="text"
+                                value={portfolio.subtitle || ''}
+                                onChange={(e) => handleFieldChange('subtitle', e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>Hero Image URL</label>
+                              <input
+                                type="url"
+                                value={portfolio.hero_image_url || ''}
+                                onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {key === 'about' && (
+                          <div className="space-y-3">
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>About Title</label>
+                              <input
+                                type="text"
+                                value={portfolio.about_title || ''}
+                                onChange={(e) => handleFieldChange('about_title', e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>About Text</label>
+                              <textarea
+                                value={portfolio.about_text || ''}
+                                onChange={(e) => handleFieldChange('about_text', e.target.value)}
+                                rows={4}
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm resize-none"
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>Profile Photo URL</label>
+                              <input
+                                type="url"
+                                value={portfolio.profile_photo_url || ''}
+                                onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Add other sections as needed */}
+                        {key !== 'hero' && key !== 'about' && (
+                          <div className="text-sm text-gray-400">
+                            {sectionConfig.defaultName} section editor - use full editor for complete functionality
+                          </div>
+                        )}
+                      </div>
+                    </section>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Preview Panel */}
+          <div className="w-1/2 bg-white flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200">
+              <div className="flex items-center space-x-4">
+                <h3 className="text-lg font-semibold text-gray-900">Live Preview</h3>
+                <span className="text-xs text-gray-500">Theme: {selectedTheme.name}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button 
+                  onClick={() => window.open(`/portfolio/${portfolio.slug}`, "_blank")} 
+                  variant="outline" 
+                  size="sm"
+                >
+                  <ExternalLink className="mr-1 h-3 w-3" /> Open Full
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <iframe
+                id="side-preview-iframe"
                 src={`/portfolio/${portfolio.slug}?preview=true&t=${Date.now()}`}
                 className="w-full h-full border-0"
                 title="Portfolio Preview"
