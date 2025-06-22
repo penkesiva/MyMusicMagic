@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Eye, PlusCircle, Trash2, Edit } from "lucide-react";
+import { Eye, PlusCircle, Trash2, Edit, Upload, Image, X } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
 import { PortfolioTrackForm } from "@/components/portfolio/PortfolioTrackForm";
@@ -76,6 +76,7 @@ const PortfolioEditorPage = () => {
   
   const [editingGalleryItem, setEditingGalleryItem] = useState<any | null>(null);
   const [showAddGalleryForm, setShowAddGalleryForm] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
 
   const supabase = useMemo(() => createClient(), []);
@@ -254,8 +255,15 @@ const PortfolioEditorPage = () => {
                 }`}>
                     {savingStatus === 'saving' ? 'Saving...' : savingStatus === 'error' ? 'Error' : 'Saved'}
                 </span>
+                <Button 
+                    onClick={() => setShowPreview(!showPreview)} 
+                    variant={showPreview ? "default" : "outline"} 
+                    size="sm"
+                >
+                    <Eye className="mr-2 h-4 w-4" /> {showPreview ? 'Hide Preview' : 'Live Preview'}
+                </Button>
                 <Button onClick={() => window.open(`/portfolio/${portfolio.slug}`, "_blank")} variant="outline" size="sm">
-                    <Eye className="mr-2 h-4 w-4" /> Preview
+                    Open in New Tab
                 </Button>
             </div>
         </div>
@@ -272,27 +280,260 @@ const PortfolioEditorPage = () => {
                         </h2>
                         
                         {key === 'hero' && (
-                            <div className="text-center py-10">
-                                <h1 className={`text-5xl font-extrabold ${selectedTheme.colors.heading}`}>
-                                    <EditableField value={portfolio.name} onSave={(newValue) => handleFieldChange('name', newValue)} theme={selectedTheme} />
-                                </h1>
-                                <p className={`mt-4 text-xl ${selectedTheme.colors.primaryStrong}`}>
-                                    <EditableField value={portfolio.subtitle || ''} onSave={(newValue) => handleFieldChange('subtitle', newValue)} theme={selectedTheme} />
-                                </p>
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    {/* Hero Content */}
+                                    <div className="space-y-4">
+                                        <h3 className={`text-xl font-semibold ${selectedTheme.colors.heading}`}>
+                                            Hero Content
+                                        </h3>
+                                        <div>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                Portfolio Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={portfolio.name}
+                                                onChange={(e) => handleFieldChange('name', e.target.value)}
+                                                placeholder="Your portfolio title"
+                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                Subtitle
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={portfolio.subtitle || ''}
+                                                onChange={(e) => handleFieldChange('subtitle', e.target.value)}
+                                                placeholder="Brief description or tagline"
+                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Hero Image Upload */}
+                                    <div className="space-y-4">
+                                        <h3 className={`text-xl font-semibold ${selectedTheme.colors.heading}`}>
+                                            Hero Background Image
+                                        </h3>
+                                        <div className="space-y-4">
+                                            {portfolio.hero_image_url ? (
+                                                <div className="relative">
+                                                    <img
+                                                        src={portfolio.hero_image_url}
+                                                        alt="Hero background"
+                                                        className="w-full h-48 object-cover rounded-lg border border-gray-600"
+                                                    />
+                                                    <button
+                                                        onClick={() => handleFieldChange('hero_image_url', '')}
+                                                        className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+                                                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                                                    <p className={`text-sm ${selectedTheme.colors.text} mb-2`}>
+                                                        No hero image uploaded
+                                                    </p>
+                                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-75`}>
+                                                        Upload a background image for your hero section
+                                                    </p>
+                                                </div>
+                                            )}
+                                            
+                                            <div>
+                                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                    Image URL
+                                                </label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="url"
+                                                        value={portfolio.hero_image_url || ''}
+                                                        onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
+                                                        placeholder="https://example.com/image.jpg"
+                                                        className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                    />
+                                                    <Button
+                                                        onClick={() => {
+                                                            // TODO: Implement file upload to Supabase storage
+                                                            alert('File upload functionality coming soon!');
+                                                        }}
+                                                        variant="outline"
+                                                        size="sm"
+                                                    >
+                                                        <Upload className="h-4 w-4 mr-2" />
+                                                        Upload
+                                                    </Button>
+                                                </div>
+                                                <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
+                                                    Enter an image URL or upload a file (recommended: 1920x1080 or larger)
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Hero Preview */}
+                                <div className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                                    <h4 className={`text-sm font-medium ${selectedTheme.colors.text} mb-3`}>
+                                        Hero Preview
+                                    </h4>
+                                    <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                                        {portfolio.hero_image_url && (
+                                            <img
+                                                src={portfolio.hero_image_url}
+                                                alt="Hero preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black opacity-60"></div>
+                                        <div className="absolute inset-0 flex items-center justify-center text-center p-4">
+                                            <div>
+                                                <h1 className={`text-2xl font-bold ${selectedTheme.colors.heading} mb-2`}>
+                                                    {portfolio.name || 'Your Portfolio Title'}
+                                                </h1>
+                                                {portfolio.subtitle && (
+                                                    <p className={`text-sm ${selectedTheme.colors.primaryStrong}`}>
+                                                        {portfolio.subtitle}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
                         {key === 'about' && (
-                            <div>
-                                <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
-                                     <EditableField value={portfolio.about_title || ''} onSave={(newValue) => handleFieldChange('about_title', newValue)} theme={selectedTheme} />
-                                </h3>
-                                <div className={`mt-4 prose prose-invert max-w-none ${selectedTheme.colors.text}`}>
-                                     <EditableField value={portfolio.about_text || ''} onSave={(newValue) => handleFieldChange('about_text', newValue)} fieldType="textarea" theme={selectedTheme} />
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    {/* About Content */}
+                                    <div className="space-y-4">
+                                        <h3 className={`text-xl font-semibold ${selectedTheme.colors.heading}`}>
+                                            About Content
+                                        </h3>
+                                        <div>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                About Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={portfolio.about_title || ''}
+                                                onChange={(e) => handleFieldChange('about_title', e.target.value)}
+                                                placeholder="About Me"
+                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                About Text
+                                            </label>
+                                            <textarea
+                                                value={portfolio.about_text || ''}
+                                                onChange={(e) => handleFieldChange('about_text', e.target.value)}
+                                                placeholder="Tell your story, share your musical journey, and connect with your audience..."
+                                                rows={8}
+                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Profile Photo Upload */}
+                                    <div className="space-y-4">
+                                        <h3 className={`text-xl font-semibold ${selectedTheme.colors.heading}`}>
+                                            Profile Photo
+                                        </h3>
+                                        <div className="space-y-4">
+                                            {portfolio.profile_photo_url ? (
+                                                <div className="relative">
+                                                    <img
+                                                        src={portfolio.profile_photo_url}
+                                                        alt="Profile photo"
+                                                        className="w-full h-64 object-cover rounded-lg border border-gray-600"
+                                                    />
+                                                    <button
+                                                        onClick={() => handleFieldChange('profile_photo_url', '')}
+                                                        className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+                                                    <Image className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                                                    <p className={`text-sm ${selectedTheme.colors.text} mb-2`}>
+                                                        No profile photo uploaded
+                                                    </p>
+                                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-75`}>
+                                                        Upload a professional photo of yourself
+                                                    </p>
+                                                </div>
+                                            )}
+                                            
+                                            <div>
+                                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                    Photo URL
+                                                </label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="url"
+                                                        value={portfolio.profile_photo_url || ''}
+                                                        onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
+                                                        placeholder="https://example.com/photo.jpg"
+                                                        className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                    />
+                                                    <Button
+                                                        onClick={() => {
+                                                            // TODO: Implement file upload to Supabase storage
+                                                            alert('File upload functionality coming soon!');
+                                                        }}
+                                                        variant="outline"
+                                                        size="sm"
+                                                    >
+                                                        <Upload className="h-4 w-4 mr-2" />
+                                                        Upload
+                                                    </Button>
+                                                </div>
+                                                <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
+                                                    Enter an image URL or upload a file (recommended: square image, 400x400 or larger)
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* About Preview */}
+                                <div className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                                    <h4 className={`text-sm font-medium ${selectedTheme.colors.text} mb-3`}>
+                                        About Section Preview
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                        {portfolio.profile_photo_url && (
+                                            <div className="flex justify-center">
+                                                <img
+                                                    src={portfolio.profile_photo_url}
+                                                    alt="Profile preview"
+                                                    className="w-24 h-24 object-cover rounded-lg"
+                                                />
+                                            </div>
+                                        )}
+                                        <div className={portfolio.profile_photo_url ? "md:col-span-2" : "md:col-span-3"}>
+                                            <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading} mb-2`}>
+                                                {portfolio.about_title || 'About Me'}
+                                            </h3>
+                                            <p className={`text-sm ${selectedTheme.colors.text} line-clamp-3`}>
+                                                {portfolio.about_text || 'No about text yet. Add your story to connect with your audience.'}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}
-                        
+
                         {key === 'testimonials' && (
                             <div className="space-y-6">
                                 <div className="flex justify-between items-start">
@@ -1149,89 +1390,125 @@ const PortfolioEditorPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                            Main Description
-                                        </label>
-                                        <textarea
-                                            value={portfolio.ai_advantage_description || ''}
-                                            onChange={(e) => handleFieldChange('ai_advantage_description', e.target.value)}
-                                            placeholder="Describe how AI enhances your music creation process..."
-                                            rows={4}
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
-                                        />
-                                    </div>
+                                {(() => {
+                                    try {
+                                        const aiAdvantagesJson = typeof portfolio.ai_advantages_json === 'string' 
+                                            ? portfolio.ai_advantages_json 
+                                            : JSON.stringify(portfolio.ai_advantages_json || {});
+                                        const aiAdvantages = JSON.parse(aiAdvantagesJson);
+                                        
+                                        return (
+                                            <div className="space-y-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div>
+                                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                            Main Description
+                                                        </label>
+                                                        <textarea
+                                                            value={aiAdvantages.description || ''}
+                                                            onChange={(e) => {
+                                                                const updated = { ...aiAdvantages, description: e.target.value };
+                                                                handleFieldChange('ai_advantages_json', JSON.stringify(updated));
+                                                            }}
+                                                            placeholder="Describe how AI enhances your music creation process..."
+                                                            rows={4}
+                                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                        />
+                                                    </div>
 
-                                    <div>
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                            Key Benefits
-                                        </label>
-                                        <textarea
-                                            value={portfolio.ai_advantage_benefits || ''}
-                                            onChange={(e) => handleFieldChange('ai_advantage_benefits', e.target.value)}
-                                            placeholder="List the key benefits of your AI-powered approach..."
-                                            rows={4}
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
-                                        />
-                                    </div>
-                                </div>
+                                                    <div>
+                                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                            Key Benefits
+                                                        </label>
+                                                        <textarea
+                                                            value={aiAdvantages.benefits || ''}
+                                                            onChange={(e) => {
+                                                                const updated = { ...aiAdvantages, benefits: e.target.value };
+                                                                handleFieldChange('ai_advantages_json', JSON.stringify(updated));
+                                                            }}
+                                                            placeholder="List the key benefits of your AI-powered approach..."
+                                                            rows={4}
+                                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                        />
+                                                    </div>
+                                                </div>
 
-                                <div>
-                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                        AI Features List
-                                    </label>
-                                    <textarea
-                                        value={portfolio.ai_advantage_features || ''}
-                                        onChange={(e) => handleFieldChange('ai_advantage_features', e.target.value)}
-                                        placeholder="List specific AI features you use (e.g., AI composition, smart mixing, automated mastering)..."
-                                        rows={3}
-                                        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
-                                    />
-                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
-                                        Separate features with commas or line breaks
-                                    </p>
-                                </div>
+                                                <div>
+                                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                        AI Features List
+                                                    </label>
+                                                    <textarea
+                                                        value={aiAdvantages.features || ''}
+                                                        onChange={(e) => {
+                                                            const updated = { ...aiAdvantages, features: e.target.value };
+                                                            handleFieldChange('ai_advantages_json', JSON.stringify(updated));
+                                                        }}
+                                                        placeholder="List specific AI features you use (e.g., AI composition, smart mixing, automated mastering)..."
+                                                        rows={3}
+                                                        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                    />
+                                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
+                                                        Separate features with commas or line breaks
+                                                    </p>
+                                                </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                            Technology Stack
-                                        </label>
-                                        <textarea
-                                            value={portfolio.ai_advantage_tech_stack || ''}
-                                            onChange={(e) => handleFieldChange('ai_advantage_tech_stack', e.target.value)}
-                                            placeholder="List the AI tools and technologies you use..."
-                                            rows={3}
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
-                                        />
-                                    </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <div>
+                                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                            Technology Stack
+                                                        </label>
+                                                        <textarea
+                                                            value={aiAdvantages.tech_stack || ''}
+                                                            onChange={(e) => {
+                                                                const updated = { ...aiAdvantages, tech_stack: e.target.value };
+                                                                handleFieldChange('ai_advantages_json', JSON.stringify(updated));
+                                                            }}
+                                                            placeholder="List the AI tools and technologies you use..."
+                                                            rows={3}
+                                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                        />
+                                                    </div>
 
-                                    <div>
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                            Call to Action
-                                        </label>
-                                        <textarea
-                                            value={portfolio.ai_advantage_cta || ''}
-                                            onChange={(e) => handleFieldChange('ai_advantage_cta', e.target.value)}
-                                            placeholder="Encourage visitors to explore your AI-powered music..."
-                                            rows={3}
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
-                                        />
-                                    </div>
-                                </div>
+                                                    <div>
+                                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                            Call to Action
+                                                        </label>
+                                                        <textarea
+                                                            value={aiAdvantages.cta || ''}
+                                                            onChange={(e) => {
+                                                                const updated = { ...aiAdvantages, cta: e.target.value };
+                                                                handleFieldChange('ai_advantages_json', JSON.stringify(updated));
+                                                            }}
+                                                            placeholder="Encourage visitors to explore your AI-powered music..."
+                                                            rows={3}
+                                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                        />
+                                                    </div>
+                                                </div>
 
-                                <div className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
-                                    <h4 className={`text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                        Preview
-                                    </h4>
-                                    <div className={`text-sm ${selectedTheme.colors.text} space-y-2`}>
-                                        <p><strong>Title:</strong> {portfolio.ai_advantage_title || 'AI-Powered Features'}</p>
-                                        <p><strong>Description:</strong> {portfolio.ai_advantage_description || 'No description yet'}</p>
-                                        <p><strong>Benefits:</strong> {portfolio.ai_advantage_benefits || 'No benefits listed yet'}</p>
-                                        <p><strong>Features:</strong> {portfolio.ai_advantage_features || 'No features listed yet'}</p>
-                                    </div>
-                                </div>
+                                                <div className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
+                                                    <h4 className={`text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                        Preview
+                                                    </h4>
+                                                    <div className={`text-sm ${selectedTheme.colors.text} space-y-2`}>
+                                                        <p><strong>Title:</strong> {portfolio.ai_advantage_title || 'AI-Powered Features'}</p>
+                                                        <p><strong>Description:</strong> {aiAdvantages.description || 'No description yet'}</p>
+                                                        <p><strong>Benefits:</strong> {aiAdvantages.benefits || 'No benefits listed yet'}</p>
+                                                        <p><strong>Features:</strong> {aiAdvantages.features || 'No features listed yet'}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    } catch (error) {
+                                        return (
+                                            <div className="text-center py-8">
+                                                <p className={`text-red-400 ${selectedTheme.colors.text}`}>
+                                                    Error loading AI advantages. Please try refreshing the page.
+                                                </p>
+                                            </div>
+                                        );
+                                    }
+                                })()}
                             </div>
                         )}
                         
@@ -1261,6 +1538,27 @@ const PortfolioEditorPage = () => {
             })}
         </div>
       </main>
+
+      {/* Live Preview Panel */}
+      {showPreview && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Live Preview - {portfolio.name}</h3>
+              <Button onClick={() => setShowPreview(false)} variant="outline" size="sm">
+                Close Preview
+              </Button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <iframe
+                src={`/portfolio/${portfolio.slug}?preview=true&t=${Date.now()}`}
+                className="w-full h-full border-0"
+                title="Portfolio Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
