@@ -200,17 +200,17 @@ const PortfolioEditorPage = () => {
   return (
     <div className="flex h-full min-h-screen font-sans">
       {/* --- Left Sidebar --- */}
-      <aside className="w-[300px] bg-gray-950 text-white p-6 flex flex-col gap-8 overflow-y-auto border-r border-gray-800">
+      <aside className="w-[280px] bg-gray-950 text-white p-4 flex flex-col gap-6 overflow-y-auto border-r border-gray-800">
         <div>
-          <h2 className="text-xl font-bold">Portfolio Settings</h2>
-          <p className="text-sm text-gray-400">
+          <h2 className="text-lg font-bold">Portfolio Settings</h2>
+          <p className="text-xs text-gray-400 mt-1">
             Manage your portfolio's appearance and sections.
           </p>
         </div>
 
-        <div className="space-y-4">
-          <h3 className="font-semibold">Color Theme</h3>
-          <div className="grid grid-cols-5 gap-3">
+        <div className="space-y-3">
+          <h3 className="font-semibold text-sm">Color Theme</h3>
+          <div className="grid grid-cols-5 gap-2">
             {THEMES.map((theme) => (
               <button
                 key={theme.name}
@@ -224,11 +224,11 @@ const PortfolioEditorPage = () => {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h3 className="font-semibold">Sections</h3>
+        <div className="space-y-3">
+          <h3 className="font-semibold text-sm">Sections</h3>
           {sortedEditorSections.map((key) => (
             <div key={key} className="flex items-center justify-between">
-              <Label htmlFor={`enable-${key}`} className="font-medium text-white">
+              <Label htmlFor={`enable-${key}`} className="font-medium text-white text-sm">
                 {SECTIONS_CONFIG[key].defaultName}
               </Label>
               <Switch
@@ -244,11 +244,11 @@ const PortfolioEditorPage = () => {
       </aside>
 
       {/* --- Right Main Area (Live Editor) --- */}
-      <main className={`flex-1 overflow-y-auto p-8 sm:p-12 ${selectedTheme.colors.background} ${selectedTheme.colors.text}`}>
-        <div className="flex justify-between items-center mb-8">
-            <h1 className="text-2xl font-bold text-white/80">Editing: {portfolio.name}</h1>
-            <div className="flex items-center space-x-4">
-                 <span className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${
+      <main className={`flex-1 overflow-y-auto p-6 ${selectedTheme.colors.background} ${selectedTheme.colors.text}`}>
+        <div className="flex justify-between items-center mb-6">
+            <h1 className="text-xl font-bold text-white/80">Editing: {portfolio.name}</h1>
+            <div className="flex items-center space-x-3">
+                 <span className={`text-xs font-medium px-2 py-1 rounded-full transition-colors ${
                     savingStatus === "saved" ? "bg-green-900/50 text-green-300" :
                     savingStatus === "saving" ? "bg-yellow-900/50 text-yellow-300 animate-pulse" :
                     "bg-red-900/50 text-red-300"
@@ -260,7 +260,7 @@ const PortfolioEditorPage = () => {
                     variant={showPreview ? "default" : "outline"} 
                     size="sm"
                 >
-                    <Eye className="mr-2 h-4 w-4" /> {showPreview ? 'Hide Preview' : 'Live Preview'}
+                    <Eye className="mr-2 h-3 w-3" /> {showPreview ? 'Hide Preview' : 'Live Preview'}
                 </Button>
                 <Button onClick={() => window.open(`/portfolio/${portfolio.slug}`, "_blank")} variant="outline" size="sm">
                     Open in New Tab
@@ -268,27 +268,27 @@ const PortfolioEditorPage = () => {
             </div>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-16">
+        <div className="max-w-5xl mx-auto space-y-8">
             {sortedEditorSections.filter(key => (portfolio.sections_config as any)?.[key]?.enabled).map(key => {
                 const sectionConfig = SECTIONS_CONFIG[key];
                 if (!sectionConfig) return null;
                 
                 return (
                     <section key={key} id={key}>
-                        <h2 className={`text-3xl font-bold mb-6 border-b-2 pb-2 ${selectedTheme.colors.heading} border-white/10`}>
+                        <h2 className={`text-2xl font-bold mb-4 border-b pb-2 ${selectedTheme.colors.heading} border-white/10`}>
                            <EditableField value={(portfolio.sections_config as any)?.[key]?.name} onSave={(newValue) => handleSectionConfigChange(key as any, "name", newValue)} theme={selectedTheme} />
                         </h2>
                         
                         {key === 'hero' && (
-                            <div className="space-y-6">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     {/* Hero Content */}
-                                    <div className="space-y-4">
-                                        <h3 className={`text-xl font-semibold ${selectedTheme.colors.heading}`}>
+                                    <div className="space-y-3">
+                                        <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
                                             Hero Content
                                         </h3>
                                         <div>
-                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                                 Portfolio Title
                                             </label>
                                             <input
@@ -296,11 +296,11 @@ const PortfolioEditorPage = () => {
                                                 value={portfolio.name}
                                                 onChange={(e) => handleFieldChange('name', e.target.value)}
                                                 placeholder="Your portfolio title"
-                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                             />
                                         </div>
                                         <div>
-                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                                 Subtitle
                                             </label>
                                             <input
@@ -308,35 +308,35 @@ const PortfolioEditorPage = () => {
                                                 value={portfolio.subtitle || ''}
                                                 onChange={(e) => handleFieldChange('subtitle', e.target.value)}
                                                 placeholder="Brief description or tagline"
-                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                             />
                                         </div>
                                     </div>
 
                                     {/* Hero Image Upload */}
-                                    <div className="space-y-4">
-                                        <h3 className={`text-xl font-semibold ${selectedTheme.colors.heading}`}>
+                                    <div className="space-y-3">
+                                        <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
                                             Hero Background Image
                                         </h3>
-                                        <div className="space-y-4">
+                                        <div className="space-y-3">
                                             {portfolio.hero_image_url ? (
                                                 <div className="relative">
                                                     <img
                                                         src={portfolio.hero_image_url}
                                                         alt="Hero background"
-                                                        className="w-full h-48 object-cover rounded-lg border border-gray-600"
+                                                        className="w-full h-32 object-cover rounded-lg border border-gray-600"
                                                     />
                                                     <button
                                                         onClick={() => handleFieldChange('hero_image_url', '')}
-                                                        className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                                                        className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
                                                     >
-                                                        <X className="h-4 w-4" />
+                                                        <X className="h-3 w-3" />
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
-                                                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                                                    <p className={`text-sm ${selectedTheme.colors.text} mb-2`}>
+                                                <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
+                                                    <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                                    <p className={`text-xs ${selectedTheme.colors.text} mb-1`}>
                                                         No hero image uploaded
                                                     </p>
                                                     <p className={`text-xs ${selectedTheme.colors.text} opacity-75`}>
@@ -346,7 +346,7 @@ const PortfolioEditorPage = () => {
                                             )}
                                             
                                             <div>
-                                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                                     Image URL
                                                 </label>
                                                 <div className="flex gap-2">
@@ -355,7 +355,7 @@ const PortfolioEditorPage = () => {
                                                         value={portfolio.hero_image_url || ''}
                                                         onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
                                                         placeholder="https://example.com/image.jpg"
-                                                        className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                        className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                                     />
                                                     <Button
                                                         onClick={() => {
@@ -365,7 +365,7 @@ const PortfolioEditorPage = () => {
                                                         variant="outline"
                                                         size="sm"
                                                     >
-                                                        <Upload className="h-4 w-4 mr-2" />
+                                                        <Upload className="h-3 w-3 mr-1" />
                                                         Upload
                                                     </Button>
                                                 </div>
@@ -378,11 +378,11 @@ const PortfolioEditorPage = () => {
                                 </div>
 
                                 {/* Hero Preview */}
-                                <div className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
-                                    <h4 className={`text-sm font-medium ${selectedTheme.colors.text} mb-3`}>
+                                <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700">
+                                    <h4 className={`text-xs font-medium ${selectedTheme.colors.text} mb-2`}>
                                         Hero Preview
                                     </h4>
-                                    <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                                    <div className="relative w-full h-24 rounded-lg overflow-hidden">
                                         {portfolio.hero_image_url && (
                                             <img
                                                 src={portfolio.hero_image_url}
@@ -391,13 +391,13 @@ const PortfolioEditorPage = () => {
                                             />
                                         )}
                                         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black opacity-60"></div>
-                                        <div className="absolute inset-0 flex items-center justify-center text-center p-4">
+                                        <div className="absolute inset-0 flex items-center justify-center text-center p-2">
                                             <div>
-                                                <h1 className={`text-2xl font-bold ${selectedTheme.colors.heading} mb-2`}>
+                                                <h1 className={`text-lg font-bold ${selectedTheme.colors.heading} mb-1`}>
                                                     {portfolio.name || 'Your Portfolio Title'}
                                                 </h1>
                                                 {portfolio.subtitle && (
-                                                    <p className={`text-sm ${selectedTheme.colors.primaryStrong}`}>
+                                                    <p className={`text-xs ${selectedTheme.colors.primaryStrong}`}>
                                                         {portfolio.subtitle}
                                                     </p>
                                                 )}
@@ -409,15 +409,15 @@ const PortfolioEditorPage = () => {
                         )}
 
                         {key === 'about' && (
-                            <div className="space-y-6">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     {/* About Content */}
-                                    <div className="space-y-4">
-                                        <h3 className={`text-xl font-semibold ${selectedTheme.colors.heading}`}>
+                                    <div className="space-y-3">
+                                        <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
                                             About Content
                                         </h3>
                                         <div>
-                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                                 About Title
                                             </label>
                                             <input
@@ -425,47 +425,47 @@ const PortfolioEditorPage = () => {
                                                 value={portfolio.about_title || ''}
                                                 onChange={(e) => handleFieldChange('about_title', e.target.value)}
                                                 placeholder="About Me"
-                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                             />
                                         </div>
                                         <div>
-                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                                 About Text
                                             </label>
                                             <textarea
                                                 value={portfolio.about_text || ''}
                                                 onChange={(e) => handleFieldChange('about_text', e.target.value)}
                                                 placeholder="Tell your story, share your musical journey, and connect with your audience..."
-                                                rows={8}
-                                                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
+                                                rows={6}
+                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
                                             />
                                         </div>
                                     </div>
 
                                     {/* Profile Photo Upload */}
-                                    <div className="space-y-4">
-                                        <h3 className={`text-xl font-semibold ${selectedTheme.colors.heading}`}>
+                                    <div className="space-y-3">
+                                        <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
                                             Profile Photo
                                         </h3>
-                                        <div className="space-y-4">
+                                        <div className="space-y-3">
                                             {portfolio.profile_photo_url ? (
                                                 <div className="relative">
                                                     <img
                                                         src={portfolio.profile_photo_url}
                                                         alt="Profile photo"
-                                                        className="w-full h-64 object-cover rounded-lg border border-gray-600"
+                                                        className="w-full h-40 object-cover rounded-lg border border-gray-600"
                                                     />
                                                     <button
                                                         onClick={() => handleFieldChange('profile_photo_url', '')}
-                                                        className="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                                                        className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
                                                     >
-                                                        <X className="h-4 w-4" />
+                                                        <X className="h-3 w-3" />
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
-                                                    <Image className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                                                    <p className={`text-sm ${selectedTheme.colors.text} mb-2`}>
+                                                <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
+                                                    <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                                    <p className={`text-xs ${selectedTheme.colors.text} mb-1`}>
                                                         No profile photo uploaded
                                                     </p>
                                                     <p className={`text-xs ${selectedTheme.colors.text} opacity-75`}>
@@ -475,7 +475,7 @@ const PortfolioEditorPage = () => {
                                             )}
                                             
                                             <div>
-                                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                                     Photo URL
                                                 </label>
                                                 <div className="flex gap-2">
@@ -484,7 +484,7 @@ const PortfolioEditorPage = () => {
                                                         value={portfolio.profile_photo_url || ''}
                                                         onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
                                                         placeholder="https://example.com/photo.jpg"
-                                                        className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                                        className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                                     />
                                                     <Button
                                                         onClick={() => {
@@ -494,7 +494,7 @@ const PortfolioEditorPage = () => {
                                                         variant="outline"
                                                         size="sm"
                                                     >
-                                                        <Upload className="h-4 w-4 mr-2" />
+                                                        <Upload className="h-3 w-3 mr-1" />
                                                         Upload
                                                     </Button>
                                                 </div>
@@ -507,25 +507,25 @@ const PortfolioEditorPage = () => {
                                 </div>
 
                                 {/* About Preview */}
-                                <div className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
-                                    <h4 className={`text-sm font-medium ${selectedTheme.colors.text} mb-3`}>
+                                <div className="bg-gray-800/30 p-3 rounded-lg border border-gray-700">
+                                    <h4 className={`text-xs font-medium ${selectedTheme.colors.text} mb-2`}>
                                         About Section Preview
                                     </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
                                         {portfolio.profile_photo_url && (
                                             <div className="flex justify-center">
                                                 <img
                                                     src={portfolio.profile_photo_url}
                                                     alt="Profile preview"
-                                                    className="w-24 h-24 object-cover rounded-lg"
+                                                    className="w-16 h-16 object-cover rounded-lg"
                                                 />
                                             </div>
                                         )}
                                         <div className={portfolio.profile_photo_url ? "md:col-span-2" : "md:col-span-3"}>
-                                            <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading} mb-2`}>
+                                            <h3 className={`text-sm font-semibold ${selectedTheme.colors.heading} mb-1`}>
                                                 {portfolio.about_title || 'About Me'}
                                             </h3>
-                                            <p className={`text-sm ${selectedTheme.colors.text} line-clamp-3`}>
+                                            <p className={`text-xs ${selectedTheme.colors.text} line-clamp-2`}>
                                                 {portfolio.about_text || 'No about text yet. Add your story to connect with your audience.'}
                                             </p>
                                         </div>
@@ -535,17 +535,17 @@ const PortfolioEditorPage = () => {
                         )}
 
                         {key === 'testimonials' && (
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                                        <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
                                             <EditableField 
                                                 value={portfolio.testimonials_title || 'Testimonials'} 
                                                 onSave={(newValue) => handleFieldChange('testimonials_title', newValue)} 
                                                 theme={selectedTheme} 
                                             />
                                         </h3>
-                                        <p className={`text-sm ${selectedTheme.colors.text} opacity-75 mt-2`}>
+                                        <p className={`text-xs ${selectedTheme.colors.text} opacity-75 mt-1`}>
                                             Showcase reviews and feedback from fans, critics, and collaborators.
                                         </p>
                                     </div>
@@ -564,7 +564,7 @@ const PortfolioEditorPage = () => {
                                             handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
                                         }}
                                     >
-                                        <PlusCircle className="mr-2 h-4 w-4" /> Add Testimonial
+                                        <PlusCircle className="mr-1 h-3 w-3" /> Add Testimonial
                                     </Button>
                                 </div>
 
@@ -576,7 +576,7 @@ const PortfolioEditorPage = () => {
                                         const testimonials = JSON.parse(testimonialsJson);
                                         if (!Array.isArray(testimonials) || testimonials.length === 0) {
                                             return (
-                                                <div className="text-center py-8">
+                                                <div className="text-center py-6">
                                                     <p className={`text-gray-400 ${selectedTheme.colors.text}`}>
                                                         No testimonials yet. Click "Add Testimonial" to get started.
                                                     </p>
@@ -585,10 +585,10 @@ const PortfolioEditorPage = () => {
                                         }
 
                                         return (
-                                            <div className="space-y-4">
+                                            <div className="space-y-3">
                                                 {testimonials.map((testimonial: any, index: number) => (
-                                                    <div key={testimonial.id || index} className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                                                        <div className="flex justify-between items-start mb-3">
+                                                    <div key={testimonial.id || index} className="p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+                                                        <div className="flex justify-between items-start mb-2">
                                                             <div className="flex-1 space-y-2">
                                                                 <input
                                                                     type="text"
@@ -614,7 +614,7 @@ const PortfolioEditorPage = () => {
                                                                                     );
                                                                                     handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
                                                                                 }}
-                                                                                className={`text-lg ${testimonial.rating >= star ? 'text-yellow-400' : 'text-gray-500'}`}
+                                                                                className={`text-sm ${testimonial.rating >= star ? 'text-yellow-400' : 'text-gray-500'}`}
                                                                             >
                                                                                 ★
                                                                             </button>
@@ -629,7 +629,7 @@ const PortfolioEditorPage = () => {
                                                                     }}
                                                                 className="text-red-400 hover:text-red-300 p-1"
                                                             >
-                                                                <Trash2 className="h-4 w-4" />
+                                                                <Trash2 className="h-3 w-3" />
                                                             </button>
                                                         </div>
                                                         <textarea
@@ -641,7 +641,7 @@ const PortfolioEditorPage = () => {
                                                                 handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
                                                             }}
                                                             placeholder="Write the testimonial content here..."
-                                                            rows={3}
+                                                            rows={2}
                                                             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm resize-none"
                                                         />
                                                     </div>
@@ -650,7 +650,7 @@ const PortfolioEditorPage = () => {
                                         );
                                     } catch (error) {
                                         return (
-                                            <div className="text-center py-8">
+                                            <div className="text-center py-6">
                                                 <p className={`text-red-400 ${selectedTheme.colors.text}`}>
                                                     Error loading testimonials. Please try refreshing the page.
                                                 </p>
@@ -887,18 +887,17 @@ const PortfolioEditorPage = () => {
                         )}
 
                         {key === 'social_links' && (
-                            <div className="space-y-6">
-                                <h3 className={`text-2xl font-bold ${selectedTheme.colors.heading}`}>
+                            <div className="space-y-4">
+                                <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
                                     Social Media Links
                                 </h3>
-                                <p className={`text-sm ${selectedTheme.colors.text} opacity-75`}>
+                                <p className={`text-xs ${selectedTheme.colors.text} opacity-75`}>
                                     Add your social media profiles to help fans connect with you across platforms.
                                 </p>
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Instagram */}
-                                    <div className="space-y-2">
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                             Instagram
                                         </label>
                                         <input
@@ -906,13 +905,12 @@ const PortfolioEditorPage = () => {
                                             value={portfolio.instagram_url || ''}
                                             onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
                                             placeholder="https://instagram.com/yourusername"
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                         />
                                     </div>
 
-                                    {/* Twitter/X */}
-                                    <div className="space-y-2">
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                             Twitter/X
                                         </label>
                                         <input
@@ -920,13 +918,12 @@ const PortfolioEditorPage = () => {
                                             value={portfolio.twitter_url || ''}
                                             onChange={(e) => handleFieldChange('twitter_url', e.target.value)}
                                             placeholder="https://twitter.com/yourusername"
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                         />
                                     </div>
 
-                                    {/* YouTube */}
-                                    <div className="space-y-2">
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                             YouTube
                                         </label>
                                         <input
@@ -934,13 +931,12 @@ const PortfolioEditorPage = () => {
                                             value={portfolio.youtube_url || ''}
                                             onChange={(e) => handleFieldChange('youtube_url', e.target.value)}
                                             placeholder="https://youtube.com/@yourchannel"
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                         />
                                     </div>
 
-                                    {/* LinkedIn */}
-                                    <div className="space-y-2">
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                    <div>
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                             LinkedIn
                                         </label>
                                         <input
@@ -948,13 +944,12 @@ const PortfolioEditorPage = () => {
                                             value={portfolio.linkedin_url || ''}
                                             onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
                                             placeholder="https://linkedin.com/in/yourprofile"
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                         />
                                     </div>
 
-                                    {/* Website */}
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                    <div className="md:col-span-2">
+                                        <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
                                             Personal Website
                                         </label>
                                         <input
@@ -962,21 +957,9 @@ const PortfolioEditorPage = () => {
                                             value={portfolio.website_url || ''}
                                             onChange={(e) => handleFieldChange('website_url', e.target.value)}
                                             placeholder="https://yourwebsite.com"
-                                            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                                            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                         />
                                     </div>
-                                </div>
-
-                                <div className="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                                    <h4 className={`text-sm font-semibold ${selectedTheme.colors.text} mb-2`}>
-                                        💡 Tips for Social Links
-                                    </h4>
-                                    <ul className={`text-xs space-y-1 ${selectedTheme.colors.text} opacity-75`}>
-                                        <li>• Use the full URL (including https://)</li>
-                                        <li>• Make sure your profiles are public</li>
-                                        <li>• Keep your links up to date</li>
-                                        <li>• Consider adding your most active platforms first</li>
-                                    </ul>
                                 </div>
                             </div>
                         )}
