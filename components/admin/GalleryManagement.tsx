@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
 import GalleryUploadForm from './GalleryUploadForm'
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { Button } from "@/components/ui/button"
 
 type GalleryItem = Database['public']['Tables']['gallery']['Row']
 
@@ -89,12 +90,9 @@ export default function GalleryManagement() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-white">Add/Edit Gallery Item</h2>
-          <button
-            onClick={() => setShowForm(false)}
-            className="text-gray-400 hover:text-white"
-          >
+          <Button variant="ghost" onClick={() => setShowForm(false)}>
             ← Back to Gallery
-          </button>
+          </Button>
         </div>
         <GalleryUploadForm
           editItem={editingItem}
@@ -109,12 +107,9 @@ export default function GalleryManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div></div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-200"
-        >
+        <Button onClick={() => setShowForm(true)}>
           Add Item
-        </button>
+        </Button>
       </div>
 
       {loading ? (
@@ -127,12 +122,9 @@ export default function GalleryManagement() {
             <div className="text-center py-20">
               <div className="text-gray-400 text-lg mb-2">No gallery items yet</div>
               <p className="text-gray-500 mb-6">Add your first gallery item to get started.</p>
-              <button
-                onClick={() => setShowForm(true)}
-                className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg transition-colors duration-200"
-              >
+              <Button onClick={() => setShowForm(true)}>
                 Add First Item
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -192,21 +184,12 @@ export default function GalleryManagement() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleEdit(item)}
-                            className="p-2 text-blue-400 hover:text-blue-300 transition-colors duration-200"
-                            title="Edit gallery item"
-                          >
+                          <Button variant="ghost" onClick={() => handleEdit(item)} title="Edit gallery item">
                             <PencilIcon className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            disabled={deletingItem === item.id}
-                            className="p-2 text-red-400 hover:text-red-300 disabled:text-red-600 transition-colors duration-200"
-                            title="Delete gallery item"
-                          >
+                          </Button>
+                          <Button variant="ghost" onClick={() => handleDelete(item.id)} disabled={deletingItem === item.id} title="Delete gallery item">
                             <TrashIcon className="h-4 w-4" />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>

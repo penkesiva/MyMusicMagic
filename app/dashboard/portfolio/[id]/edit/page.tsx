@@ -710,15 +710,12 @@ const PortfolioEditorPage = () => {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <button
-                                                                onClick={() => {
-                                                                        const updatedTestimonials = testimonials.filter((_: any, i: number) => i !== index);
-                                                                        handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
-                                                                    }}
-                                                                className="text-red-400 hover:text-red-300 p-1"
-                                                            >
+                                                            <Button variant="destructive" onClick={() => {
+                                                                const updatedTestimonials = testimonials.filter((_: any, i: number) => i !== index);
+                                                                handleFieldChange('testimonials_json', JSON.stringify(updatedTestimonials));
+                                                            }}>
                                                                 <Trash2 className="h-3 w-3" />
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                         <textarea
                                                             value={testimonial.content || ''}
@@ -861,15 +858,12 @@ const PortfolioEditorPage = () => {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <button
-                                                                onClick={() => {
-                                                                        const updatedPosts = posts.filter((_: any, i: number) => i !== index);
-                                                                        handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
-                                                                    }}
-                                                                className="text-red-400 hover:text-red-300 p-1"
-                                                            >
+                                                            <Button variant="destructive" onClick={() => {
+                                                                const updatedPosts = posts.filter((_: any, i: number) => i !== index);
+                                                                handleFieldChange('blog_posts_json', JSON.stringify(updatedPosts));
+                                                            }}>
                                                                 <Trash2 className="h-4 w-4" />
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                         <div className="space-y-2">
                                                             <textarea
@@ -1178,15 +1172,12 @@ const PortfolioEditorPage = () => {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <button
-                                                                onClick={() => {
-                                                                        const updatedNews = newsItems.filter((_: any, i: number) => i !== index);
-                                                                        handleFieldChange('news_items_json', JSON.stringify(updatedNews));
-                                                                    }}
-                                                                className="text-red-400 hover:text-red-300 p-1"
-                                                            >
+                                                            <Button variant="destructive" onClick={() => {
+                                                                const updatedNews = newsItems.filter((_: any, i: number) => i !== index);
+                                                                handleFieldChange('news_items_json', JSON.stringify(updatedNews));
+                                                            }}>
                                                                 <Trash2 className="h-4 w-4" />
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                         <textarea
                                                             value={item.content || ''}
@@ -1326,15 +1317,12 @@ const PortfolioEditorPage = () => {
                                                                     </select>
                                                                 </div>
                                                             </div>
-                                                            <button
-                                                                onClick={() => {
-                                                                        const updatedSkills = skills.filter((_: any, i: number) => i !== index);
-                                                                        handleFieldChange('skills_json', JSON.stringify(updatedSkills));
-                                                                    }}
-                                                                className="text-red-400 hover:text-red-300 p-1"
-                                                            >
+                                                            <Button variant="destructive" onClick={() => {
+                                                                const updatedSkills = skills.filter((_: any, i: number) => i !== index);
+                                                                handleFieldChange('skills_json', JSON.stringify(updatedSkills));
+                                                            }}>
                                                                 <Trash2 className="h-4 w-4" />
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                         <textarea
                                                             value={skill.description || ''}

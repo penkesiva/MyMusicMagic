@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { Button } from "@/components/ui/button"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('')
@@ -146,13 +147,9 @@ export default function SignUpPage() {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75 disabled:cursor-not-allowed transition-all"
-                >
-                  {isLoading ? 'Creating account...' : 'Create Account'}
-                </button>
+                <Button type="submit" disabled={isLoading} className="w-full">
+                    {isLoading ? 'Creating account...' : 'Create Account'}
+                </Button>
 
                 <div className="text-center">
                    <p className="text-sm text-gray-600">

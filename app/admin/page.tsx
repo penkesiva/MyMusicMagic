@@ -18,6 +18,7 @@ import {
   ChevronUpIcon,
   PlusIcon
 } from '@heroicons/react/24/outline'
+import { Button } from "@/components/ui/button"
 
 type Track = Database['public']['Tables']['tracks']['Row']
 
@@ -142,18 +143,13 @@ export default function AdminPage() {
                   Manage your artist profile, including bio, photo, and social links.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setArtistInfoOpen(v => !v)}
-                className="flex items-center text-sm text-blue-300 hover:text-blue-200 transition-colors"
-                aria-label={artistInfoOpen ? 'Collapse' : 'Expand'}
-              >
+              <Button variant="ghost" type="button" onClick={() => setArtistInfoOpen(v => !v)} aria-label={artistInfoOpen ? 'Collapse' : 'Expand'}>
                 {artistInfoOpen ? (
                   <><ChevronUpIcon className="h-4 w-4 mr-1" /> Collapse</>
                 ) : (
                   <><ChevronDownIcon className="h-4 w-4 mr-1" /> Expand</>
                 )}
-              </button>
+              </Button>
             </div>
             {artistInfoOpen && (
               <div className="mt-3">
@@ -173,18 +169,13 @@ export default function AdminPage() {
                   Upload images and add YouTube videos to showcase your musical journey.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setGalleryOpen(v => !v)}
-                className="flex items-center text-sm text-blue-300 hover:text-blue-200 transition-colors"
-                aria-label={galleryOpen ? 'Collapse' : 'Expand'}
-              >
+              <Button variant="ghost" type="button" onClick={() => setGalleryOpen(v => !v)} aria-label={galleryOpen ? 'Collapse' : 'Expand'}>
                 {galleryOpen ? (
                   <><ChevronUpIcon className="h-4 w-4 mr-1" /> Collapse</>
                 ) : (
                   <><ChevronDownIcon className="h-4 w-4 mr-1" /> Expand</>
                 )}
-              </button>
+              </Button>
             </div>
             {galleryOpen && (
               <div className="mt-3">
@@ -204,18 +195,13 @@ export default function AdminPage() {
                   Upload new tracks or edit existing ones in your collection.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setTrackMgmtOpen(v => !v)}
-                className="flex items-center text-sm text-blue-300 hover:text-blue-200 transition-colors"
-                aria-label={trackMgmtOpen ? 'Collapse' : 'Expand'}
-              >
+              <Button variant="ghost" type="button" onClick={() => setTrackMgmtOpen(v => !v)} aria-label={trackMgmtOpen ? 'Collapse' : 'Expand'}>
                 {trackMgmtOpen ? (
                   <><ChevronUpIcon className="h-4 w-4 mr-1" /> Collapse</>
                 ) : (
                   <><ChevronDownIcon className="h-4 w-4 mr-1" /> Expand</>
                 )}
-              </button>
+              </Button>
             </div>
             {trackMgmtOpen && (
               <div className="mt-3">
@@ -237,26 +223,12 @@ export default function AdminPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-1.5 rounded-lg transition-colors ${
-                      viewMode === 'list' 
-                        ? 'bg-primary-500 text-white' 
-                        : 'bg-gray-600 text-gray-300 hover:bg-gray-700'
-                    }`}
-                  >
+                  <Button size="icon" variant={viewMode === 'list' ? 'default' : 'secondary'} onClick={() => setViewMode('list')}>
                     <ListBulletIcon className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-1.5 rounded-lg transition-colors ${
-                      viewMode === 'grid' 
-                        ? 'bg-primary-500 text-white' 
-                        : 'bg-gray-600 text-gray-300 hover:bg-gray-700'
-                    }`}
-                  >
+                  </Button>
+                  <Button size="icon" variant={viewMode === 'grid' ? 'default' : 'secondary'} onClick={() => setViewMode('grid')}>
                     <Squares2X2Icon className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
                 <button
                   onClick={() => setShowTracks(!showTracks)}
@@ -302,18 +274,12 @@ export default function AdminPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleEdit(track)}
-                              className="p-1.5 text-blue-400 hover:text-blue-300 transition-colors"
-                            >
+                            <Button size="icon" variant="ghost" onClick={() => handleEdit(track)}>
                               <PencilIcon className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => setDeletingTrack(track)}
-                              className="p-1.5 text-red-400 hover:text-red-300 transition-colors"
-                            >
+                            </Button>
+                            <Button size="icon" variant="ghost" onClick={() => setDeletingTrack(track)}>
                               <TrashIcon className="h-4 w-4" />
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -336,18 +302,12 @@ export default function AdminPage() {
                               {new Date(track.created_at).toLocaleDateString()}
                             </p>
                             <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => handleEdit(track)}
-                                className="p-1.5 text-blue-400 hover:text-blue-300 transition-colors"
-                              >
+                              <Button size="icon" variant="ghost" onClick={() => handleEdit(track)}>
                                 <PencilIcon className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => setDeletingTrack(track)}
-                                className="p-1.5 text-red-400 hover:text-red-300 transition-colors"
-                              >
+                              </Button>
+                              <Button size="icon" variant="ghost" onClick={() => setDeletingTrack(track)}>
                                 <TrashIcon className="h-4 w-4" />
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -405,20 +365,12 @@ export default function AdminPage() {
                 Are you sure you want to delete "{deletingTrack.title}"? This action cannot be undone.
               </p>
               <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setDeletingTrack(null)}
-                  className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm hover:bg-gray-700 transition-colors"
-                  disabled={isDeleting}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleDelete(deletingTrack)}
-                  className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors"
-                  disabled={isDeleting}
-                >
+                <Button variant="destructive" onClick={() => handleDelete(deletingTrack)} disabled={isDeleting}>
                   {isDeleting ? 'Deleting...' : 'Delete'}
-                </button>
+                </Button>
+                <Button variant="secondary" onClick={() => setDeletingTrack(null)}>
+                  Cancel
+                </Button>
               </div>
             </div>
           </div>
