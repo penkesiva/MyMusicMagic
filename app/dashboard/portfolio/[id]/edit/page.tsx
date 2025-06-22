@@ -77,6 +77,8 @@ const PortfolioEditorPage = () => {
   const [editingGalleryItem, setEditingGalleryItem] = useState<any | null>(null);
   const [showAddGalleryForm, setShowAddGalleryForm] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [uploadingHero, setUploadingHero] = useState(false);
+  const [uploadingProfile, setUploadingProfile] = useState(false);
 
 
   const supabase = useMemo(() => createClient(), []);
@@ -163,6 +165,140 @@ const PortfolioEditorPage = () => {
   const handleFieldChange = (field: keyof Portfolio, value: any) => {
     saveChanges({ [field]: value });
     setPortfolio(prev => ({ ...prev!, [field]: value }));
+  };
+
+  const uploadHeroImage = async (file: File) => {
+    if (!portfolio) return;
+    
+    setUploadingHero(true);
+    try {
+      console.log('Starting hero image upload...', { file: file.name, size: file.size });
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${portfolio.id}/hero-${Date.now()}.${fileExt}`;
+      
+      console.log('Uploading to path:', fileName);
+      
+      // Try site-bg-images first, fallback to gallery-images
+      let bucketName = 'site-bg-images';
+      let uploadError = null;
+      
+      const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      
+      if (error) {
+        console.log('site-bg-images failed, trying gallery-images...', error);
+        uploadError = error;
+        
+        // Fallback to gallery-images bucket
+        bucketName = 'gallery-images';
+        const fallbackResult = await supabase.storage
+          .from(bucketName)
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        if (fallbackResult.error) {
+          console.error('Both buckets failed:', fallbackResult.error);
+          throw fallbackResult.error;
+        }
+        
+        console.log('Upload successful to gallery-images, getting public URL...');
+        const { data: { publicUrl } } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(fileName);
+        
+        console.log('Public URL generated:', publicUrl);
+        handleFieldChange('hero_image_url', publicUrl);
+        return;
+      }
+      
+      console.log('Upload successful to site-bg-images, getting public URL...');
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(fileName);
+      
+      console.log('Public URL generated:', publicUrl);
+      handleFieldChange('hero_image_url', publicUrl);
+    } catch (error: any) {
+      console.error('Error uploading hero image:', error);
+      alert(`Failed to upload image: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUploadingHero(false);
+    }
+  };
+
+  const uploadProfilePhoto = async (file: File) => {
+    if (!portfolio) return;
+    
+    setUploadingProfile(true);
+    try {
+      console.log('Starting profile photo upload...', { file: file.name, size: file.size });
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${portfolio.id}/profile-${Date.now()}.${fileExt}`;
+      
+      console.log('Uploading to path:', fileName);
+      
+      // Try site-bg-images first, fallback to gallery-images
+      let bucketName = 'site-bg-images';
+      let uploadError = null;
+      
+      const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      
+      if (error) {
+        console.log('site-bg-images failed, trying gallery-images...', error);
+        uploadError = error;
+        
+        // Fallback to gallery-images bucket
+        bucketName = 'gallery-images';
+        const fallbackResult = await supabase.storage
+          .from(bucketName)
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        if (fallbackResult.error) {
+          console.error('Both buckets failed:', fallbackResult.error);
+          throw fallbackResult.error;
+        }
+        
+        console.log('Upload successful to gallery-images, getting public URL...');
+        const { data: { publicUrl } } = supabase.storage
+          .from(bucketName)
+          .getPublicUrl(fileName);
+        
+        console.log('Public URL generated:', publicUrl);
+        handleFieldChange('profile_photo_url', publicUrl);
+        return;
+      }
+      
+      console.log('Upload successful to site-bg-images, getting public URL...');
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(fileName);
+      
+      console.log('Public URL generated:', publicUrl);
+      handleFieldChange('profile_photo_url', publicUrl);
+    } catch (error: any) {
+      console.error('Error uploading profile photo:', error);
+      alert(`Failed to upload image: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUploadingProfile(false);
+    }
   };
   
   const handleSectionConfigChange = (
@@ -357,16 +493,31 @@ const PortfolioEditorPage = () => {
                                                         placeholder="https://example.com/image.jpg"
                                                         className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                                     />
-                                                    <Button
-                                                        onClick={() => {
-                                                            // TODO: Implement file upload to Supabase storage
-                                                            alert('File upload functionality coming soon!');
+                                                    <input
+                                                        type="file"
+                                                        id="hero-upload"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                uploadHeroImage(file);
+                                                                e.target.value = '';
+                                                            }
                                                         }}
+                                                        className="hidden"
+                                                    />
+                                                    <Button
+                                                        onClick={() => document.getElementById('hero-upload')?.click()}
                                                         variant="outline"
                                                         size="sm"
+                                                        disabled={uploadingHero}
                                                     >
-                                                        <Upload className="h-3 w-3 mr-1" />
-                                                        Upload
+                                                        {uploadingHero ? (
+                                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                                        ) : (
+                                                            <Upload className="h-3 w-3 mr-1" />
+                                                        )}
+                                                        {uploadingHero ? 'Uploading...' : 'Upload'}
                                                     </Button>
                                                 </div>
                                                 <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
@@ -486,16 +637,31 @@ const PortfolioEditorPage = () => {
                                                         placeholder="https://example.com/photo.jpg"
                                                         className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                                                     />
-                                                    <Button
-                                                        onClick={() => {
-                                                            // TODO: Implement file upload to Supabase storage
-                                                            alert('File upload functionality coming soon!');
+                                                    <input
+                                                        type="file"
+                                                        id="profile-upload"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                uploadProfilePhoto(file);
+                                                                e.target.value = '';
+                                                            }
                                                         }}
+                                                        className="hidden"
+                                                    />
+                                                    <Button
+                                                        onClick={() => document.getElementById('profile-upload')?.click()}
                                                         variant="outline"
                                                         size="sm"
+                                                        disabled={uploadingProfile}
                                                     >
-                                                        <Upload className="h-3 w-3 mr-1" />
-                                                        Upload
+                                                        {uploadingProfile ? (
+                                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                                        ) : (
+                                                            <Upload className="h-3 w-3 mr-1" />
+                                                        )}
+                                                        {uploadingProfile ? 'Uploading...' : 'Upload'}
                                                     </Button>
                                                 </div>
                                                 <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mt-1`}>
