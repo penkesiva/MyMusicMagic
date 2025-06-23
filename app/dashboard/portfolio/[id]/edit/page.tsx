@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown } from "lucide-react";
+import {
+  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText
+} from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
 import { PortfolioTrackForm } from "@/components/portfolio/PortfolioTrackForm";
@@ -83,6 +85,10 @@ const PortfolioEditorPage = () => {
   const [colorThemeOpen, setColorThemeOpen] = useState(true);
   const [sectionsOpen, setSectionsOpen] = useState(true);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  const [galleryViewMode, setGalleryViewMode] = useState<'list' | 'grid'>('list');
+  const [galleryFilter, setGalleryFilter] = useState<'all' | 'photo' | 'video'>('all');
+  const [trackViewMode, setTrackViewMode] = useState<'list' | 'grid'>('list');
+  const [uploadingResume, setUploadingResume] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -168,7 +174,7 @@ const PortfolioEditorPage = () => {
       'skills_title', 'skills_json', 'status_title', 'current_status', 'status_description',
       'ai_advantage_title', 'ai_advantages_json', 'contact_title', 'contact_description',
       'contact_email', 'contact_phone', 'contact_location', 'footer_text', 'footer_links_json',
-      'sections_config', 'theme_name'
+      'sections_config', 'theme_name', 'resume_url'
     ];
 
     const portfolioToSave: Partial<Portfolio> = {};
@@ -334,6 +340,36 @@ const PortfolioEditorPage = () => {
       alert(`Failed to upload image: ${error.message || 'Unknown error'}`);
     } finally {
       setUploadingProfile(false);
+    }
+  };
+
+  const uploadResume = async (file: File) => {
+    if (!portfolio) return;
+    
+    setUploadingResume(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${portfolio.id}/resume-${Date.now()}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('resumes')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true 
+        });
+
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('resumes')
+        .getPublicUrl(fileName);
+      
+      handleFieldChange('resume_url', publicUrl);
+    } catch (error: any) {
+      console.error('Error uploading resume:', error);
+      alert(`Failed to upload resume: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUploadingResume(false);
     }
   };
   
@@ -672,16 +708,16 @@ const PortfolioEditorPage = () => {
                             />
                           ) : (
                             <div className="space-y-4">
-                              <Button 
-                                onClick={() => setShowAddTrackForm(true)}
-                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                              >
-                                <PlusCircle className="mr-2 h-4 w-4" /> Add Track
-                              </Button>
+                               <div className="flex justify-end items-center mb-4 gap-2">
+                                  <Button onClick={() => setTrackViewMode('list')} variant="ghost" size="icon" className={trackViewMode === 'list' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><List className="h-5 w-5" /></Button>
+                                  <Button onClick={() => setTrackViewMode('grid')} variant="ghost" size="icon" className={trackViewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><Grid className="h-5 w-5" /></Button>
+                                  <Button onClick={() => setShowAddTrackForm(true)} className="bg-white/10 border-white/20 text-white hover:bg-white/20"><PlusCircle className="mr-2 h-4 w-4" /> Add Item</Button>
+                                </div>
                               <PortfolioTracksDisplay
                                 portfolioId={portfolio.id}
                                 onEdit={(track) => setEditingTrack(track)}
                                 onRefresh={fetchPortfolio}
+                                viewMode={trackViewMode}
                               />
                             </div>
                           )
@@ -700,16 +736,26 @@ const PortfolioEditorPage = () => {
                             />
                           ) : (
                             <div className="space-y-4">
-                              <Button 
-                                onClick={() => setShowAddGalleryForm(true)}
-                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                              >
-                                <PlusCircle className="mr-2 h-4 w-4" /> Add Gallery Item
-                              </Button>
+                              <div className="flex justify-between items-center mb-4">
+                                <div className="flex-1 flex justify-center">
+                                  <div className="inline-flex items-center bg-white/10 p-1 rounded-lg">
+                                    <Button onClick={() => setGalleryFilter('all')} size="sm" variant="ghost" className={galleryFilter === 'all' ? 'bg-purple-500 text-white hover:bg-purple-600' : 'text-gray-300 hover:bg-white/20 hover:text-white'}>All</Button>
+                                    <Button onClick={() => setGalleryFilter('photo')} size="sm" variant="ghost" className={galleryFilter === 'photo' ? 'bg-purple-500 text-white hover:bg-purple-600' : 'text-gray-300 hover:bg-white/20 hover:text-white'}>Photos</Button>
+                                    <Button onClick={() => setGalleryFilter('video')} size="sm" variant="ghost" className={galleryFilter === 'video' ? 'bg-purple-500 text-white hover:bg-purple-600' : 'text-gray-300 hover:bg-white/20 hover:text-white'}>Videos</Button>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Button onClick={() => setGalleryViewMode('list')} variant="ghost" size="icon" className={galleryViewMode === 'list' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><List className="h-5 w-5" /></Button>
+                                  <Button onClick={() => setGalleryViewMode('grid')} variant="ghost" size="icon" className={galleryViewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><Grid className="h-5 w-5" /></Button>
+                                  <Button onClick={() => setShowAddGalleryForm(true)} className="bg-white/10 border-white/20 text-white hover:bg-white/20"><PlusCircle className="mr-2 h-4 w-4" /> Add Item</Button>
+                                </div>
+                              </div>
                               <PortfolioGalleryDisplay
                                 portfolioId={portfolio.id}
                                 onEdit={(item) => setEditingGalleryItem(item)}
                                 onRefresh={fetchPortfolio}
+                                viewMode={galleryViewMode}
+                                filter={galleryFilter}
                               />
                             </div>
                           )
@@ -727,6 +773,56 @@ const PortfolioEditorPage = () => {
                             <h3 className="text-lg font-semibold text-white/80">Press Section</h3>
                             <p className="text-sm text-white/50 mt-2">Customization options for this section are coming soon!</p>
                           </div>
+                        )}
+
+                        {key === 'resume' && (
+                           <div className="space-y-4">
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Resume Document
+                            </label>
+                            {portfolio.resume_url ? (
+                                <div className="flex items-center gap-4 p-3 bg-white/10 rounded-lg">
+                                    <FileText className="h-6 w-6 text-purple-400" />
+                                    <a href={portfolio.resume_url} target="_blank" rel="noopener noreferrer" className="flex-1 text-sm text-white truncate hover:underline">
+                                      {portfolio.resume_url.split('/').pop()}
+                                    </a>
+                                    <button onClick={() => handleFieldChange('resume_url', null)} className="p-2 text-red-400 hover:text-red-300 transition-colors" title="Remove resume">
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                  <FileText className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                  <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No resume uploaded</p>
+                                </div>
+                            )}
+                            <div className="flex gap-2">
+                              <Input
+                                type="url"
+                                value={portfolio.resume_url || ''}
+                                onChange={(e) => handleFieldChange('resume_url', e.target.value)}
+                                placeholder="Or paste public URL to resume"
+                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                              <input
+                                type="file" id="resume-upload" accept=".pdf,.doc,.docx"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) uploadResume(file);
+                                  e.target.value = '';
+                                }}
+                                className="hidden"
+                              />
+                              <Button
+                                onClick={() => document.getElementById('resume-upload')?.click()}
+                                variant="outline" size="sm" disabled={uploadingResume}
+                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                              >
+                                {uploadingResume ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                <span className="ml-2">Upload</span>
+                              </Button>
+                            </div>
+                           </div>
                         )}
                       </div>
                     )}

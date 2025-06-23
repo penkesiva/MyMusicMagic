@@ -15,7 +15,8 @@ export const SECTIONS_CONFIG: Record<string, Section> = {
     blog: { defaultName: 'Blog', defaultEnabled: false, defaultOrder: 8 },
     status: { defaultName: 'What I’m Working On', defaultEnabled: false, defaultOrder: 9 },
     skills: { defaultName: 'Skills & Tools', defaultEnabled: false, defaultOrder: 10 },
-    ai_advantage: { defaultName: 'Hobbies', defaultEnabled: false, defaultOrder: 11 },
-    contact: { defaultName: 'Connect', defaultEnabled: true, defaultOrder: 12 },
-    footer: { defaultName: 'Footer', defaultEnabled: true, defaultOrder: 13 },
+    resume: { defaultName: 'Resume', defaultEnabled: false, defaultOrder: 11 },
+    ai_advantage: { defaultName: 'Hobbies', defaultEnabled: false, defaultOrder: 12 },
+    contact: { defaultName: 'Connect', defaultEnabled: true, defaultOrder: 13 },
+    footer: { defaultName: 'Footer', defaultEnabled: true, defaultOrder: 14 },
 }; 

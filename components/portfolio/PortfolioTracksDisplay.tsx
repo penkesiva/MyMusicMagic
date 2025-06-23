@@ -11,9 +11,10 @@ interface PortfolioTracksDisplayProps {
   portfolioId: string
   onEdit?: (track: Track) => void
   onRefresh?: () => void
+  viewMode?: 'list' | 'grid'
 }
 
-export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh }: PortfolioTracksDisplayProps) {
+export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'list' }: PortfolioTracksDisplayProps) {
   const [tracks, setTracks] = useState<Track[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -139,74 +140,61 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh 
 
   if (tracks.length === 0) {
     return (
-      <div className="bg-dark-400/30 rounded-lg p-6 text-center">
-        <div className="text-gray-400 mb-2">🎵 No tracks yet</div>
-        <p className="text-gray-500 text-sm">Add your first track to get started.</p>
+      <div className="text-center p-8 border-2 border-dashed border-white/20 rounded-lg">
+        <h3 className="text-lg font-semibold text-white/80">No Tracks Found</h3>
+        <p className="text-sm text-white/50 mt-2">Add your first track to get started.</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-3">
-      {tracks.map((track) => (
-        <div key={track.id} className="bg-dark-400/50 rounded-lg p-4 border border-gray-600">
-          <div className="flex items-center gap-4">
-            {/* Thumbnail */}
-            <div className="relative w-16 h-16 flex-shrink-0">
-              <img
-                src={track.thumbnail_url || '/default-track-thumbnail.jpg'}
-                alt={track.title}
-                className="w-full h-full object-cover rounded-lg"
-              />
-              <button
-                onClick={() => handlePlayPause(track)}
-                className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center hover:bg-black/60 transition-colors"
-              >
-                {playingTrack === track.id ? (
-                  <PauseIcon className="h-6 w-6 text-white" />
-                ) : (
-                  <PlayIcon className="h-6 w-6 text-white ml-1" />
-                )}
-              </button>
-            </div>
-
-            {/* Track Info */}
-            <div className="flex-1 min-w-0">
-              <h4 className="text-white font-medium text-sm mb-1 line-clamp-1">{track.title}</h4>
-              {track.description && (
-                <p className="text-gray-500 text-xs mb-2 line-clamp-1">{track.description}</p>
-              )}
-              <div className="flex items-center gap-4 text-xs text-gray-500">
-                {track.duration && (
-                  <span>{formatDuration(track.duration)}</span>
-                )}
-                <span>{formatDate(track.created_at)}</span>
+    <div className="space-y-4">
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {tracks.map((track) => (
+            <div key={track.id} className="bg-white/5 rounded-lg overflow-hidden border border-white/10 group">
+              <div className="relative aspect-square">
+                <img src={track.thumbnail_url || '/default-track-thumbnail.jpg'} alt={track.title} className="w-full h-full object-cover"/>
+                 <button onClick={() => handlePlayPause(track)} className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  {playingTrack === track.id ? (<PauseIcon className="h-8 w-8 text-white" />) : (<PlayIcon className="h-8 w-8 text-white ml-1" />)}
+                </button>
+              </div>
+              <div className="p-3">
+                <h4 className="font-medium text-sm text-white truncate">{track.title}</h4>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-gray-400 text-xs">{formatDuration(track.duration)}</p>
+                  <div className="flex items-center gap-1">
+                    {onEdit && (<button onClick={() => onEdit(track)} className="p-1 text-blue-400 hover:text-blue-300" title="Edit"><PencilIcon className="h-4 w-4" /></button>)}
+                    <button onClick={() => handleDelete(track.id)} disabled={deletingTrack === track.id} className="p-1 text-red-400 hover:text-red-300" title="Delete"><TrashIcon className="h-4 w-4" /></button>
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              {onEdit && (
-                <button
-                  onClick={() => onEdit(track)}
-                  className="p-2 text-blue-400 hover:text-blue-300 transition-colors"
-                  title="Edit track"
-                >
-                  <PencilIcon className="h-4 w-4" />
-                </button>
-              )}
-              <button
-                onClick={() => handleDelete(track.id)}
-                disabled={deletingTrack === track.id}
-                className="p-2 text-red-400 hover:text-red-300 disabled:text-red-600 transition-colors"
-                title="Delete track"
-              >
-                <TrashIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+          ))}
         </div>
-      ))}
+      ) : (
+        <div className="space-y-3">
+          {tracks.map((track) => (
+            <div key={track.id} className="flex items-center p-3 bg-white/5 rounded-lg border border-white/10">
+              <div className="relative w-16 h-16 flex-shrink-0">
+                <img src={track.thumbnail_url || '/default-track-thumbnail.jpg'} alt={track.title} className="w-full h-full object-cover rounded-md"/>
+                <button onClick={() => handlePlayPause(track)} className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center hover:bg-black/60 transition-colors">
+                  {playingTrack === track.id ? (<PauseIcon className="h-6 w-6 text-white" />) : (<PlayIcon className="h-6 w-6 text-white ml-1" />)}
+                </button>
+              </div>
+              <div className="flex-1 min-w-0 mx-4">
+                <h4 className="font-medium text-sm text-white truncate">{track.title}</h4>
+                <p className="text-gray-400 text-xs truncate">{track.description}</p>
+              </div>
+              <div className="text-gray-400 text-xs mx-4">{formatDuration(track.duration)}</div>
+              <div className="flex items-center gap-2">
+                {onEdit && (<button onClick={() => onEdit(track)} className="p-2 text-blue-400 hover:text-blue-300 transition-colors" title="Edit track"><PencilIcon className="h-4 w-4" /></button>)}
+                <button onClick={() => handleDelete(track.id)} disabled={deletingTrack === track.id} className="p-2 text-red-400 hover:text-red-300 disabled:text-red-600 transition-colors" title="Delete track"><TrashIcon className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 } 

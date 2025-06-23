@@ -272,6 +272,7 @@ export interface Database {
           footer_links_json: Json | null
           sections_config: Json | null
           theme_name: string | null
+          resume_url: string | null
         }
         Insert: {
           id?: string
@@ -316,6 +317,7 @@ export interface Database {
           footer_links_json?: Json | null
           sections_config?: Json | null
           theme_name?: string | null
+          resume_url?: string | null
         }
         Update: {
           id?: string
@@ -360,6 +362,7 @@ export interface Database {
           footer_links_json?: Json | null
           sections_config?: Json | null
           theme_name?: string | null
+          resume_url?: string | null
         }
       }
       artist_info: {
