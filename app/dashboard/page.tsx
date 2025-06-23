@@ -300,139 +300,142 @@ export default function DashboardPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
           </div>
         ) : (
-          <div className="space-y-8">
-            {/* Profile Section */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-white">Profile</h2>
-                {!isEditingProfile ? (
-                  <button
-                    onClick={() => setIsEditingProfile(true)}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
-                  >
-                    Edit Profile
-                  </button>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Column - Profile and Subscription */}
+            <div className="space-y-8">
+              {/* Profile Section */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-white">Profile</h2>
+                  {!isEditingProfile ? (
+                    <button
+                      onClick={() => setIsEditingProfile(true)}
+                      className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
+                    >
+                      Edit Profile
+                    </button>
+                  ) : (
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={handleSaveProfile}
+                        className="px-4 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setIsEditingProfile(false)}
+                        className="px-4 py-2 bg-gray-500/20 border border-gray-500/30 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-all duration-300"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {isEditingProfile ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                      <input
+                        type="text"
+                        value={editingProfile.username}
+                        onChange={(e) => setEditingProfile({ ...editingProfile, username: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                      <input
+                        type="text"
+                        value={editingProfile.full_name}
+                        onChange={(e) => setEditingProfile({ ...editingProfile, full_name: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+                      <textarea
+                        value={editingProfile.bio}
+                        onChange={(e) => setEditingProfile({ ...editingProfile, bio: e.target.value })}
+                        rows={3}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Website URL</label>
+                      <input
+                        type="url"
+                        value={editingProfile.website_url}
+                        onChange={(e) => setEditingProfile({ ...editingProfile, website_url: e.target.value })}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        placeholder="https://example.com"
+                      />
+                    </div>
+                  </div>
                 ) : (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={handleSaveProfile}
-                      className="px-4 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setIsEditingProfile(false)}
-                      className="px-4 py-2 bg-gray-500/20 border border-gray-500/30 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-all duration-300"
-                    >
-                      Cancel
-                    </button>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-400 mb-1">Username</h3>
+                      <p className="text-white">{profile?.username || 'Not set'}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-400 mb-1">Full Name</h3>
+                      <p className="text-white">{profile?.full_name || 'Not set'}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-400 mb-1">Bio</h3>
+                      <p className="text-white">{profile?.bio || 'No bio added yet'}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-400 mb-1">Website</h3>
+                      <p className="text-white">
+                        {profile?.website_url ? (
+                          <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition-colors">
+                            {profile.website_url}
+                          </a>
+                        ) : (
+                          'Not set'
+                        )}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {isEditingProfile ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Username</label>
-                    <input
-                      type="text"
-                      value={editingProfile.username}
-                      onChange={(e) => setEditingProfile({ ...editingProfile, username: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                    />
+              {/* Subscription Section */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
+                <h2 className="text-xl font-semibold text-white mb-4">Subscription</h2>
+                <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text-lg font-medium text-white capitalize">{subscription?.plan_type || 'Free'} Plan</h3>
+                      <p className="text-gray-300">Status: <span className="text-green-400">{subscription?.status || 'Active'}</span></p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-white">
+                        {subscription?.plan_type === 'free' ? 'Free' : '$9.99'}
+                      </p>
+                      <p className="text-sm text-gray-400">per month</p>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                    <input
-                      type="text"
-                      value={editingProfile.full_name}
-                      onChange={(e) => setEditingProfile({ ...editingProfile, full_name: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                    />
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-300 mb-2">Features:</h4>
+                    <ul className="space-y-1">
+                      {getPlanFeatures(subscription?.plan_type || 'free').map((feature, index) => (
+                        <li key={index} className="text-sm text-gray-300 flex items-center">
+                          <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
-                    <textarea
-                      value={editingProfile.bio}
-                      onChange={(e) => setEditingProfile({ ...editingProfile, bio: e.target.value })}
-                      rows={3}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Website URL</label>
-                    <input
-                      type="url"
-                      value={editingProfile.website_url}
-                      onChange={(e) => setEditingProfile({ ...editingProfile, website_url: e.target.value })}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      placeholder="https://example.com"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-1">Username</h3>
-                    <p className="text-white">{profile?.username || 'Not set'}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-1">Full Name</h3>
-                    <p className="text-white">{profile?.full_name || 'Not set'}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-1">Bio</h3>
-                    <p className="text-white">{profile?.bio || 'No bio added yet'}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-400 mb-1">Website</h3>
-                    <p className="text-white">
-                      {profile?.website_url ? (
-                        <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition-colors">
-                          {profile.website_url}
-                        </a>
-                      ) : (
-                        'Not set'
-                      )}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Subscription Section */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
-              <h2 className="text-xl font-semibold text-white mb-4">Subscription</h2>
-              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg p-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-medium text-white capitalize">{subscription?.plan_type || 'Free'} Plan</h3>
-                    <p className="text-gray-300">Status: <span className="text-green-400">{subscription?.status || 'Active'}</span></p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-white">
-                      {subscription?.plan_type === 'free' ? 'Free' : '$9.99'}
-                    </p>
-                    <p className="text-sm text-gray-400">per month</p>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <h4 className="text-sm font-medium text-gray-300 mb-2">Features:</h4>
-                  <ul className="space-y-1">
-                    {getPlanFeatures(subscription?.plan_type || 'free').map((feature, index) => (
-                      <li key={index} className="text-sm text-gray-300 flex items-center">
-                        <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               </div>
             </div>
 
-            {/* Portfolios Section */}
+            {/* Right Column - Portfolios */}
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-white">Portfolios</h2>
@@ -446,7 +449,7 @@ export default function DashboardPage() {
 
               {isCreatingPortfolio && (
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Portfolio Name</label>
                       <input
@@ -512,7 +515,7 @@ export default function DashboardPage() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="space-y-4">
                   {portfolios.map((portfolio) => (
                     <div key={portfolio.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300">
                       <div className="flex justify-between items-start mb-3">
