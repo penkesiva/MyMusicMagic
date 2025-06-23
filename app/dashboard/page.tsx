@@ -305,32 +305,23 @@ export default function DashboardPage() {
             <div className="space-y-8">
               {/* Profile Section */}
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-start mb-4">
                   <h2 className="text-xl font-semibold text-white">Profile</h2>
-                  {!isEditingProfile ? (
-                    <button
-                      onClick={() => setIsEditingProfile(true)}
-                      className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
-                    >
-                      Edit Profile
-                    </button>
-                  ) : (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={handleSaveProfile}
-                        className="px-4 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setIsEditingProfile(false)}
-                        className="px-4 py-2 bg-gray-500/20 border border-gray-500/30 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-all duration-300"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  )}
+                  <button
+                    onClick={() => setIsEditingProfile(!isEditingProfile)}
+                    className="px-3 py-1 bg-white/10 border border-white/20 text-white text-sm rounded hover:bg-white/20 transition-all duration-300"
+                  >
+                    {isEditingProfile ? 'Cancel' : 'Edit'}
+                  </button>
                 </div>
+
+                {!profile?.username && (
+                  <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <p className="text-yellow-400 text-sm">
+                      ⚠️ Please set a username to enable public portfolio URLs. Your portfolios won't be accessible until you do.
+                    </p>
+                  </div>
+                )}
 
                 {isEditingProfile ? (
                   <div className="grid grid-cols-1 gap-4">
@@ -370,6 +361,20 @@ export default function DashboardPage() {
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                         placeholder="https://example.com"
                       />
+                    </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={handleSaveProfile}
+                        className="px-4 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setIsEditingProfile(false)}
+                        className="px-4 py-2 bg-gray-500/20 border border-gray-500/30 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-all duration-300"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 ) : (
@@ -516,50 +521,78 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {portfolios.map((portfolio) => (
-                    <div key={portfolio.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300">
+                  {portfolios.map((p) => (
+                    <div key={p.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300">
                       <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-lg font-medium text-white">{portfolio.name}</h3>
+                        <h3 className="text-lg font-medium text-white">{p.name}</h3>
                         <div className="flex space-x-1">
                           <button
-                            onClick={() => handleTogglePublish(portfolio.id, portfolio.is_published)}
+                            onClick={() => handleTogglePublish(p.id, p.is_published)}
                             className={`px-2 py-1 text-xs rounded ${
-                              portfolio.is_published
+                              p.is_published
                                 ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                                 : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                             } hover:opacity-80 transition-all duration-300`}
                           >
-                            {portfolio.is_published ? 'Published' : 'Draft'}
+                            {p.is_published ? 'Published' : 'Draft'}
                           </button>
-                          {portfolio.is_default && (
+                          {p.is_default && (
                             <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded">
                               Default
                             </span>
                           )}
                         </div>
                       </div>
-                      <p className="text-sm text-gray-400 mb-4">/{portfolio.slug}</p>
-                      <div className="flex space-x-2">
+                      <p className="text-sm text-gray-400 mb-4">/{p.slug}</p>
+                      <p className="text-gray-400 text-sm truncate">
+                        {p.subtitle || 'No description provided'}
+                      </p>
+                      <div className="mt-4 flex flex-col sm:flex-row gap-2">
                         <Link
-                          href={`/dashboard/portfolio/${portfolio.id}/edit`}
-                          className="flex-1 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm rounded hover:from-purple-600 hover:to-pink-600 transition-all duration-300 text-center"
+                          href={`/dashboard/portfolio/${p.id}/edit`}
+                          className="w-full sm:w-auto px-4 py-2 text-center rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold hover:opacity-90 transition-opacity"
                         >
                           Edit
                         </Link>
-                        <Link
-                          href={`/portfolio/${portfolio.slug}`}
-                          target="_blank"
-                          className="flex-1 px-3 py-2 bg-white/10 border border-white/20 text-white text-sm rounded hover:bg-white/20 transition-all duration-300 text-center"
+                        <button
+                          onClick={() => handleTogglePublish(p.id, p.is_published)}
+                          className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                            p.is_published
+                              ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20'
+                              : 'bg-gray-500/10 text-gray-400 hover:bg-gray-500/20'
+                          }`}
                         >
-                          View
+                          {p.is_published ? <EyeIcon className="w-5 h-5" /> : <EyeSlashIcon className="w-5 h-5" />}
+                          <span>{p.is_published ? 'Published' : 'Draft'}</span>
+                        </button>
+                        <Link
+                          href={`/portfolio/${profile?.username || 'user'}/${p.slug}`}
+                          className={`w-full sm:w-auto px-4 py-2 text-center rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                            p.is_published
+                              ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'
+                              : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                          }`}
+                          onClick={(e) => !p.is_published && e.preventDefault()}
+                          title={p.is_published ? 'View live portfolio' : 'Publish to view'}
+                        >
+                          <EyeIcon className="w-5 h-5" />
+                          <span>View</span>
                         </Link>
                         <button
-                          onClick={() => handleDeletePortfolio(portfolio.id)}
-                          className="px-3 py-2 bg-red-500/20 border border-red-500/30 text-red-400 text-sm rounded hover:bg-red-500/30 transition-all duration-300"
+                          onClick={() => handleDeletePortfolio(p.id)}
+                          className="w-full sm:w-auto px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 font-semibold transition-colors flex items-center justify-center gap-2"
                         >
-                          Delete
+                          <TrashIcon className="w-5 h-5" />
+                          <span>Delete</span>
                         </button>
                       </div>
+                      {p.slug && (
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                          <p className="text-sm text-gray-400">
+                            Public URL: <a href={`/portfolio/${profile?.username || 'user'}/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">{`/portfolio/${profile?.username || 'user'}/${p.slug}`}</a>
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

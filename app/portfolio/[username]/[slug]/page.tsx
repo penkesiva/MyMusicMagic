@@ -16,17 +16,31 @@ import { TrackCard } from '@/app/components/tracks/TrackCard';
 import { SECTIONS_CONFIG } from '@/lib/sections';
 
 type PageProps = {
-  params: { slug: string };
+  params: { username: string; slug: string };
 };
 
 type Track = Database['public']['Tables']['tracks']['Row'];
 type GalleryItem = Database['public']['Tables']['gallery']['Row'];
 
 export default async function PortfolioPage({ params }: PageProps) {
+  // First, get the user profile by username
+  const { data: userProfile, error: userError } = await supabase
+    .from('user_profiles')
+    .select('id, username, full_name')
+    .eq('username', params.username)
+    .single();
+
+  if (userError || !userProfile) {
+    notFound();
+  }
+
+  // Then get the portfolio for that specific user
   const { data: portfolio, error: portfolioError } = await supabase
     .from('user_portfolios')
     .select('*')
+    .eq('user_id', userProfile.id)
     .eq('slug', params.slug)
+    .eq('is_published', true)
     .single();
 
   if (portfolioError || !portfolio) {
@@ -50,8 +64,25 @@ export default async function PortfolioPage({ params }: PageProps) {
 
   let sortedSections: string[] = [];
   if (portfolio.sections_config) {
-    sortedSections = (portfolio.sections_config as string[] | null)
-      ?.filter(key => SECTIONS_CONFIG[key]?.enabled) || [];
+    // Handle different possible formats of sections_config
+    let sectionsArray: string[] = [];
+    
+    if (Array.isArray(portfolio.sections_config)) {
+      sectionsArray = portfolio.sections_config;
+    } else if (typeof portfolio.sections_config === 'object') {
+      // If it's an object, extract the keys
+      sectionsArray = Object.keys(portfolio.sections_config);
+    } else if (typeof portfolio.sections_config === 'string') {
+      // If it's a string, try to parse it
+      try {
+        const parsed = JSON.parse(portfolio.sections_config);
+        sectionsArray = Array.isArray(parsed) ? parsed : Object.keys(parsed || {});
+      } catch (e) {
+        sectionsArray = [];
+      }
+    }
+    
+    sortedSections = sectionsArray.filter(key => SECTIONS_CONFIG[key]?.enabled) || [];
   }
 
   const theme = THEMES.find(t => t.name === portfolio?.theme_name) || THEMES[0];

@@ -72,6 +72,7 @@ const PortfolioEditorPage = () => {
   const { id } = params;
 
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [savingStatus, setSavingStatus] = useState("saved");
   
@@ -206,6 +207,25 @@ const PortfolioEditorPage = () => {
   const fetchPortfolio = async () => {
     if (!id) return;
     setLoading(true);
+    
+    // First get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      router.push("/auth/signin");
+      return;
+    }
+
+    // Get user profile
+    const { data: profileData, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    
+    if (profileData) {
+      setUserProfile(profileData);
+    }
+
     const { data, error } = await supabase
       .from("user_portfolios")
       .select("*, tracks(*), gallery(*)")
@@ -639,6 +659,14 @@ const PortfolioEditorPage = () => {
               </span>
             </div>
             <div className="flex items-center space-x-3">
+              <Switch
+                id="publish-switch"
+                isChecked={portfolio.is_published}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('is_published', e.target.checked)}
+              />
+              <Label htmlFor="publish-switch" className="text-white font-medium">
+                {portfolio.is_published ? 'Published' : 'Unpublished'}
+              </Label>
               <button 
                 onClick={() => setShowPreview(!showPreview)} 
                 className={`px-4 py-2 rounded-lg transition-all duration-300 text-sm font-medium ${
@@ -657,13 +685,16 @@ const PortfolioEditorPage = () => {
                   {previewMode === 'fullscreen' ? 'Side-by-Side' : 'Fullscreen'}
                 </button>
               )}
-              <button 
-                onClick={() => window.open(`/portfolio/${portfolio.slug}`, "_blank")} 
-                className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm font-medium flex items-center"
-              >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Open in New Tab
-              </button>
+              <div title={!portfolio.is_published ? "You must publish your portfolio to make it public." : "Open public page"}>
+                <button
+                  onClick={() => portfolio.is_published && window.open(`/portfolio/${userProfile?.username || 'user'}/${portfolio.slug}`, "_blank")} 
+                  disabled={!portfolio.is_published}
+                  className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Open in New Tab
+                </button>
+              </div>
             </div>
           </div>
         </div>
