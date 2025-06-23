@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
+import { HOBBIES_LIST } from "@/lib/hobbies";
 import { PortfolioTrackForm } from "@/components/portfolio/PortfolioTrackForm";
 import PortfolioGalleryForm from "@/components/portfolio/PortfolioGalleryForm";
 import { THEMES } from "@/lib/themes";
@@ -89,6 +90,7 @@ const PortfolioEditorPage = () => {
   const [galleryFilter, setGalleryFilter] = useState<'all' | 'photo' | 'video'>('all');
   const [trackViewMode, setTrackViewMode] = useState<'list' | 'grid'>('list');
   const [uploadingResume, setUploadingResume] = useState(false);
+  const [hobbySearch, setHobbySearch] = useState("");
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -383,6 +385,24 @@ const PortfolioEditorPage = () => {
     (newConfig[sectionKey] as any)[configKey] = value;
     handleFieldChange("sections_config", newConfig);
   };
+
+  const handleAddHobby = (hobby: { name: string; icon: string }) => {
+    const currentHobbies = (portfolio?.ai_advantages_json as any[]) || [];
+    if (!currentHobbies.some(h => h.name === hobby.name)) {
+      handleFieldChange('ai_advantages_json', [...currentHobbies, hobby]);
+    }
+    setHobbySearch("");
+  };
+
+  const handleRemoveHobby = (hobbyName: string) => {
+    const currentHobbies = (portfolio?.ai_advantages_json as any[]) || [];
+    handleFieldChange('ai_advantages_json', currentHobbies.filter(h => h.name !== hobbyName));
+  };
+
+  const filteredHobbies = HOBBIES_LIST.filter(hobby => 
+    hobby.name.toLowerCase().includes(hobbySearch.toLowerCase()) &&
+    !((portfolio?.ai_advantages_json as any[]) || []).some(h => h.name === hobby.name)
+  );
 
   if (loading) {
     return (
@@ -772,6 +792,54 @@ const PortfolioEditorPage = () => {
                           <div className="text-center p-8 border-2 border-dashed border-white/20 rounded-lg">
                             <h3 className="text-lg font-semibold text-white/80">Press Section</h3>
                             <p className="text-sm text-white/50 mt-2">Customization options for this section are coming soon!</p>
+                          </div>
+                        )}
+
+                        {key === 'ai_advantage' && (
+                          <div className="space-y-4">
+                            <div>
+                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Add a Hobby</label>
+                               <div className="relative max-w-sm">
+                                 <Input
+                                    type="text"
+                                    placeholder="Search for hobbies..."
+                                    value={hobbySearch}
+                                    onChange={(e) => setHobbySearch(e.target.value)}
+                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  />
+                                  {hobbySearch && filteredHobbies.length > 0 && (
+                                    <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-white/20 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                        {filteredHobbies.map(hobby => (
+                                          <button
+                                            key={hobby.name}
+                                            onClick={() => handleAddHobby(hobby)}
+                                            className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
+                                          >
+                                            <span className="text-xl">{hobby.icon}</span>
+                                            <span>{hobby.name}</span>
+                                          </button>
+                                        ))}
+                                    </div>
+                                  )}
+                              </div>
+                            </div>
+                             <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Your Hobbies</label>
+                                <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10 min-h-[40px]">
+                                  {portfolio.ai_advantages_json && Array.isArray(portfolio.ai_advantages_json) && portfolio.ai_advantages_json.map((hobby: any) => (
+                                    <div key={hobby.name} className="flex items-center gap-2 bg-purple-500/20 text-white px-3 py-1 rounded-full text-sm">
+                                      <span>{hobby.icon}</span>
+                                      <span>{hobby.name}</span>
+                                      <button onClick={() => handleRemoveHobby(hobby.name)} className="text-purple-300 hover:text-white">
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                  {(!portfolio.ai_advantages_json || (Array.isArray(portfolio.ai_advantages_json) && portfolio.ai_advantages_json.length === 0)) && (
+                                     <p className="text-sm text-gray-400">Add hobbies from the list above.</p>
+                                  )}
+                                </div>
+                            </div>
                           </div>
                         )}
 
