@@ -506,7 +506,7 @@ const PortfolioEditorPage = () => {
                       className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 transition-colors"
                     >
                       <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
-                        {(portfolio.sections_config as any)?.[key]?.name}
+                        {SECTIONS_CONFIG[key]?.defaultName}
                       </h2>
                       <ChevronDown className={`w-6 h-6 transform transition-transform text-white ${openSections[key] ? 'rotate-180' : ''}`} />
                     </button>
@@ -599,16 +599,6 @@ const PortfolioEditorPage = () => {
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                {/* Left Column: About Text */}
                                <div className="space-y-4">
-                                 <div>
-                                   <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Title</label>
-                                   <Input
-                                     type="text"
-                                     value={portfolio.about_title || ''}
-                                     onChange={(e) => handleFieldChange('about_title', e.target.value)}
-                                     placeholder="About Me"
-                                     className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                   />
-                                 </div>
                                  <div>
                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
                                    <Textarea
@@ -723,6 +713,20 @@ const PortfolioEditorPage = () => {
                               />
                             </div>
                           )
+                        )}
+
+                        {key === 'key_projects' && (
+                          <div className="text-center p-8 border-2 border-dashed border-white/20 rounded-lg">
+                            <h3 className="text-lg font-semibold text-white/80">Key Projects Section</h3>
+                            <p className="text-sm text-white/50 mt-2">Customization options for this section are coming soon!</p>
+                          </div>
+                        )}
+
+                        {key === 'press' && (
+                          <div className="text-center p-8 border-2 border-dashed border-white/20 rounded-lg">
+                            <h3 className="text-lg font-semibold text-white/80">Press Section</h3>
+                            <p className="text-sm text-white/50 mt-2">Customization options for this section are coming soon!</p>
+                          </div>
                         )}
                       </div>
                     )}
