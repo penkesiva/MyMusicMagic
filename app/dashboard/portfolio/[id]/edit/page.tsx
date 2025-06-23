@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText
+  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -91,8 +91,65 @@ const PortfolioEditorPage = () => {
   const [trackViewMode, setTrackViewMode] = useState<'list' | 'grid'>('list');
   const [uploadingResume, setUploadingResume] = useState(false);
   const [hobbySearch, setHobbySearch] = useState("");
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [placeholder, setPlaceholder] = useState("");
+
+  const placeholders = [
+    "Build a portfolio for an upcoming cello artist...",
+    "A full-stack developer specializing in React and Node.js...",
+    "Create a page for a freelance photographer...",
+    "A UI/UX designer with a passion for mobile apps...",
+  ];
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setPlaceholder(placeholders[i]);
+      i = (i + 1) % placeholders.length;
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const supabase = useMemo(() => createClient(), []);
+
+  const handleGenerate = async () => {
+    if (!aiPrompt || !portfolio) return;
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-portfolio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: aiPrompt, currentPortfolio: portfolio }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate content from AI.');
+      }
+
+      const data = await response.json();
+      
+      // Merge AI data with existing portfolio, keeping IDs and other essential fields
+      const updatedPortfolio = { ...portfolio, ...data };
+      setPortfolio(updatedPortfolio);
+      
+      // Save the AI-generated changes
+      saveChanges(data);
+
+    } catch (error) {
+      console.error("AI Generation Error:", error);
+      alert("There was an error generating the portfolio content. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleReset = () => {
+    if (window.confirm("Are you sure you want to reset the entire portfolio? All your current content will be cleared.")) {
+      fetchPortfolio(); // Re-fetches the original data from the database
+      alert("Portfolio has been reset to its last saved state.");
+    }
+  };
 
   const sortedEditorSections = useMemo(() => {
     if (!portfolio) return [];
@@ -445,6 +502,36 @@ const PortfolioEditorPage = () => {
           <p className="text-xs text-gray-300">
             Customize your hero-portfolio.
           </p>
+        </div>
+
+        <div className="space-y-3 p-4 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-purple-400" />
+            <h3 className="font-semibold text-sm text-white">AI Assistant</h3>
+          </div>
+          <Textarea
+            placeholder={placeholder}
+            value={aiPrompt}
+            onChange={(e) => setAiPrompt(e.target.value)}
+            rows={3}
+            className="w-full text-sm bg-gray-900/50 border-white/20 placeholder:text-gray-500 focus:ring-purple-400"
+          />
+          <div className="flex items-center gap-2">
+            <Button 
+                onClick={handleGenerate} 
+                disabled={isGenerating || !aiPrompt}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 disabled:opacity-50"
+            >
+              {isGenerating ? 'Generating...' : 'Generate'}
+            </Button>
+            <Button 
+                onClick={handleReset}
+                variant="outline"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+            >
+              Reset
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2">
