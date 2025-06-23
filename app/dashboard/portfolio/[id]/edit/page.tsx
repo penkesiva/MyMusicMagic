@@ -82,9 +82,42 @@ const PortfolioEditorPage = () => {
   const [previewMode, setPreviewMode] = useState<'fullscreen' | 'side-by-side'>('side-by-side');
   const [colorThemeOpen, setColorThemeOpen] = useState(true);
   const [sectionsOpen, setSectionsOpen] = useState(true);
-
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   const supabase = useMemo(() => createClient(), []);
+
+  const sortedEditorSections = useMemo(() => {
+    if (!portfolio) return [];
+    return Object.keys(SECTIONS_CONFIG)
+      .sort((a, b) => (portfolio?.sections_config as any)?.[a]?.order - (portfolio?.sections_config as any)?.[b]?.order);
+  }, [portfolio]);
+
+  useEffect(() => {
+    // Initialize sections to open only when a portfolio is first loaded
+    if (portfolio && sortedEditorSections.length > 0 && Object.keys(openSections).length === 0) {
+      const allOpen: Record<string, boolean> = {};
+      sortedEditorSections.forEach(key => { allOpen[key] = true; });
+      setOpenSections(allOpen);
+    }
+  }, [portfolio, sortedEditorSections, openSections]);
+
+  const toggleSection = (key: string) => {
+    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const expandAll = () => {
+    const allOpen: Record<string, boolean> = {};
+    sortedEditorSections.forEach(key => { allOpen[key] = true; });
+    setOpenSections(allOpen);
+  };
+
+  const collapseAll = () => {
+    const allClosed: Record<string, boolean> = {};
+    sortedEditorSections.forEach(key => { allClosed[key] = false; });
+    setOpenSections(allClosed);
+  };
+
+  const selectedTheme = useMemo(() => THEMES.find(t => t.name === portfolio?.theme_name) || THEMES[0], [portfolio?.theme_name]);
 
   const fetchPortfolio = async () => {
     if (!id) return;
@@ -331,11 +364,6 @@ const PortfolioEditorPage = () => {
     );
   }
 
-  const sortedEditorSections = Object.keys(SECTIONS_CONFIG)
-    .sort((a, b) => (portfolio.sections_config as any)?.[a]?.order - (portfolio.sections_config as any)?.[b]?.order);
-  
-  const selectedTheme = THEMES.find(t => t.name === portfolio.theme_name) || THEMES[0];
-
   return (
     <div className="flex h-full min-h-screen font-sans bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
       {/* --- Left Sidebar (Hero Portfolio Theme) --- */}
@@ -460,230 +488,244 @@ const PortfolioEditorPage = () => {
         <main className={`flex-1 overflow-y-auto ${selectedTheme.colors.background} ${selectedTheme.colors.text}`}>
           {/* Content Area (User's Theme) */}
           <div className="p-6">
-            <div className="max-w-5xl mx-auto space-y-8">
+            <div className="max-w-5xl mx-auto space-y-6">
+              <div className="flex justify-end items-center gap-2">
+                  <span className="text-sm text-gray-400">Manage Sections</span>
+                  <Button onClick={expandAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Expand All</Button>
+                  <Button onClick={collapseAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Collapse All</Button>
+              </div>
+
               {sortedEditorSections.filter(key => (portfolio.sections_config as any)?.[key]?.enabled).map(key => {
                 const sectionConfig = SECTIONS_CONFIG[key];
                 if (!sectionConfig) return null;
                 
                 return (
-                  <section key={key} id={key}>
-                    <h2 className={`text-2xl font-bold mb-4 border-b pb-2 ${selectedTheme.colors.heading} border-white/10`}>
-                       <EditableField value={(portfolio.sections_config as any)?.[key]?.name} onSave={(newValue) => handleSectionConfigChange(key as any, "name", newValue)} theme={selectedTheme} />
-                    </h2>
+                  <section key={key} id={key} className="bg-white/5 rounded-xl border border-white/10 overflow-hidden transition-all duration-300">
+                    <button 
+                      onClick={() => toggleSection(key)} 
+                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 transition-colors"
+                    >
+                      <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
+                        {(portfolio.sections_config as any)?.[key]?.name}
+                      </h2>
+                      <ChevronDown className={`w-6 h-6 transform transition-transform text-white ${openSections[key] ? 'rotate-180' : ''}`} />
+                    </button>
                     
-                    {key === 'hero' && (
-                      <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                          {/* Left Column: Title & Subtitle */}
-                          <div className="space-y-4">
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Portfolio Title
-                              </label>
-                              <Input
-                                type="text"
-                                value={portfolio.name}
-                                onChange={(e) => handleFieldChange('name', e.target.value)}
-                                placeholder="Your portfolio title"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Subtitle
-                              </label>
-                              <Input
-                                type="text"
-                                value={portfolio.subtitle || ''}
-                                onChange={(e) => handleFieldChange('subtitle', e.target.value)}
-                                placeholder="Brief description or tagline"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                          </div>
+                    {openSections[key] && (
+                      <div className="p-6">
+                        {key === 'hero' && (
+                          <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                              {/* Left Column: Title & Subtitle */}
+                              <div className="space-y-4">
+                                <div>
+                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                    Portfolio Title
+                                  </label>
+                                  <Input
+                                    type="text"
+                                    value={portfolio.name}
+                                    onChange={(e) => handleFieldChange('name', e.target.value)}
+                                    placeholder="Your portfolio title"
+                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  />
+                                </div>
+                                <div>
+                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                    Subtitle
+                                  </label>
+                                  <Input
+                                    type="text"
+                                    value={portfolio.subtitle || ''}
+                                    onChange={(e) => handleFieldChange('subtitle', e.target.value)}
+                                    placeholder="Brief description or tagline"
+                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  />
+                                </div>
+                              </div>
 
-                          {/* Right Column: Image Upload */}
-                          <div className="space-y-2">
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                              Hero Background Image
-                            </label>
-                            {portfolio.hero_image_url ? (
-                                <div className="relative group">
-                                    <img src={portfolio.hero_image_url} alt="Hero" className="w-full h-32 object-cover rounded-lg border border-white/10" />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                        <button onClick={() => handleFieldChange('hero_image_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
+                              {/* Right Column: Image Upload */}
+                              <div className="space-y-2">
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  Hero Background Image
+                                </label>
+                                {portfolio.hero_image_url ? (
+                                    <div className="relative group">
+                                        <img src={portfolio.hero_image_url} alt="Hero" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                            <button onClick={() => handleFieldChange('hero_image_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
                                     </div>
+                                ) : (
+                                    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                      <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                      <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No image set</p>
+                                    </div>
+                                )}
+                                <div className="flex gap-2">
+                                  <Input
+                                    type="url"
+                                    value={portfolio.hero_image_url || ''}
+                                    onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
+                                    placeholder="Paste image URL"
+                                    className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  />
+                                  <input
+                                    type="file" id="hero-upload" accept="image/*"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) uploadHeroImage(file);
+                                      e.target.value = '';
+                                    }}
+                                    className="hidden"
+                                  />
+                                  <Button
+                                    onClick={() => document.getElementById('hero-upload')?.click()}
+                                    variant="outline" size="sm" disabled={uploadingHero}
+                                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                  >
+                                    {uploadingHero ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                  </Button>
                                 </div>
-                            ) : (
-                                <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                  <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                  <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No image set</p>
-                                </div>
-                            )}
-                            <div className="flex gap-2">
-                              <Input
-                                type="url"
-                                value={portfolio.hero_image_url || ''}
-                                onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
-                                placeholder="Paste image URL"
-                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                              <input
-                                type="file" id="hero-upload" accept="image/*"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) uploadHeroImage(file);
-                                  e.target.value = '';
-                                }}
-                                className="hidden"
-                              />
-                              <Button
-                                onClick={() => document.getElementById('hero-upload')?.click()}
-                                variant="outline" size="sm" disabled={uploadingHero}
-                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                              >
-                                {uploadingHero ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                              </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {key === 'about' && (
-                       <div className="space-y-6">
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                           {/* Left Column: About Text */}
-                           <div className="space-y-4">
-                             <div>
-                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Title</label>
-                               <Input
-                                 type="text"
-                                 value={portfolio.about_title || ''}
-                                 onChange={(e) => handleFieldChange('about_title', e.target.value)}
-                                 placeholder="About Me"
-                                 className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                               />
-                             </div>
-                             <div>
-                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
-                               <Textarea
-                                 value={portfolio.about_text || ''}
-                                 onChange={(e) => handleFieldChange('about_text', e.target.value)}
-                                 placeholder="Tell your story..."
-                                 rows={8}
-                                 className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
-                               />
-                             </div>
-                           </div>
-                           
-                           {/* Right Column: Profile Photo */}
-                           <div className="space-y-2">
-                             <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
-                             {portfolio.profile_photo_url ? (
-                               <div className="relative group">
-                                 <img src={portfolio.profile_photo_url} alt="Profile" className="w-40 h-40 object-cover rounded-lg border border-white/10" />
-                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                   <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
-                                     <Trash2 className="h-4 w-4" />
-                                   </button>
+                        )}
+                        
+                        {key === 'about' && (
+                           <div className="space-y-6">
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                               {/* Left Column: About Text */}
+                               <div className="space-y-4">
+                                 <div>
+                                   <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Title</label>
+                                   <Input
+                                     type="text"
+                                     value={portfolio.about_title || ''}
+                                     onChange={(e) => handleFieldChange('about_title', e.target.value)}
+                                     placeholder="About Me"
+                                     className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                   />
+                                 </div>
+                                 <div>
+                                   <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
+                                   <Textarea
+                                     value={portfolio.about_text || ''}
+                                     onChange={(e) => handleFieldChange('about_text', e.target.value)}
+                                     placeholder="Tell your story..."
+                                     rows={8}
+                                     className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
+                                   />
                                  </div>
                                </div>
-                             ) : (
-                               <div className="w-40 h-40 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center justify-center text-center">
-                                 <Image className="h-8 w-8 text-gray-400 mb-2" />
-                                 <p className={`text-xs ${selectedTheme.colors.text}`}>No photo</p>
+                               
+                               {/* Right Column: Profile Photo */}
+                               <div className="space-y-2">
+                                 <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
+                                 {portfolio.profile_photo_url ? (
+                                   <div className="relative group">
+                                     <img src={portfolio.profile_photo_url} alt="Profile" className="w-40 h-40 object-cover rounded-lg border border-white/10" />
+                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                       <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
+                                         <Trash2 className="h-4 w-4" />
+                                       </button>
+                                     </div>
+                                   </div>
+                                 ) : (
+                                   <div className="w-40 h-40 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center justify-center text-center">
+                                     <Image className="h-8 w-8 text-gray-400 mb-2" />
+                                     <p className={`text-xs ${selectedTheme.colors.text}`}>No photo</p>
+                                   </div>
+                                 )}
+                                 <div className="flex gap-2 max-w-sm">
+                                   <Input
+                                     type="url"
+                                     value={portfolio.profile_photo_url || ''}
+                                     onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
+                                     placeholder="Paste image URL"
+                                     className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                   />
+                                   <input
+                                     type="file" id="profile-upload" accept="image/*"
+                                     onChange={(e) => {
+                                       const file = e.target.files?.[0];
+                                       if (file) uploadProfilePhoto(file);
+                                       e.target.value = '';
+                                     }}
+                                     className="hidden"
+                                   />
+                                   <Button
+                                     onClick={() => document.getElementById('profile-upload')?.click()}
+                                     variant="outline" size="sm" disabled={uploadingProfile}
+                                     className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                   >
+                                     {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                   </Button>
+                                 </div>
                                </div>
-                             )}
-                             <div className="flex gap-2 max-w-sm">
-                               <Input
-                                 type="url"
-                                 value={portfolio.profile_photo_url || ''}
-                                 onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
-                                 placeholder="Paste image URL"
-                                 className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                               />
-                               <input
-                                 type="file" id="profile-upload" accept="image/*"
-                                 onChange={(e) => {
-                                   const file = e.target.files?.[0];
-                                   if (file) uploadProfilePhoto(file);
-                                   e.target.value = '';
-                                 }}
-                                 className="hidden"
-                               />
-                               <Button
-                                 onClick={() => document.getElementById('profile-upload')?.click()}
-                                 variant="outline" size="sm" disabled={uploadingProfile}
-                                 className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                               >
-                                 {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                               </Button>
                              </div>
                            </div>
-                         </div>
-                       </div>
-                    )}
+                        )}
 
-                    {key === 'tracks' && (
-                      (showAddTrackForm || !!editingTrack) ? (
-                        <PortfolioTrackForm
-                          portfolioId={portfolio.id}
-                          track={editingTrack}
-                          onCancel={() => {
-                            setEditingTrack(null);
-                            setShowAddTrackForm(false);
-                          }}
-                          onSuccess={fetchPortfolio}
-                        />
-                      ) : (
-                        <div className="space-y-4">
-                          <Button 
-                            onClick={() => setShowAddTrackForm(true)}
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                          >
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add Track
-                          </Button>
-                          <PortfolioTracksDisplay
-                            portfolioId={portfolio.id}
-                            onEdit={(track) => setEditingTrack(track)}
-                            onRefresh={fetchPortfolio}
-                          />
-                        </div>
-                      )
+                        {key === 'tracks' && (
+                          (showAddTrackForm || !!editingTrack) ? (
+                            <PortfolioTrackForm
+                              portfolioId={portfolio.id}
+                              track={editingTrack}
+                              onCancel={() => {
+                                setEditingTrack(null);
+                                setShowAddTrackForm(false);
+                              }}
+                              onSuccess={fetchPortfolio}
+                            />
+                          ) : (
+                            <div className="space-y-4">
+                              <Button 
+                                onClick={() => setShowAddTrackForm(true)}
+                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                              >
+                                <PlusCircle className="mr-2 h-4 w-4" /> Add Track
+                              </Button>
+                              <PortfolioTracksDisplay
+                                portfolioId={portfolio.id}
+                                onEdit={(track) => setEditingTrack(track)}
+                                onRefresh={fetchPortfolio}
+                              />
+                            </div>
+                          )
+                        )}
+                        
+                        {key === 'gallery' && (
+                          (showAddGalleryForm || !!editingGalleryItem) ? (
+                            <PortfolioGalleryForm
+                              portfolioId={portfolio.id}
+                              item={editingGalleryItem}
+                              onCancel={() => {
+                                setEditingGalleryItem(null);
+                                setShowAddGalleryForm(false);
+                              }}
+                              onSuccess={fetchPortfolio}
+                            />
+                          ) : (
+                            <div className="space-y-4">
+                              <Button 
+                                onClick={() => setShowAddGalleryForm(true)}
+                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                              >
+                                <PlusCircle className="mr-2 h-4 w-4" /> Add Gallery Item
+                              </Button>
+                              <PortfolioGalleryDisplay
+                                portfolioId={portfolio.id}
+                                onEdit={(item) => setEditingGalleryItem(item)}
+                                onRefresh={fetchPortfolio}
+                              />
+                            </div>
+                          )
+                        )}
+                      </div>
                     )}
-                    
-                    {key === 'gallery' && (
-                      (showAddGalleryForm || !!editingGalleryItem) ? (
-                        <PortfolioGalleryForm
-                          portfolioId={portfolio.id}
-                          item={editingGalleryItem}
-                          onCancel={() => {
-                            setEditingGalleryItem(null);
-                            setShowAddGalleryForm(false);
-                          }}
-                          onSuccess={fetchPortfolio}
-                        />
-                      ) : (
-                        <div className="space-y-4">
-                          <Button 
-                            onClick={() => setShowAddGalleryForm(true)}
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                          >
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add Gallery Item
-                          </Button>
-                          <PortfolioGalleryDisplay
-                            portfolioId={portfolio.id}
-                            onEdit={(item) => setEditingGalleryItem(item)}
-                            onRefresh={fetchPortfolio}
-                          />
-                        </div>
-                      )
-                    )}
-
-                    {/* ... other sections ... */}
                   </section>
                 );
               })}
