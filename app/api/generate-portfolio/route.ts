@@ -49,10 +49,10 @@ function getPrompt(prompt: string) {
 }
 
 export async function POST(request: Request) {
-  const { prompt, currentPortfolio } = await request.json();
+  const { prompt, currentPortfolio, type, about_text, artist_name } = await request.json();
 
-  if (!prompt) {
-    return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
+  if (!prompt && !type) {
+    return NextResponse.json({ error: 'Prompt or type is required' }, { status: 400 });
   }
 
   if (!process.env.GEMINI_API_KEY) {
@@ -61,26 +61,54 @@ export async function POST(request: Request) {
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Using the specified model
-    const fullPrompt = getPrompt(prompt);
+    
+    let fullPrompt: string;
+    
+    if (type === 'footer_about_summary') {
+      fullPrompt = `
+        You are a creative assistant that generates a brief, professional summary for a portfolio footer.
+        
+        Based on the following about text, create a concise 2-3 sentence summary that captures the essence of the person for the footer section.
+        
+        About Text: "${about_text}"
+        Artist Name: "${artist_name}"
+        
+        Generate a brief, professional summary that:
+        - Is 2-3 sentences long
+        - Captures the key points from the about text
+        - Is suitable for a footer section (more concise than the main about section)
+        - Maintains a professional tone
+        - Focuses on the person's main skills, passion, or professional identity
+        
+        Return only the summary text, no JSON or additional formatting.
+      `;
+    } else {
+      fullPrompt = getPrompt(prompt);
+    }
     
     const result = await model.generateContent(fullPrompt);
     const response = await result.response;
     const text = response.text();
 
-    // Clean the response to ensure it's valid JSON
-    const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    const generatedData = JSON.parse(jsonString);
+    if (type === 'footer_about_summary') {
+      // For footer about summary, return the text directly
+      return NextResponse.json({ content: text.trim() });
+    } else {
+      // For full portfolio generation, parse as JSON
+      const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const generatedData = JSON.parse(jsonString);
 
-    // Combine generated section toggles with the user's existing config order and names
-    const finalSectionsConfig = { ...currentPortfolio.sections_config };
-    for (const key in generatedData.sections_config) {
-        if (finalSectionsConfig[key]) {
-            finalSectionsConfig[key].enabled = generatedData.sections_config[key].enabled;
-        }
+      // Combine generated section toggles with the user's existing config order and names
+      const finalSectionsConfig = { ...currentPortfolio.sections_config };
+      for (const key in generatedData.sections_config) {
+          if (finalSectionsConfig[key]) {
+              finalSectionsConfig[key].enabled = generatedData.sections_config[key].enabled;
+          }
+      }
+      generatedData.sections_config = finalSectionsConfig;
+
+      return NextResponse.json(generatedData);
     }
-    generatedData.sections_config = finalSectionsConfig;
-
-    return NextResponse.json(generatedData);
 
   } catch (error) {
     console.error('Error calling Gemini API:', error);

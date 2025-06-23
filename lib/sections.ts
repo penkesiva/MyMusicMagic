@@ -155,6 +155,14 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 14,
         enabled: true,
         defaultEnabled: true,
-        fields: {}
+        fields: {
+            footer_about_summary: 'textarea',
+            footer_links_json: 'json',
+            footer_social_links_json: 'json',
+            footer_copyright_text: 'text',
+            footer_show_social_links: 'boolean',
+            footer_show_about_summary: 'boolean',
+            footer_show_links: 'boolean'
+        }
     }
 }; 

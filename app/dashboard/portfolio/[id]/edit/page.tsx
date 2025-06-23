@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star
+  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -237,6 +237,13 @@ const PortfolioEditorPage = () => {
       router.push("/dashboard");
     } else if (data) {
       const portfolioData = data as any;
+      console.log('📥 Fetched portfolio data:', {
+        name: portfolioData.name,
+        hobbies_title: portfolioData.hobbies_title,
+        hobbies_json: portfolioData.hobbies_json,
+        sections_config: portfolioData.sections_config
+      });
+      
       if (!portfolioData.sections_config || typeof portfolioData.sections_config !== 'object') {
           portfolioData.sections_config = {};
       }
@@ -250,6 +257,10 @@ const PortfolioEditorPage = () => {
               };
           }
       }
+      
+      console.log('🔧 Initialized sections_config:', portfolioData.sections_config);
+      console.log('🎯 Hobbies section enabled:', (portfolioData.sections_config as any)?.hobbies?.enabled);
+      
       setPortfolio(portfolioData);
     }
     setLoading(false);
@@ -262,23 +273,50 @@ const PortfolioEditorPage = () => {
 
   const saveChanges = useDebouncedCallback(async (updatedPortfolio: Partial<Portfolio>) => {
     if (!portfolio) return;
-    setSavingStatus("saving");
+
+    // Debug user context
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      console.error('❌ User auth error:', userError);
+      return;
+    }
+    
+    console.log('👤 Current user:', user?.id);
+    console.log('📄 Portfolio user_id:', portfolio.user_id);
+    console.log('🔐 User matches portfolio owner:', user?.id === portfolio.user_id);
 
     const validPortfolioKeys: (keyof Portfolio)[] = [
-      'name', 'slug', 'template_id', 'is_published', 'is_default', 'subtitle', 'hero_image_url',
+      'name', 'slug', 'template_id', 'is_published', 'is_default', 'hero_image_url',
+      'hero_title', 'hero_subtitle', 'hero_cta_text', 'hero_cta_link',
       'about_title', 'about_text', 'profile_photo_url', 'instagram_url', 'twitter_url',
-      'youtube_url', 'linkedin_url', 'website_url', 'testimonials_title', 'testimonials_json',
-      'blog_title', 'blog_description', 'blog_posts_json', 'news_title', 'news_items_json',
-      'skills_title', 'skills_json', 'status_title', 'current_status', 'status_description',
-      'ai_advantage_title', 'ai_advantages_json', 'contact_title', 'contact_description',
-      'contact_email', 'contact_phone', 'contact_location', 'footer_text', 'footer_links_json',
-      'sections_config', 'theme_name', 'resume_url'
+      'youtube_url', 'linkedin_url', 'website_url', 'github_url',
+      'hobbies_title', 'hobbies_json', 'skills_title', 'skills_json',
+      'press_title', 'press_json', 'key_projects_title', 'key_projects_json',
+      'contact_title', 'contact_description', 'contact_email', 'footer_text',
+      'footer_about_summary', 'footer_links_json', 'footer_social_links_json', 'footer_copyright_text',
+      'footer_show_social_links', 'footer_show_about_summary', 'footer_show_links',
+      'sections_config', 'theme_name', 'resume_url', 'resume_title', 'artist_name', 'bio',
+      'seo_title', 'seo_description'
     ];
 
     const portfolioToSave: Partial<Portfolio> = {};
     for (const key of Object.keys(updatedPortfolio) as (keyof Portfolio)[]) {
       if (validPortfolioKeys.includes(key)) {
-        (portfolioToSave as any)[key] = updatedPortfolio[key];
+        let value = updatedPortfolio[key];
+        
+        // Handle JSON fields - if the database expects text, stringify them
+        if (key === 'hobbies_json' || key === 'skills_json' || key === 'sections_config' || 
+            key === 'press_json' || key === 'key_projects_json' || key === 'footer_links_json' || 
+            key === 'footer_social_links_json') {
+          if (value && typeof value === 'object') {
+            value = JSON.stringify(value);
+            console.log(`🔄 Stringified ${key}:`, value);
+          }
+        }
+        
+        (portfolioToSave as any)[key] = value;
+      } else {
+        console.warn('⚠️ Field not in validPortfolioKeys:', key, updatedPortfolio[key]);
       }
     }
 
@@ -287,6 +325,11 @@ const PortfolioEditorPage = () => {
       return;
     }
     
+    // Debug logging
+    console.log('💾 Saving portfolio data:', JSON.stringify(portfolioToSave, null, 2));
+    console.log('🔍 Fields being sent:', Object.keys(portfolioToSave));
+    console.log('🎯 Portfolio ID:', portfolio.id);
+    
     const { error } = await supabase
       .from("user_portfolios")
       .update(portfolioToSave)
@@ -294,8 +337,16 @@ const PortfolioEditorPage = () => {
 
     if (error) {
       console.error("Error saving portfolio:", error);
+      console.error("Error details:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      console.error("Full error object:", JSON.stringify(error, null, 2));
       setSavingStatus("error");
     } else {
+      console.log('✅ Portfolio saved successfully');
       setSavingStatus("saved");
       // Optimistically update local state, no need to re-fetch immediately
       setPortfolio(prev => ({...prev, ...updatedPortfolio}) as Portfolio);
@@ -303,8 +354,14 @@ const PortfolioEditorPage = () => {
   }, 1500);
 
   const handleFieldChange = (field: keyof Portfolio, value: any) => {
-    saveChanges({ [field]: value });
+    // Set saving status immediately when changes start
+    setSavingStatus("saving");
+    
+    // Update local state immediately for responsive UI
     setPortfolio(prev => ({ ...prev!, [field]: value }));
+    
+    // Debounce the actual save to database
+    saveChanges({ [field]: value });
   };
 
   const uploadHeroImage = async (file: File) => {
@@ -483,16 +540,23 @@ const PortfolioEditorPage = () => {
   };
 
   const handleAddHobby = (hobby: { name: string; icon: string }) => {
+    console.log('➕ Adding hobby:', JSON.stringify(hobby, null, 2));
     const currentHobbies = safeGetArray(portfolio?.hobbies_json);
+    console.log('Current hobbies:', JSON.stringify(currentHobbies, null, 2));
     if (!currentHobbies.some(h => h.name === hobby.name)) {
-        handleFieldChange('hobbies_json', [...currentHobbies, hobby]);
+        const newHobbies = [...currentHobbies, hobby];
+        console.log('New hobbies array:', JSON.stringify(newHobbies, null, 2));
+        handleFieldChange('hobbies_json', newHobbies);
     }
     setHobbySearch("");
   };
 
   const handleRemoveHobby = (hobbyName: string) => {
+    console.log('➖ Removing hobby:', hobbyName);
     const currentHobbies = safeGetArray(portfolio?.hobbies_json);
-    handleFieldChange('hobbies_json', currentHobbies.filter(h => h.name !== hobbyName));
+    const filteredHobbies = currentHobbies.filter(h => h.name !== hobbyName);
+    console.log('Filtered hobbies:', JSON.stringify(filteredHobbies, null, 2));
+    handleFieldChange('hobbies_json', filteredHobbies);
   };
 
   const filteredHobbies = HOBBIES_LIST.filter(hobby => 
@@ -657,6 +721,11 @@ const PortfolioEditorPage = () => {
               }`}>
                 {savingStatus === 'saving' ? 'Saving...' : savingStatus === 'error' ? 'Error' : 'Saved'}
               </span>
+              {!portfolio.is_published && (
+                <span className="text-xs font-medium px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                  ⚠️ Unpublished - Preview may not work
+                </span>
+              )}
             </div>
             <div className="flex items-center space-x-3">
               <Switch
@@ -747,12 +816,12 @@ const PortfolioEditorPage = () => {
                                 </div>
                                 <div>
                                   <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                    Subtitle
+                                    Hero Subtitle
                                   </label>
                                   <Input
                                     type="text"
-                                    value={portfolio.subtitle || ''}
-                                    onChange={(e) => handleFieldChange('subtitle', e.target.value)}
+                                    value={portfolio.hero_subtitle || ''}
+                                    onChange={(e) => handleFieldChange('hero_subtitle', e.target.value)}
                                     placeholder="Brief description or tagline"
                                     className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                   />
@@ -1124,6 +1193,182 @@ const PortfolioEditorPage = () => {
                             </div>
                            </div>
                         )}
+
+                        {key === 'footer' && (
+                          <div className="space-y-6">
+                            {/* About Summary */}
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                  About Summary
+                                </label>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    id="footer_show_about_summary"
+                                    checked={portfolio.footer_show_about_summary !== false}
+                                    onChange={(e) => handleFieldChange('footer_show_about_summary', e.target.checked)}
+                                    className="rounded border-white/20 bg-white/10"
+                                  />
+                                  <label htmlFor="footer_show_about_summary" className={`text-xs ${selectedTheme.colors.text}`}>
+                                    Show in footer
+                                  </label>
+                                </div>
+                              </div>
+                              <div className="flex gap-2 mb-2">
+                                <Textarea
+                                  value={portfolio.footer_about_summary || ''}
+                                  onChange={(e) => handleFieldChange('footer_about_summary', e.target.value)}
+                                  placeholder="A brief summary about yourself for the footer..."
+                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  rows={3}
+                                />
+                                <Button
+                                  onClick={async () => {
+                                    if (!portfolio.about_text) {
+                                      alert('Please add some content to your About section first.');
+                                      return;
+                                    }
+                                    try {
+                                      const response = await fetch('/api/generate-portfolio', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                          type: 'footer_about_summary',
+                                          about_text: portfolio.about_text,
+                                          artist_name: portfolio.artist_name
+                                        })
+                                      });
+                                      const data = await response.json();
+                                      if (data.content) {
+                                        handleFieldChange('footer_about_summary', data.content);
+                                      }
+                                    } catch (error) {
+                                      console.error('Error generating footer about summary:', error);
+                                    }
+                                  }}
+                                  variant="outline" size="sm"
+                                  className="bg-purple-600/20 border-purple-500/30 text-purple-300 hover:bg-purple-600/30"
+                                >
+                                  <Sparkles className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Quick Links */}
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                  Quick Links
+                                </label>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    id="footer_show_links"
+                                    checked={portfolio.footer_show_links !== false}
+                                    onChange={(e) => handleFieldChange('footer_show_links', e.target.checked)}
+                                    className="rounded border-white/20 bg-white/10"
+                                  />
+                                  <label htmlFor="footer_show_links" className={`text-xs ${selectedTheme.colors.text}`}>
+                                    Show in footer
+                                  </label>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                {safeGetArray(portfolio.footer_links_json).map((link: any, index: number) => (
+                                  <div key={index} className="flex gap-2">
+                                    <Input
+                                      type="text"
+                                      value={link.text || ''}
+                                      onChange={(e) => {
+                                        const links = safeGetArray(portfolio.footer_links_json);
+                                        links[index] = { ...link, text: e.target.value };
+                                        handleFieldChange('footer_links_json', links);
+                                      }}
+                                      placeholder="Link text"
+                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                    <Input
+                                      type="url"
+                                      value={link.url || ''}
+                                      onChange={(e) => {
+                                        const links = safeGetArray(portfolio.footer_links_json);
+                                        links[index] = { ...link, url: e.target.value };
+                                        handleFieldChange('footer_links_json', links);
+                                      }}
+                                      placeholder="URL"
+                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                    <Button
+                                      onClick={() => {
+                                        const links = safeGetArray(portfolio.footer_links_json);
+                                        links.splice(index, 1);
+                                        handleFieldChange('footer_links_json', links);
+                                      }}
+                                      variant="outline" size="sm"
+                                      className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                                <Button
+                                  onClick={() => {
+                                    const links = safeGetArray(portfolio.footer_links_json);
+                                    links.push({ text: '', url: '' });
+                                    handleFieldChange('footer_links_json', links);
+                                  }}
+                                  variant="outline" size="sm"
+                                  className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                                >
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Add Link
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Social Links Toggle */}
+                            <div>
+                              <div className="flex items-center justify-between">
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                  Social Links
+                                </label>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    id="footer_show_social_links"
+                                    checked={portfolio.footer_show_social_links !== false}
+                                    onChange={(e) => handleFieldChange('footer_show_social_links', e.target.checked)}
+                                    className="rounded border-white/20 bg-white/10"
+                                  />
+                                  <label htmlFor="footer_show_social_links" className={`text-xs ${selectedTheme.colors.text}`}>
+                                    Show in footer
+                                  </label>
+                                </div>
+                              </div>
+                              <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
+                                Uses social links from Contact section
+                              </p>
+                            </div>
+
+                            {/* Copyright Text */}
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Copyright Text
+                              </label>
+                              <Input
+                                type="text"
+                                value={portfolio.footer_copyright_text || ''}
+                                onChange={(e) => handleFieldChange('footer_copyright_text', e.target.value)}
+                                placeholder={`© ${new Date().getFullYear()} ${portfolio.artist_name || 'Hero Portfolio'}. All rights reserved.`}
+                                className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                              <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
+                                Leave empty to use default copyright text
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </section>
@@ -1133,6 +1378,43 @@ const PortfolioEditorPage = () => {
           </div>
         </main>
       </div>
+
+      {showPreview && (
+        <div className={`fixed inset-0 z-50 bg-black ${previewMode === 'fullscreen' ? '' : 'p-4'}`}>
+          <div className={`relative h-full ${previewMode === 'fullscreen' ? '' : 'rounded-lg overflow-hidden'}`}>
+            <div className="absolute top-4 right-4 z-10 flex gap-2">
+              <button
+                onClick={() => setShowPreview(false)}
+                className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  const iframe = document.getElementById('preview-iframe') as HTMLIFrameElement;
+                  if (iframe) iframe.src = iframe.src;
+                }}
+                className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
+              >
+                Refresh
+              </button>
+            </div>
+            {!portfolio.is_published && (
+              <div className="absolute top-4 left-4 z-10">
+                <div className="px-3 py-1 bg-yellow-500/90 text-yellow-900 rounded text-sm font-medium">
+                  ⚠️ Portfolio is unpublished - some content may not display
+                </div>
+              </div>
+            )}
+            <iframe
+              id="preview-iframe"
+              src={`/portfolio/${userProfile?.username || 'user'}/${portfolio?.slug}?t=${Date.now()}`}
+              className="w-full h-full border-0"
+              title="Portfolio Preview"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

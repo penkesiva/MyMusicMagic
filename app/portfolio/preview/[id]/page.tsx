@@ -16,34 +16,32 @@ import { TrackCard } from '@/app/components/tracks/TrackCard';
 import { SECTIONS_CONFIG } from '@/lib/sections';
 
 type PageProps = {
-  params: { username: string; slug: string };
+  params: { id: string };
 };
 
 type Track = Database['public']['Tables']['tracks']['Row'];
 type GalleryItem = Database['public']['Tables']['gallery']['Row'];
 
-export default async function PortfolioPage({ params }: PageProps) {
-  // First, get the user profile by username
-  const { data: userProfile, error: userError } = await supabase
-    .from('user_profiles')
-    .select('id, username, full_name')
-    .eq('username', params.username)
-    .single();
-
-  if (userError || !userProfile) {
-    notFound();
-  }
-
-  // Then get the portfolio for that specific user
+export default async function PortfolioPreviewPage({ params }: PageProps) {
+  // Get the portfolio by ID (allows unpublished portfolios for preview)
   const { data: portfolio, error: portfolioError } = await supabase
     .from('user_portfolios')
     .select('*')
-    .eq('user_id', userProfile.id)
-    .eq('slug', params.slug)
-    .eq('is_published', true)
+    .eq('id', params.id)
     .single();
 
   if (portfolioError || !portfolio) {
+    notFound();
+  }
+
+  // Get user profile for the portfolio
+  const { data: userProfile, error: userError } = await supabase
+    .from('user_profiles')
+    .select('id, username, full_name')
+    .eq('id', portfolio.user_id)
+    .single();
+
+  if (userError || !userProfile) {
     notFound();
   }
 
@@ -95,7 +93,7 @@ export default async function PortfolioPage({ params }: PageProps) {
   }
 
   // Debug logging
-  console.log('🔍 Portfolio Debug Info:');
+  console.log('🔍 Portfolio Preview Debug Info:');
   console.log('Artist Name:', portfolio.artist_name);
   console.log('Hero Title:', portfolio.hero_title);
   console.log('Hero Subtitle:', portfolio.hero_subtitle);
@@ -474,6 +472,11 @@ export default async function PortfolioPage({ params }: PageProps) {
 
   return (
     <div className={`min-h-screen ${theme.colors.background}`}>
+      {/* Preview Banner */}
+      <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
+        🎯 PREVIEW MODE - This is how your portfolio will look when published
+      </div>
+      
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-24 md:space-y-32 py-8 md:py-16">
           {sortedSections.map(key => (
@@ -493,7 +496,7 @@ export default async function PortfolioPage({ params }: PageProps) {
                        {portfolio.artist_name || 'Artist Name'}
                      </h1>
                      <p className="text-xl md:text-2xl mb-8 opacity-90" style={{ color: theme.colors.text }}>
-                       {portfolio.hero_title || 'Welcome to my portfolio'}
+                       {portfolio.hero_title || portfolio.hero_subtitle || 'Welcome to my portfolio'}
                      </p>
                      {portfolio.hero_cta_text && portfolio.hero_cta_link && (
                        <a
@@ -527,4 +530,4 @@ export default async function PortfolioPage({ params }: PageProps) {
       {renderFooter(portfolio)}
     </div>
   );
-}
+} 
