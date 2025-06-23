@@ -61,8 +61,6 @@ export default function DashboardPage() {
       const { error: ensureProfileError } = await supabase
         .rpc('ensure_user_profile', { user_uuid: user.id })
 
-      console.log('Ensure profile:', { ensureProfileError })
-
       // Fetch user profile
       const { data: profileData, error: profileError } = await supabase
         .from('user_profiles')
@@ -70,36 +68,46 @@ export default function DashboardPage() {
         .eq('id', user.id)
         .single()
 
-      console.log('Profile fetch:', { profileData, profileError })
-
       if (profileData) {
         setProfile(profileData)
         setEditingProfile({
-          full_name: profileData.full_name || '',
           username: profileData.username || '',
+          full_name: profileData.full_name || '',
           bio: profileData.bio || '',
           website_url: profileData.website_url || ''
         })
       }
 
       // Ensure user subscription exists
-      const { error: ensureSubscriptionError } = await supabase
-        .rpc('ensure_user_subscription', { user_uuid: user.id })
+      // Temporarily disabled due to database issues
+      // const { error: ensureSubscriptionError } = await supabase
+      //   .rpc('ensure_user_subscription', { user_uuid: user.id })
+      // console.log('Ensure subscription:', { ensureSubscriptionError })
 
-      console.log('Ensure subscription:', { ensureSubscriptionError })
+      // Fetch user subscription - temporarily disabled
+      // const { data: subscriptionData, error: subscriptionError } = await supabase
+      //   .from('user_subscriptions')
+      //   .select('*')
+      //   .eq('user_id', user.id)
+      //   .single()
+      // console.log('Subscription fetch:', { subscriptionData, subscriptionError })
+      // if (subscriptionData) {
+      //   setSubscription(subscriptionData)
+      // }
 
-      // Fetch user subscription
-      const { data: subscriptionData, error: subscriptionError } = await supabase
-        .from('user_subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
-
-      console.log('Subscription fetch:', { subscriptionData, subscriptionError })
-
-      if (subscriptionData) {
-        setSubscription(subscriptionData)
-      }
+      // Set default subscription for now
+      setSubscription({
+        id: 'default',
+        user_id: user.id,
+        plan_type: 'free',
+        status: 'active',
+        stripe_customer_id: null,
+        stripe_subscription_id: null,
+        current_period_start: null,
+        current_period_end: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
 
       // Fetch user portfolios
       const { data: portfoliosData, error: portfoliosError } = await supabase
@@ -107,8 +115,6 @@ export default function DashboardPage() {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-
-      console.log('Portfolios fetch:', { portfoliosData, portfoliosError })
 
       if (portfoliosData) {
         setPortfolios(portfoliosData)
@@ -120,9 +126,6 @@ export default function DashboardPage() {
         .select('*')
         .eq('is_active', true)
         .order('name', { ascending: true })
-
-      console.log('Templates data:', templatesData)
-      console.log('Templates error:', templatesError)
 
       // Temporarily set empty templates array if there's an error
       if (templatesError) {
