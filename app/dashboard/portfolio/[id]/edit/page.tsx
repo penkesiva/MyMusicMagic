@@ -404,6 +404,8 @@ const PortfolioEditorPage = () => {
     !((portfolio?.ai_advantages_json as any[]) || []).some(h => h.name === hobby.name)
   );
 
+  const isHobbyAlreadyAdded = (portfolio?.ai_advantages_json as any[])?.some(h => h.name.toLowerCase() === hobbySearch.toLowerCase());
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900">
@@ -807,9 +809,9 @@ const PortfolioEditorPage = () => {
                                     onChange={(e) => setHobbySearch(e.target.value)}
                                     className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                   />
-                                  {hobbySearch && filteredHobbies.length > 0 && (
+                                  {hobbySearch && (
                                     <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-white/20 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                        {filteredHobbies.map(hobby => (
+                                        {filteredHobbies.length > 0 && filteredHobbies.map(hobby => (
                                           <button
                                             key={hobby.name}
                                             onClick={() => handleAddHobby(hobby)}
@@ -819,6 +821,15 @@ const PortfolioEditorPage = () => {
                                             <span>{hobby.name}</span>
                                           </button>
                                         ))}
+                                        {filteredHobbies.length === 0 && !isHobbyAlreadyAdded && (
+                                           <button
+                                              onClick={() => handleAddHobby({ name: hobbySearch, icon: '⭐' })}
+                                              className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
+                                            >
+                                              <span className="text-xl">⭐</span>
+                                              <span>Add "{hobbySearch}"</span>
+                                            </button>
+                                        )}
                                     </div>
                                   )}
                               </div>
