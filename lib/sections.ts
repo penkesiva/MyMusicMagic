@@ -1,22 +1,160 @@
-export interface Section {
+export type Section = {
+    key: string;
     defaultName: string;
-    defaultEnabled: boolean;
     defaultOrder: number;
-}
+    enabled: boolean;
+    defaultEnabled: boolean;
+    fields: {
+        [key: string]: 'text' | 'textarea' | 'url' | 'boolean' | 'json';
+    };
+};
 
-export const SECTIONS_CONFIG: Record<string, Section> = {
-    hero: { defaultName: 'Hero', defaultEnabled: true, defaultOrder: 1 },
-    about: { defaultName: 'About Me', defaultEnabled: true, defaultOrder: 2 },
-    tracks: { defaultName: 'Tracks', defaultEnabled: true, defaultOrder: 3 },
-    gallery: { defaultName: 'Photo Gallery', defaultEnabled: true, defaultOrder: 4 },
-    key_projects: { defaultName: 'Key Projects', defaultEnabled: false, defaultOrder: 5 },
-    testimonials: { defaultName: 'Testimonials', defaultEnabled: false, defaultOrder: 6 },
-    press: { defaultName: 'Press', defaultEnabled: false, defaultOrder: 7 },
-    blog: { defaultName: 'Blog', defaultEnabled: false, defaultOrder: 8 },
-    status: { defaultName: 'What I’m Working On', defaultEnabled: false, defaultOrder: 9 },
-    skills: { defaultName: 'Skills & Tools', defaultEnabled: false, defaultOrder: 10 },
-    resume: { defaultName: 'Resume', defaultEnabled: false, defaultOrder: 11 },
-    ai_advantage: { defaultName: 'Hobbies', defaultEnabled: false, defaultOrder: 12 },
-    contact: { defaultName: 'Connect', defaultEnabled: true, defaultOrder: 13 },
-    footer: { defaultName: 'Footer', defaultEnabled: true, defaultOrder: 14 },
+export const SECTIONS_CONFIG: { [key: string]: Section } = {
+    hero: {
+        key: 'hero',
+        defaultName: 'Hero',
+        defaultOrder: 0,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {
+            hero_title: 'text',
+            hero_subtitle: 'text',
+            hero_cta_text: 'text',
+            hero_cta_link: 'url',
+            hero_image_url: 'url'
+        }
+    },
+    about: {
+        key: 'about',
+        defaultName: 'About Me',
+        defaultOrder: 1,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {
+            about_title: 'text',
+            about_text: 'textarea',
+            profile_photo_url: 'url'
+        }
+    },
+    tracks: {
+        key: 'tracks',
+        defaultName: 'Tracks',
+        defaultOrder: 2,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {}
+    },
+    gallery: {
+        key: 'gallery',
+        defaultName: 'Photo Gallery',
+        defaultOrder: 3,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {}
+    },
+    key_projects: {
+        key: 'key_projects',
+        defaultName: 'Key Projects',
+        defaultOrder: 5,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {
+            key_projects_title: 'text',
+            key_projects_json: 'json'
+        }
+    },
+    testimonials: {
+        key: 'testimonials',
+        defaultName: 'Testimonials',
+        defaultOrder: 6,
+        enabled: false,
+        defaultEnabled: false,
+        fields: {}
+    },
+    press: {
+        key: 'press',
+        defaultName: 'Press & Media',
+        defaultOrder: 4,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {
+            press_title: 'text',
+            press_json: 'json'
+        }
+    },
+    blog: {
+        key: 'blog',
+        defaultName: 'Blog',
+        defaultOrder: 8,
+        enabled: false,
+        defaultEnabled: false,
+        fields: {}
+    },
+    status: {
+        key: 'status',
+        defaultName: 'What I\'m Working On',
+        defaultOrder: 9,
+        enabled: false,
+        defaultEnabled: false,
+        fields: {}
+    },
+    skills: {
+        key: 'skills',
+        defaultName: 'Skills & Tools',
+        defaultOrder: 6,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {
+            skills_title: 'text',
+            skills_json: 'json'
+        }
+    },
+    resume: {
+        key: 'resume',
+        defaultName: 'Resume',
+        defaultOrder: 8,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {
+            resume_title: 'text',
+            resume_url: 'url'
+        }
+    },
+    hobbies: {
+        key: 'hobbies',
+        defaultName: 'Hobbies',
+        defaultOrder: 7,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {
+            hobbies_title: 'text',
+            hobbies_json: 'json'
+        }
+    },
+    contact: {
+        key: 'contact',
+        defaultName: 'Contact Me',
+        defaultOrder: 9,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {
+            contact_title: 'text',
+            contact_description: 'textarea',
+            contact_email: 'text',
+            twitter_url: 'url',
+            instagram_url: 'url',
+            linkedin_url: 'url',
+            github_url: 'url',
+            website_url: 'url',
+            youtube_url: 'url'
+        }
+    },
+    footer: {
+        key: 'footer',
+        defaultName: 'Footer',
+        defaultOrder: 14,
+        enabled: true,
+        defaultEnabled: true,
+        fields: {}
+    }
 }; 

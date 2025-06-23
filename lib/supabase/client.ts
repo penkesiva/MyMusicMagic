@@ -1,9 +1,13 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { Database } from '@/types/database'
+import { createBrowserClient } from '@supabase/ssr'
+import { Database } from '@/types_db'
 
-export const createClient = () => {
-  return createClientComponentClient<Database>()
-}
+export const createClient = () =>
+  createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+export const supabase = createClient();
 
 // Helper function to get the current user
 export const getCurrentUser = async () => {

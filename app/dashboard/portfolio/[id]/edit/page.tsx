@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles
+  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
 import { HOBBIES_LIST } from "@/lib/hobbies";
+import { SKILLS_LIST } from "@/lib/skills";
 import { PortfolioTrackForm } from "@/components/portfolio/PortfolioTrackForm";
 import PortfolioGalleryForm from "@/components/portfolio/PortfolioGalleryForm";
 import { THEMES } from "@/lib/themes";
@@ -91,6 +92,7 @@ const PortfolioEditorPage = () => {
   const [trackViewMode, setTrackViewMode] = useState<'list' | 'grid'>('list');
   const [uploadingResume, setUploadingResume] = useState(false);
   const [hobbySearch, setHobbySearch] = useState("");
+  const [skillSearch, setSkillSearch] = useState("");
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [placeholder, setPlaceholder] = useState("");
@@ -180,6 +182,23 @@ const PortfolioEditorPage = () => {
     const allClosed: Record<string, boolean> = {};
     sortedEditorSections.forEach(key => { allClosed[key] = false; });
     setOpenSections(allClosed);
+  };
+
+  const safeGetArray = (field: any) => {
+    if (Array.isArray(field)) {
+      return field;
+    }
+    if (typeof field === 'string') {
+      try {
+        const parsed = JSON.parse(field);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   };
 
   const selectedTheme = useMemo(() => THEMES.find(t => t.name === portfolio?.theme_name) || THEMES[0], [portfolio?.theme_name]);
@@ -444,24 +463,44 @@ const PortfolioEditorPage = () => {
   };
 
   const handleAddHobby = (hobby: { name: string; icon: string }) => {
-    const currentHobbies = (portfolio?.ai_advantages_json as any[]) || [];
+    const currentHobbies = safeGetArray(portfolio?.hobbies_json);
     if (!currentHobbies.some(h => h.name === hobby.name)) {
-      handleFieldChange('ai_advantages_json', [...currentHobbies, hobby]);
+        handleFieldChange('hobbies_json', [...currentHobbies, hobby]);
     }
     setHobbySearch("");
   };
 
   const handleRemoveHobby = (hobbyName: string) => {
-    const currentHobbies = (portfolio?.ai_advantages_json as any[]) || [];
-    handleFieldChange('ai_advantages_json', currentHobbies.filter(h => h.name !== hobbyName));
+    const currentHobbies = safeGetArray(portfolio?.hobbies_json);
+    handleFieldChange('hobbies_json', currentHobbies.filter(h => h.name !== hobbyName));
   };
 
   const filteredHobbies = HOBBIES_LIST.filter(hobby => 
     hobby.name.toLowerCase().includes(hobbySearch.toLowerCase()) &&
-    !((portfolio?.ai_advantages_json as any[]) || []).some(h => h.name === hobby.name)
+    !safeGetArray(portfolio?.hobbies_json).some(h => h.name === hobby.name)
   );
 
-  const isHobbyAlreadyAdded = (portfolio?.ai_advantages_json as any[])?.some(h => h.name.toLowerCase() === hobbySearch.toLowerCase());
+  const isHobbyAlreadyAdded = safeGetArray(portfolio?.hobbies_json).some(h => h.name.toLowerCase() === hobbySearch.toLowerCase());
+
+  const handleAddSkill = (skill: { name: string; color: string }) => {
+    const currentSkills = safeGetArray(portfolio?.skills_json);
+    if (!currentSkills.some(s => s.name === skill.name)) {
+        handleFieldChange('skills_json', [...currentSkills, skill]);
+    }
+    setSkillSearch("");
+  };
+
+  const handleRemoveSkill = (skillName: string) => {
+    const currentSkills = safeGetArray(portfolio?.skills_json);
+    handleFieldChange('skills_json', currentSkills.filter(s => s.name !== skillName));
+  };
+
+  const filteredSkills = SKILLS_LIST.filter(skill => 
+    skill.name.toLowerCase().includes(skillSearch.toLowerCase()) &&
+    !safeGetArray(portfolio?.skills_json).some(s => s.name === skill.name)
+  );
+  
+  const isSkillAlreadyAdded = safeGetArray(portfolio?.skills_json).some(s => s.name.toLowerCase() === skillSearch.toLowerCase());
 
   if (loading) {
     return (
@@ -884,7 +923,7 @@ const PortfolioEditorPage = () => {
                           </div>
                         )}
 
-                        {key === 'ai_advantage' && (
+                        {key === 'hobbies' && (
                           <div className="space-y-4">
                             <div>
                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Add a Hobby</label>
@@ -898,15 +937,15 @@ const PortfolioEditorPage = () => {
                                   />
                                   {hobbySearch && (
                                     <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-white/20 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                        {filteredHobbies.length > 0 && filteredHobbies.map(hobby => (
-                                          <button
-                                            key={hobby.name}
-                                            onClick={() => handleAddHobby(hobby)}
-                                            className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
-                                          >
-                                            <span className="text-xl">{hobby.icon}</span>
-                                            <span>{hobby.name}</span>
-                                          </button>
+                                        {filteredHobbies.map(hobby => (
+                                            <button
+                                              key={hobby.name}
+                                              onClick={() => handleAddHobby(hobby)}
+                                              className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
+                                            >
+                                              <span className="text-xl">{hobby.icon}</span>
+                                              <span>{hobby.name}</span>
+                                            </button>
                                         ))}
                                         {filteredHobbies.length === 0 && !isHobbyAlreadyAdded && (
                                            <button
@@ -921,22 +960,86 @@ const PortfolioEditorPage = () => {
                                   )}
                               </div>
                             </div>
-                             <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Your Hobbies</label>
-                                <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10 min-h-[40px]">
-                                  {portfolio.ai_advantages_json && Array.isArray(portfolio.ai_advantages_json) && portfolio.ai_advantages_json.map((hobby: any) => (
-                                    <div key={hobby.name} className="flex items-center gap-2 bg-purple-500/20 text-white px-3 py-1 rounded-full text-sm">
-                                      <span>{hobby.icon}</span>
-                                      <span>{hobby.name}</span>
-                                      <button onClick={() => handleRemoveHobby(hobby.name)} className="text-purple-300 hover:text-white">
+                            <div>
+                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Your Hobbies</label>
+                               <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10 min-h-[40px]">
+                                {safeGetArray(portfolio.hobbies_json).map((hobby: any) => (
+                                  <div key={hobby.name} className="flex items-center gap-2 bg-purple-500/20 text-white px-3 py-1 rounded-full text-sm">
+                                    <span>{hobby.icon}</span>
+                                    <span>{hobby.name}</span>
+                                    <button onClick={() => handleRemoveHobby(hobby.name)} className="text-purple-300 hover:text-white">
+                                      <X className="h-3 w-3" />
+                                    </button>
+                                  </div>
+                                ))}
+                                {safeGetArray(portfolio.hobbies_json).length === 0 && (
+                                   <p className="text-sm text-gray-400">Add hobbies from the list above.</p>
+                                )}
+                               </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {key === 'skills' && (
+                          <div className="space-y-4">
+                            <div>
+                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Add a Skill or Tool</label>
+                               <div className="relative max-w-sm">
+                                 <Input
+                                    type="text"
+                                    placeholder="Search for skills..."
+                                    value={skillSearch}
+                                    onChange={(e) => setSkillSearch(e.target.value)}
+                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  />
+                                  {skillSearch && (
+                                    <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-white/20 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                        {filteredSkills.map(skill => {
+                                          const IconComponent = skill.icon;
+                                          return (
+                                            <button
+                                              key={skill.name}
+                                              onClick={() => handleAddSkill(skill)}
+                                              className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
+                                            >
+                                              <IconComponent className="h-5 w-5" style={{ color: skill.color }}/>
+                                              <span>{skill.name}</span>
+                                            </button>
+                                          );
+                                        })}
+                                        {filteredSkills.length === 0 && !isSkillAlreadyAdded && (
+                                           <button
+                                              onClick={() => handleAddSkill({ name: skillSearch, color: '#FFFFFF' })}
+                                              className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
+                                            >
+                                              <Star className="h-5 w-5" style={{ color: '#FFFFFF' }}/>
+                                              <span>Add "{skillSearch}"</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                  )}
+                              </div>
+                            </div>
+                            <div>
+                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Your Skills</label>
+                               <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10 min-h-[40px]">
+                                {safeGetArray(portfolio.skills_json).map((skill: any) => {
+                                  const skillDef = SKILLS_LIST.find(s => s.name === skill.name);
+                                  const IconComponent = skillDef ? skillDef.icon : Star;
+                                  return(
+                                    <div key={skill.name} className="flex items-center gap-2 bg-purple-500/20 text-white px-3 py-1 rounded-full text-sm">
+                                      <IconComponent className="h-4 w-4" style={{ color: skill.color || '#FFFFFF' }}/>
+                                      <span>{skill.name}</span>
+                                      <button onClick={() => handleRemoveSkill(skill.name)} className="text-purple-300 hover:text-white">
                                         <X className="h-3 w-3" />
                                       </button>
                                     </div>
-                                  ))}
-                                  {(!portfolio.ai_advantages_json || (Array.isArray(portfolio.ai_advantages_json) && portfolio.ai_advantages_json.length === 0)) && (
-                                     <p className="text-sm text-gray-400">Add hobbies from the list above.</p>
-                                  )}
-                                </div>
+                                  );
+                                })}
+                                {safeGetArray(portfolio.skills_json).length === 0 && (
+                                   <p className="text-sm text-gray-400">Add skills from the list above.</p>
+                                )}
+                               </div>
                             </div>
                           </div>
                         )}
