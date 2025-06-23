@@ -7,7 +7,9 @@ import { THEMES, PortfolioTheme } from '@/lib/themes'
 import { SECTIONS_CONFIG } from '@/lib/sections'
 import { TrackCard } from '@/components/tracks/TrackCard'
 import Image from 'next/image'
-import { Play, Mail, Music, Image as ImageIcon, User, ArrowRight, ExternalLink, Instagram, Twitter, Youtube, Linkedin, Globe } from 'lucide-react'
+import {
+  Play, Mail, Music, Image as ImageIcon, User, ArrowRight, ExternalLink, Instagram, Twitter, Youtube, Linkedin, Globe, FileText, Briefcase, Award, Star
+} from 'lucide-react'
 
 type Portfolio = Database['public']['Tables']['user_portfolios']['Row']
 type Track = Database['public']['Tables']['tracks']['Row']
@@ -189,7 +191,7 @@ const PortfolioPage = ({ params }: { params: { slug: string } }) => {
                                 {portfolio.about_title || 'About Me'}
                             </h2>
                         </div>
-                        <div className={`prose prose-lg max-w-none ${colors.text}`}>
+                        <div className={`prose prose-lg max-w-none ${colors.text} ${colors.background === '#FFFFFF' ? 'prose-invert' : ''}`}>
                             <p className="text-lg leading-relaxed whitespace-pre-wrap">{portfolio.about_text}</p>
                         </div>
                     </div>
@@ -202,7 +204,7 @@ const PortfolioPage = ({ params }: { params: { slug: string } }) => {
                     <div className="text-center mb-12">
                         <div className="flex items-center justify-center mb-4">
                             <Music className={`w-8 h-8 ${colors.primary} mr-3`} />
-                            <h2 className={`text-4xl font-bold ${colors.heading}`}>My Music</h2>
+                            <h2 className={`text-4xl font-bold ${colors.heading}`}>{getSectionConfig('tracks').defaultName}</h2>
                         </div>
                         <p className={`${colors.text} text-lg max-w-2xl mx-auto`}>
                             Discover my latest tracks and musical journey
@@ -222,7 +224,7 @@ const PortfolioPage = ({ params }: { params: { slug: string } }) => {
                     <div className="text-center mb-12">
                         <div className="flex items-center justify-center mb-4">
                             <ImageIcon className={`w-8 h-8 ${colors.primary} mr-3`} />
-                            <h2 className={`text-4xl font-bold ${colors.heading}`}>Gallery</h2>
+                            <h2 className={`text-4xl font-bold ${colors.heading}`}>{getSectionConfig('gallery').defaultName}</h2>
                         </div>
                         <p className={`${colors.text} text-lg max-w-2xl mx-auto`}>
                             Behind the scenes and visual moments
@@ -247,72 +249,82 @@ const PortfolioPage = ({ params }: { params: { slug: string } }) => {
                     </div>
                 </div>
             )
-        case 'social_links':
-            const socialLinks = [
-                { url: portfolio.instagram_url || undefined, icon: Instagram, label: 'Instagram', color: 'hover:text-pink-400' },
-                { url: portfolio.twitter_url || undefined, icon: Twitter, label: 'Twitter', color: 'hover:text-blue-400' },
-                { url: portfolio.youtube_url || undefined, icon: Youtube, label: 'YouTube', color: 'hover:text-red-400' },
-                { url: portfolio.linkedin_url || undefined, icon: Linkedin, label: 'LinkedIn', color: 'hover:text-blue-600' },
-                { url: portfolio.website_url || undefined, icon: Globe, label: 'Website', color: 'hover:text-green-400' }
-            ].filter(link => link.url && link.url.trim() !== '');
-
-            if (socialLinks.length === 0) return null;
-            
+        case 'key_projects':
             return (
-                <div className="text-center">
-                    <h2 className={`text-4xl font-bold ${colors.heading} mb-6`}>Connect With Me</h2>
-                    <p className={`${colors.text} text-lg max-w-2xl mx-auto mb-8`}>
-                        Follow my journey and stay updated with my latest work
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-4">
-                        {socialLinks.map((link, index) => {
-                            const IconComponent = link.icon;
-                            return (
-                                <a
-                                    key={index}
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`inline-flex items-center px-6 py-3 rounded-full font-semibold transition-all duration-300 ${colors.primary} border-2 border-current hover:scale-105 hover:shadow-lg ${link.color}`}
-                                >
-                                    <IconComponent className="w-5 h-5 mr-2" />
-                                    {link.label}
-                                </a>
-                            );
-                        })}
+                <div>
+                    <div className="text-center mb-12">
+                        <div className="flex items-center justify-center mb-4">
+                            <Briefcase className={`w-8 h-8 ${colors.primary} mr-3`} />
+                            <h2 className={`text-4xl font-bold ${colors.heading}`}>{getSectionConfig('key_projects').defaultName}</h2>
+                        </div>
+                        <p className={`${colors.text} text-lg max-w-2xl mx-auto`}>Coming Soon</p>
                     </div>
                 </div>
             )
-        case 'contact':
-            if (!portfolio.contact_email) return null;
+        case 'press':
             return (
-                 <div id="contact" className="text-center">
-                    <div className="max-w-3xl mx-auto">
-                        <div className="flex items-center justify-center mb-6">
-                            <Mail className={`w-8 h-8 ${colors.primary} mr-3`} />
-                            <h2 className={`text-4xl font-bold ${colors.heading}`}>
-                                {portfolio.contact_title || 'Get In Touch'}
-                            </h2>
+                <div>
+                    <div className="text-center mb-12">
+                        <div className="flex items-center justify-center mb-4">
+                            <Award className={`w-8 h-8 ${colors.primary} mr-3`} />
+                            <h2 className={`text-4xl font-bold ${colors.heading}`}>{getSectionConfig('press').defaultName}</h2>
                         </div>
-                        <p className={`${colors.text} text-lg max-w-2xl mx-auto mb-8 leading-relaxed`}>
-                            {portfolio.contact_description || "I'm available for new projects, collaborations, and exciting opportunities. Let's create something amazing together!"}
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                            <a 
-                                href={`mailto:${portfolio.contact_email}`} 
-                                className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 bg-white text-gray-900 hover:scale-105 hover:shadow-2xl`}
-                            >
-                                <Mail className="w-5 h-5 mr-2" />
-                                Send Email
-                            </a>
-                            <a 
-                                href={`mailto:${portfolio.contact_email}?subject=Collaboration Inquiry`} 
-                                className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 ${colors.primary} border-2 border-current hover:scale-105 hover:shadow-2xl`}
-                            >
-                                <ExternalLink className="w-5 h-5 mr-2" />
-                                Work Together
-                            </a>
+                        <p className={`${colors.text} text-lg max-w-2xl mx-auto`}>Coming Soon</p>
+                    </div>
+                </div>
+            )
+        case 'ai_advantage':
+            if (!portfolio.ai_advantages_json || (portfolio.ai_advantages_json as any[]).length === 0) return null;
+            return (
+                <div>
+                    <div className="text-center mb-12">
+                        <div className="flex items-center justify-center mb-4">
+                            <Star className={`w-8 h-8 ${colors.primary} mr-3`} />
+                            <h2 className={`text-4xl font-bold ${colors.heading}`}>{getSectionConfig('ai_advantage').defaultName}</h2>
                         </div>
+                    </div>
+                    <div className="flex flex-wrap justify-center gap-4">
+                        {(portfolio.ai_advantages_json as any[]).map(hobby => (
+                            <div key={hobby.name} className={`flex items-center gap-3 px-4 py-2 rounded-full ${colors.card} border-2 border-transparent hover:border-current`}>
+                                <span className="text-2xl">{hobby.icon}</span>
+                                <span className={`font-semibold ${colors.cardText}`}>{hobby.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )
+        case 'resume':
+            if (!portfolio.resume_url) return null;
+            return (
+                <div className="text-center">
+                    <div className="flex items-center justify-center mb-4">
+                        <FileText className={`w-8 h-8 ${colors.primary} mr-3`} />
+                        <h2 className={`text-4xl font-bold ${colors.heading}`}>{getSectionConfig('resume').defaultName}</h2>
+                    </div>
+                     <a href={portfolio.resume_url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 ${colors.primary} hover:scale-105`}>
+                        Download My Resume
+                    </a>
+                </div>
+            )
+        case 'contact':
+            return (
+                <div id="contact" className="text-center">
+                    <div className="flex items-center justify-center mb-4">
+                        <Mail className={`w-8 h-8 ${colors.primary} mr-3`} />
+                        <h2 className={`text-4xl font-bold ${colors.heading}`}>{getSectionConfig('contact').defaultName}</h2>
+                    </div>
+                    {portfolio.contact_description && (
+                        <p className={`${colors.text} text-lg max-w-2xl mx-auto mb-8`}>{portfolio.contact_description}</p>
+                    )}
+                    {portfolio.contact_email && (
+                        <a href={`mailto:${portfolio.contact_email}`} className={`inline-block text-xl font-semibold ${colors.primaryStrong} hover:underline mb-8`}>{portfolio.contact_email}</a>
+                    )}
+                    <div className="flex justify-center gap-6 mt-4">
+                        {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><Instagram className="w-6 h-6"/></a>}
+                        {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><Twitter className="w-6 h-6"/></a>}
+                        {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><Youtube className="w-6 h-6"/></a>}
+                        {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><Linkedin className="w-6 h-6"/></a>}
+                        {portfolio.website_url && <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><Globe className="w-6 h-6"/></a>}
                     </div>
                 </div>
             )
