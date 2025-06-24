@@ -151,145 +151,150 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
   };
 
   const renderHobbies = (portfolio: Portfolio) => {
-    if (!portfolio.hobbies_title || !portfolio.hobbies_json || (portfolio.hobbies_json as any[]).length === 0) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.hobbies?.name || portfolio.hobbies_title || SECTIONS_CONFIG['hobbies'].defaultName;
-    
-    return <section id="hobbies" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
-      <div className="container mx-auto">
-        <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-        <div className="flex flex-wrap justify-center gap-6">
-          {(portfolio.hobbies_json as any[])?.map((hobby: any) => (
-            <div key={hobby.name} className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-lg w-32">
-              <span className="text-4xl">{hobby.icon}</span>
-              <span className="text-sm font-medium text-center">{hobby.name}</span>
+    const hobbies = portfolio.hobbies_json as any[] || [];
+    return (
+      <section id="hobbies" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+        <div className="container mx-auto">
+          <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
+          {hobbies.length > 0 ? (
+            <div className="flex flex-wrap justify-center gap-6">
+              {hobbies.map((hobby: any) => (
+                <div key={hobby.name} className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-lg w-32">
+                  <span className="text-4xl">{hobby.icon}</span>
+                  <span className="text-sm font-medium text-center">{hobby.name}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          ) : (
+            <div className="text-center text-gray-400">No hobbies added yet.</div>
+          )}
         </div>
-      </div>
-    </section>;
+      </section>
+    );
   };
 
   const renderSkills = (portfolio: Portfolio) => {
-    if (!portfolio.skills_title || !portfolio.skills_json || (portfolio.skills_json as any[]).length === 0) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.skills?.name || portfolio.skills_title || SECTIONS_CONFIG['skills'].defaultName;
-    
+    const skills = portfolio.skills_json as any[] || [];
     return (
       <section id="skills" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <div className="flex flex-wrap justify-center items-center gap-6">
-            {(portfolio.skills_json as any[])?.map((skill: any) => {
-              const skillDef = SKILLS_LIST.find(s => s.name === skill.name);
-              const IconComponent = skillDef ? skillDef.icon : null;
-
-              if (!IconComponent) return null;
-
-              return (
-                <div key={skill.name} className="flex items-center gap-3 py-2 px-4 bg-white/5 rounded-full border border-white/20" title={skill.name}>
-                  <IconComponent className="h-6 w-6" style={{ color: skill.color || '#FFFFFF' }}/>
-                  <span className="text-md font-semibold">{skill.name}</span>
-                </div>
-              );
-            })}
-          </div>
+          {skills.length > 0 ? (
+            <div className="flex flex-wrap justify-center items-center gap-6">
+              {skills.map((skill: any) => {
+                const skillDef = SKILLS_LIST.find(s => s.name === skill.name);
+                const IconComponent = skillDef ? skillDef.icon : null;
+                if (!IconComponent) return null;
+                return (
+                  <div key={skill.name} className="flex items-center gap-3 py-2 px-4 bg-white/5 rounded-full border border-white/20" title={skill.name}>
+                    <IconComponent className="h-6 w-6" style={{ color: skill.color || '#FFFFFF' }}/>
+                    <span className="text-md font-semibold">{skill.name}</span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400">No skills added yet.</div>
+          )}
         </div>
       </section>
     );
   };
   
   const renderAbout = (portfolio: Portfolio) => {
-    if (!portfolio.about_text) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.about?.name || portfolio.about_title || SECTIONS_CONFIG['about'].defaultName;
-    
     return (
       <section id="about" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <div className="grid lg:grid-cols-3 gap-12 items-center">
-            {portfolio.profile_photo_url && (
-              <div className="lg:col-span-1 flex justify-center">
-                <div className="relative">
-                  <Image
-                    src={portfolio.profile_photo_url}
-                    alt={portfolio.artist_name || 'Artist profile photo'}
-                    width={300}
-                    height={300}
-                    className="rounded-2xl aspect-square object-cover shadow-2xl"
-                  />
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black to-transparent opacity-20"></div>
+          {portfolio.about_text ? (
+            <div className="grid lg:grid-cols-3 gap-12 items-center">
+              {portfolio.profile_photo_url && (
+                <div className="lg:col-span-1 flex justify-center">
+                  <div className="relative">
+                    <Image
+                      src={portfolio.profile_photo_url}
+                      alt={portfolio.artist_name || 'Artist profile photo'}
+                      width={300}
+                      height={300}
+                      className="rounded-2xl aspect-square object-cover shadow-2xl"
+                    />
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black to-transparent opacity-20"></div>
+                  </div>
+                </div>
+              )}
+              <div className={portfolio.profile_photo_url ? "lg:col-span-2" : "lg:col-span-3"}>
+                <div className="flex items-center mb-6">
+                  <User className={`w-8 h-8 ${colors.primary} mr-3`} />
+                  <h2 className={`text-4xl font-bold ${colors.heading}`}>{sectionTitle}</h2>
+                </div>
+                <div className={`prose prose-lg max-w-none ${colors.text} ${colors.background === '#FFFFFF' ? 'prose-invert' : ''}`}>
+                  <p className="text-lg leading-relaxed whitespace-pre-wrap">{portfolio.about_text}</p>
                 </div>
               </div>
-            )}
-            <div className={portfolio.profile_photo_url ? "lg:col-span-2" : "lg:col-span-3"}>
-              <div className="flex items-center mb-6">
-                <User className={`w-8 h-8 ${colors.primary} mr-3`} />
-                <h2 className={`text-4xl font-bold ${colors.heading}`}>
-                  {sectionTitle}
-                </h2>
-              </div>
-              <div className={`prose prose-lg max-w-none ${colors.text} ${colors.background === '#FFFFFF' ? 'prose-invert' : ''}`}>
-                <p className="text-lg leading-relaxed whitespace-pre-wrap">{portfolio.about_text}</p>
-              </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-center text-gray-400">No about text added yet.</div>
+          )}
         </div>
       </section>
     );
   };
 
   const renderTracks = (portfolio: Portfolio, tracks: Track[]) => {
-    if (tracks.length === 0) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.tracks?.name || SECTIONS_CONFIG['tracks'].defaultName;
-    
     return (
       <section id="tracks" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {tracks.map(track => (
-              <TrackCard 
-                key={track.id} 
-                track={track}
-                onPlay={() => {}}
-                onInfo={() => {}}
-              />
-            ))}
-          </div>
+          {tracks.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {tracks.map(track => (
+                <TrackCard 
+                  key={track.id} 
+                  track={track}
+                  onPlay={() => {}}
+                  onInfo={() => {}}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400">No tracks added yet.</div>
+          )}
         </div>
       </section>
     );
   };
 
   const renderGallery = (portfolio: Portfolio, galleryItems: GalleryItem[]) => {
-    if (galleryItems.length === 0) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.gallery?.name || SECTIONS_CONFIG['gallery'].defaultName;
-    
     return (
       <section id="gallery" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {galleryItems.map((item) => (
-              <div key={item.id} className="group relative aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                <Image
-                  src={item.image_url || '/default-track-thumbnail.jpg'}
-                  alt={item.title || 'Gallery image'}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                {item.title && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <p className="text-white text-center font-semibold text-sm">{item.title}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {galleryItems.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {galleryItems.map((item) => (
+                <div key={item.id} className="group relative aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                  <Image
+                    src={item.image_url || '/default-track-thumbnail.jpg'}
+                    alt={item.title || 'Gallery image'}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {item.title && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <p className="text-white text-center font-semibold text-sm">{item.title}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400">No gallery items yet.</div>
+          )}
         </div>
       </section>
     );
@@ -322,17 +327,18 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
   };
 
   const renderResume = (portfolio: Portfolio) => {
-    if (!portfolio.resume_url) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.resume?.name || SECTIONS_CONFIG['resume'].defaultName;
-    
     return (
       <section id="resume" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto text-center">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <a href={portfolio.resume_url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 ${colors.primary} hover:scale-105`}>
-            Download My Resume
-          </a>
+          {portfolio.resume_url ? (
+            <a href={portfolio.resume_url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 ${colors.primary} hover:scale-105`}>
+              Download My Resume
+            </a>
+          ) : (
+            <div className="text-center text-gray-400">No resume uploaded yet.</div>
+          )}
         </div>
       </section>
     );
@@ -555,12 +561,12 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
                 {key === 'about' && renderAbout(portfolio)}
                 {key === 'tracks' && renderTracks(portfolio, tracks)}
                 {key === 'gallery' && renderGallery(portfolio, galleryItems)}
-                {key === 'key_projects' && renderKeyProjects(portfolio)}
-                {key === 'press' && renderPress(portfolio)}
-                {key === 'resume' && renderResume(portfolio)}
-                {key === 'hobbies' && renderHobbies(portfolio)}
                 {key === 'skills' && renderSkills(portfolio)}
+                {key === 'hobbies' && renderHobbies(portfolio)}
                 {key === 'contact' && renderContact(portfolio)}
+                {key === 'resume' && renderResume(portfolio)}
+                {key === 'press' && renderPress(portfolio)}
+                {key === 'key_projects' && renderKeyProjects(portfolio)}
                 {key === 'testimonials' && renderTestimonials(portfolio)}
                 {key === 'blog' && renderBlog(portfolio)}
                 {key === 'status' && renderStatus(portfolio)}

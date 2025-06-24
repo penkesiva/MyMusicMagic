@@ -112,7 +112,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     resume: {
         key: 'resume',
         defaultName: 'Resume',
-        defaultOrder: 8,
+        defaultOrder: 9,
         enabled: true,
         defaultEnabled: true,
         fields: {
