@@ -15,6 +15,10 @@ import {
 import { TrackCard } from '@/app/components/tracks/TrackCard';
 import { SECTIONS_CONFIG } from '@/lib/sections';
 
+// Force dynamic rendering to prevent caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 type PageProps = {
   params: { id: string };
 };
@@ -23,6 +27,9 @@ type Track = Database['public']['Tables']['tracks']['Row'];
 type GalleryItem = Database['public']['Tables']['gallery']['Row'];
 
 export default async function PortfolioPreviewPage({ params }: PageProps) {
+  console.log('🎯 Preview route called with ID:', params.id);
+  console.log('⏰ Timestamp:', new Date().toISOString());
+  
   // Get the portfolio by ID (allows unpublished portfolios for preview)
   const { data: portfolio, error: portfolioError } = await supabase
     .from('user_portfolios')
@@ -31,8 +38,23 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
     .single();
 
   if (portfolioError || !portfolio) {
+    console.error('❌ Portfolio not found:', portfolioError);
     notFound();
   }
+
+  console.log('✅ Portfolio found:', portfolio.name);
+  console.log('📊 Portfolio data:', {
+    id: portfolio.id,
+    name: portfolio.name,
+    artist_name: portfolio.artist_name,
+    hero_title: portfolio.hero_title,
+    hero_subtitle: portfolio.hero_subtitle,
+    about_text: portfolio.about_text?.substring(0, 50) + '...', // Show first 50 chars
+    hobbies_title: portfolio.hobbies_title,
+    hobbies_json: portfolio.hobbies_json,
+    sections_config: portfolio.sections_config,
+    updated_at: portfolio.updated_at
+  });
 
   // Get user profile for the portfolio
   const { data: userProfile, error: userError } = await supabase

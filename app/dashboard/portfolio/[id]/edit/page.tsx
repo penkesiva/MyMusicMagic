@@ -1392,7 +1392,11 @@ const PortfolioEditorPage = () => {
               <button
                 onClick={() => {
                   const iframe = document.getElementById('preview-iframe') as HTMLIFrameElement;
-                  if (iframe) iframe.src = iframe.src;
+                  if (iframe) {
+                    const newUrl = `/portfolio/preview/${portfolio?.id}?t=${Date.now()}&v=${Math.random()}&cache=${new Date().getTime()}&refresh=true`;
+                    console.log('🔄 Refreshing preview with URL:', newUrl);
+                    iframe.src = newUrl;
+                  }
                 }}
                 className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
               >
@@ -1408,7 +1412,7 @@ const PortfolioEditorPage = () => {
             )}
             <iframe
               id="preview-iframe"
-              src={`/portfolio/${userProfile?.username || 'user'}/${portfolio?.slug}?t=${Date.now()}`}
+              src={`/portfolio/preview/${portfolio?.id}?t=${Date.now()}&v=${Math.random()}&cache=${new Date().getTime()}`}
               className="w-full h-full border-0"
               title="Portfolio Preview"
             />
