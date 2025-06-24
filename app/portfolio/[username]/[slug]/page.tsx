@@ -91,7 +91,14 @@ export default async function PortfolioPage({ params }: PageProps) {
     }
     
     // Only include sections that exist in SECTIONS_CONFIG
-    sortedSections = sectionsArray.filter(key => SECTIONS_CONFIG[key]) || [];
+    const validSections = sectionsArray.filter(key => SECTIONS_CONFIG[key]) || [];
+    
+    // Sort sections by their order field from sections_config
+    sortedSections = validSections.sort((a, b) => {
+      const orderA = (portfolio.sections_config as any)?.[a]?.order ?? SECTIONS_CONFIG[a]?.defaultOrder ?? 999;
+      const orderB = (portfolio.sections_config as any)?.[b]?.order ?? SECTIONS_CONFIG[b]?.defaultOrder ?? 999;
+      return orderA - orderB;
+    });
   }
 
   // Debug logging
@@ -476,55 +483,58 @@ export default async function PortfolioPage({ params }: PageProps) {
     <div className={`min-h-screen ${theme.colors.background}`}>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-24 md:space-y-32 py-8 md:py-16">
-          {sortedSections.map(key => (
-            <section key={key} id={key} className="scroll-mt-20">
-              {key === 'hero' && (
-                 <div className="relative w-full min-h-[80vh] flex items-center justify-center text-center p-4 overflow-hidden">
-                   {portfolio.hero_image_url && (
-                     <Image
-                       src={portfolio.hero_image_url}
-                       alt={portfolio.artist_name || 'Hero image'}
-                       fill
-                       className="object-cover brightness-50"
-                     />
-                   )}
-                   <div className="relative z-10 text-white max-w-3xl">
-                     <h1 className="text-5xl md:text-7xl font-extrabold mb-4" style={{ color: theme.colors.heading }}>
-                       {portfolio.artist_name || 'Artist Name'}
-                     </h1>
-                     <p className="text-xl md:text-2xl mb-8 opacity-90" style={{ color: theme.colors.text }}>
-                       {portfolio.hero_title || 'Welcome to my portfolio'}
-                     </p>
-                     {portfolio.hero_cta_text && portfolio.hero_cta_link && (
-                       <a
-                         href={portfolio.hero_cta_link}
-                         className="inline-block px-8 py-3 bg-white text-black font-bold rounded-full text-lg hover:bg-opacity-90 transition-all duration-300"
-                         style={{ backgroundColor: theme.colors.primary, color: theme.colors.background }}
-                       >
-                         {portfolio.hero_cta_text}
-                       </a>
+          {/* Main sections rendering */}
+          {sortedSections
+            .filter(key => key !== 'footer')
+            .map(key => (
+              <section key={key} id={key} className="scroll-mt-20">
+                {key === 'hero' && (
+                   <div className="relative w-full min-h-[80vh] flex items-center justify-center text-center p-4 overflow-hidden">
+                     {portfolio.hero_image_url && (
+                       <Image
+                         src={portfolio.hero_image_url}
+                         alt={portfolio.artist_name || 'Hero image'}
+                         fill
+                         className="object-cover brightness-50"
+                       />
                      )}
+                     <div className="relative z-10 text-white max-w-3xl">
+                       <h1 className="text-5xl md:text-7xl font-extrabold mb-4" style={{ color: theme.colors.heading }}>
+                         {portfolio.artist_name || 'Artist Name'}
+                       </h1>
+                       <p className="text-xl md:text-2xl mb-8 opacity-90" style={{ color: theme.colors.text }}>
+                         {portfolio.hero_title || 'Welcome to my portfolio'}
+                       </p>
+                       {portfolio.hero_cta_text && portfolio.hero_cta_link && (
+                         <a
+                           href={portfolio.hero_cta_link}
+                           className="inline-block px-8 py-3 bg-white text-black font-bold rounded-full text-lg hover:bg-opacity-90 transition-all duration-300"
+                           style={{ backgroundColor: theme.colors.primary, color: theme.colors.background }}
+                         >
+                           {portfolio.hero_cta_text}
+                         </a>
+                       )}
+                     </div>
                    </div>
-                 </div>
-               )}
-              {key === 'about' && renderAbout(portfolio)}
-              {key === 'tracks' && renderTracks(portfolio, tracks)}
-              {key === 'gallery' && renderGallery(portfolio, galleryItems)}
-              {key === 'key_projects' && renderKeyProjects(portfolio)}
-              {key === 'press' && renderPress(portfolio)}
-              {key === 'resume' && renderResume(portfolio)}
-              {key === 'hobbies' && renderHobbies(portfolio)}
-              {key === 'skills' && renderSkills(portfolio)}
-              {key === 'contact' && renderContact(portfolio)}
-              {key === 'testimonials' && renderTestimonials(portfolio)}
-              {key === 'blog' && renderBlog(portfolio)}
-              {key === 'status' && renderStatus(portfolio)}
-              {key === 'footer' && renderFooter(portfolio)}
-            </section>
-          ))}
+                 )}
+                {key === 'about' && renderAbout(portfolio)}
+                {key === 'tracks' && renderTracks(portfolio, tracks)}
+                {key === 'gallery' && renderGallery(portfolio, galleryItems)}
+                {key === 'key_projects' && renderKeyProjects(portfolio)}
+                {key === 'press' && renderPress(portfolio)}
+                {key === 'resume' && renderResume(portfolio)}
+                {key === 'hobbies' && renderHobbies(portfolio)}
+                {key === 'skills' && renderSkills(portfolio)}
+                {key === 'contact' && renderContact(portfolio)}
+                {key === 'testimonials' && renderTestimonials(portfolio)}
+                {key === 'blog' && renderBlog(portfolio)}
+                {key === 'status' && renderStatus(portfolio)}
+              </section>
+            ))}
+          {/* Render the footer at the end if enabled */}
+          {(portfolio.sections_config?.footer?.enabled ?? true) && renderFooter(portfolio)}
         </div>
       </main>
-      {renderFooter(portfolio)}
     </div>
   );
 }
