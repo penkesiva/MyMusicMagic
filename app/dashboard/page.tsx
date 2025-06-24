@@ -11,9 +11,11 @@ import {
   TrashIcon,
   CheckIcon,
   XMarkIcon,
-  EyeSlashIcon
+  EyeSlashIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import { TemplatePreview } from '@/components/ui/template-preview'
+import { Sparkles } from 'lucide-react'
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 type UserSubscription = Database['public']['Tables']['user_subscriptions']['Row']
@@ -174,6 +176,86 @@ export default function DashboardPage() {
     try {
       const slug = newPortfolioName.toLowerCase().replace(/[^a-z0-9]/g, '-')
       
+      // Get template data if selected
+      let templateData = null;
+      if (selectedTemplate) {
+        const { data: template } = await supabase
+          .from('portfolio_templates')
+          .select('*')
+          .eq('id', selectedTemplate)
+          .single();
+        templateData = template;
+      }
+
+      // Prepare default sections config based on template
+      let defaultSectionsConfig = {};
+      let defaultThemeName = 'Midnight Dusk';
+      let defaultContent = {};
+
+      if (templateData) {
+        // Apply template-specific settings
+        if (templateData.name === 'Music Maestro') {
+          defaultThemeName = 'Music Maestro';
+          defaultSectionsConfig = {
+            hero: { enabled: true, name: 'Welcome', order: 1 },
+            about: { enabled: true, name: 'About My Music', order: 2 },
+            tracks: { enabled: true, name: 'My Music', order: 3 },
+            gallery: { enabled: true, name: 'Gallery', order: 4 },
+            skills: { enabled: true, name: 'Instruments & Skills', order: 5 },
+            hobbies: { enabled: true, name: 'Musical Interests', order: 6 },
+            contact: { enabled: true, name: 'Get In Touch', order: 7 },
+            footer: { enabled: true, name: 'Footer', order: 8 }
+          };
+          defaultContent = {
+            hero_title: 'Welcome to My Musical Journey',
+            hero_subtitle: 'Composer • Performer • Music Producer',
+            about_title: 'About My Music',
+            about_text: 'I am a passionate musician dedicated to creating beautiful melodies that touch the soul. With years of experience in composition and performance, I blend classical techniques with modern innovation to create unique musical experiences.',
+            hobbies_title: 'Musical Interests',
+            hobbies_json: [
+              { name: 'Piano', icon: '🎹' },
+              { name: 'Guitar', icon: '🎸' },
+              { name: 'Violin', icon: '🎻' },
+              { name: 'Drums', icon: '🥁' },
+              { name: 'Composing', icon: '🎵' },
+              { name: 'Music Production', icon: '🎧' },
+              { name: 'Singing', icon: '🎤' }
+            ],
+            skills_title: 'Instruments & Skills',
+            skills_json: [
+              { name: 'Piano', color: '#4F46E5' },
+              { name: 'Guitar', color: '#7C3AED' },
+              { name: 'Vocals', color: '#F59E0B' },
+              { name: 'Music Production', color: '#10B981' },
+              { name: 'Composition', color: '#EF4444' }
+            ],
+            contact_title: 'Let\'s Make Music Together',
+            contact_description: 'Ready to collaborate on your next musical project? I\'m always excited to work with fellow musicians and creators.',
+            footer_about_summary: 'Dedicated to creating beautiful music that inspires and connects people across the world.'
+          };
+        } else {
+          // Default sections for other templates
+          defaultSectionsConfig = {
+            hero: { enabled: true, name: 'Hero', order: 1 },
+            about: { enabled: true, name: 'About', order: 2 },
+            tracks: { enabled: true, name: 'Tracks', order: 3 },
+            gallery: { enabled: true, name: 'Gallery', order: 4 },
+            contact: { enabled: true, name: 'Contact', order: 5 },
+            footer: { enabled: true, name: 'Footer', order: 6 }
+          };
+        }
+      } else {
+        // Default sections if no template selected
+        defaultSectionsConfig = {
+          hero: { enabled: true, name: 'Hero', order: 1 },
+          about: { enabled: true, name: 'About', order: 2 },
+          tracks: { enabled: true, name: 'Tracks', order: 3 },
+          gallery: { enabled: true, name: 'Gallery', order: 4 },
+          contact: { enabled: true, name: 'Contact', order: 5 },
+          footer: { enabled: true, name: 'Footer', order: 6 }
+        };
+      }
+      
       const { data, error } = await supabase
         .from('user_portfolios')
         .insert({
@@ -181,6 +263,9 @@ export default function DashboardPage() {
           name: newPortfolioName,
           slug: slug,
           template_id: selectedTemplate || null,
+          theme_name: defaultThemeName,
+          sections_config: defaultSectionsConfig,
+          ...defaultContent,
           is_published: true, // Make portfolios published by default
           is_default: portfolios.length === 0 // First portfolio is default
         })
@@ -467,18 +552,57 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Template</label>
-                      <select
-                        value={selectedTemplate}
-                        onChange={(e) => setSelectedTemplate(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      >
-                        <option value="">Choose a template</option>
+                      
+                      {/* Template Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                         {templates.map((template) => (
-                          <option key={template.id} value={template.id}>
-                            {template.name}
-                          </option>
+                          <TemplatePreview
+                            key={template.id}
+                            template={{
+                              ...template,
+                              description: template.description || 'No description available'
+                            }}
+                            isSelected={selectedTemplate === template.id}
+                            onSelect={setSelectedTemplate}
+                          />
                         ))}
-                      </select>
+                      </div>
+                      
+                      {/* No template option */}
+                      <div
+                        className={`p-3 rounded-lg border-2 transition-all duration-300 cursor-pointer ${
+                          !selectedTemplate
+                            ? 'border-purple-500 bg-purple-500/10'
+                            : 'border-white/10 bg-white/5 hover:border-white/20'
+                        }`}
+                        onClick={() => setSelectedTemplate('')}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 rounded-lg bg-gray-700 flex items-center justify-center">
+                            <Sparkles className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-white text-sm">Start from Scratch</h3>
+                            <p className="text-gray-400 text-xs">Create a custom portfolio with basic sections</p>
+                          </div>
+                          {!selectedTemplate && (
+                            <div className="ml-auto w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {selectedTemplate && (
+                        <div className="mt-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                          <p className="text-sm text-purple-300">
+                            {templates.find(t => t.id === selectedTemplate)?.description}
+                          </p>
+                          <p className="text-xs text-purple-400 mt-1">
+                            This template will set up your portfolio with industry-specific sections and styling.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex space-x-2 mt-4">

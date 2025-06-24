@@ -285,8 +285,7 @@ const PortfolioEditorPage = () => {
     console.log('📄 Portfolio user_id:', portfolio.user_id);
     console.log('🔐 User matches portfolio owner:', user?.id === portfolio.user_id);
 
-    const validPortfolioKeys: (keyof Portfolio)[] = [
-      'name', 'slug', 'template_id', 'is_published', 'is_default', 'hero_image_url',
+    const validPortfolioKeys = [
       'hero_title', 'hero_subtitle', 'hero_cta_text', 'hero_cta_link',
       'about_title', 'about_text', 'profile_photo_url', 'instagram_url', 'twitter_url',
       'youtube_url', 'linkedin_url', 'website_url', 'github_url',

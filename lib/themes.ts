@@ -14,6 +14,19 @@ export interface PortfolioTheme {
 
 export const THEMES = [
   {
+    name: 'Music Maestro',
+    colors: {
+      background: 'bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900',
+      text: 'text-purple-100',
+      primary: 'text-purple-400',
+      primaryStrong: 'text-purple-300',
+      card: 'bg-purple-900/50 backdrop-blur-sm border border-purple-800/50',
+      cardText: 'text-purple-200',
+      heading: 'text-white',
+      accent: 'text-amber-400'
+    }
+  },
+  {
     name: 'Midnight Dusk',
     colors: {
       background: 'bg-gray-900',

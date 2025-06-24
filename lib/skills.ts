@@ -10,6 +10,7 @@ import {
   SiKotlin, SiGo, SiCplusplus, SiDotnet, SiSpring, SiQt, SiUnrealengine, SiUnity, SiRuby, SiSharp
 } from 'react-icons/si';
 import { VscTerminalCmd } from 'react-icons/vsc';
+import { Music, Piano, Guitar, Mic, Headphones, Disc, Music2, Volume2, Radio, Speaker, Zap, Palette, Camera, Code, GraduationCap, Brush, Briefcase, Sparkles } from 'lucide-react';
 
 export const SKILLS_LIST = [
   // Frontend
@@ -89,5 +90,28 @@ export const SKILLS_LIST = [
   // OS
   { name: 'Linux', icon: FaLinux, color: '#FCC624' },
   { name: 'macOS', icon: FaApple, color: '#000000' },
-  { name: 'Windows', icon: FaMicrosoft, color: '#0078D4' }
+  { name: 'Windows', icon: FaMicrosoft, color: '#0078D4' },
+
+  // Music-specific skills
+  { name: 'Piano', icon: Piano, color: '#4F46E5' },
+  { name: 'Guitar', icon: Guitar, color: '#7C3AED' },
+  { name: 'Vocals', icon: Mic, color: '#F59E0B' },
+  { name: 'Music Production', icon: Headphones, color: '#10B981' },
+  { name: 'Composition', icon: Music, color: '#EF4444' },
+  { name: 'Sound Design', icon: Volume2, color: '#8B5CF6' },
+  { name: 'DJing', icon: Disc, color: '#06B6D4' },
+  { name: 'Music Theory', icon: Music2, color: '#84CC16' },
+  { name: 'Arrangement', icon: Radio, color: '#F97316' },
+  { name: 'Live Performance', icon: Speaker, color: '#EC4899' },
+  { name: 'Studio Recording', icon: Zap, color: '#6366F1' },
+  { name: 'Audio Engineering', icon: Volume2, color: '#14B8A6' },
+  
+  // General skills
+  { name: 'Design', icon: Palette, color: '#EF4444' },
+  { name: 'Photography', icon: Camera, color: '#10B981' },
+  { name: 'Programming', icon: Code, color: '#3B82F6' },
+  { name: 'Teaching', icon: GraduationCap, color: '#8B5CF6' },
+  { name: 'Art', icon: Brush, color: '#F59E0B' },
+  { name: 'Business', icon: Briefcase, color: '#6B7280' },
+  { name: 'Creativity', icon: Sparkles, color: '#EC4899' }
 ]; 
