@@ -479,6 +479,16 @@ export default async function PortfolioPage({ params }: PageProps) {
     );
   };
 
+  // After fetching portfolio:
+  console.log('✅ Portfolio found:', portfolio.name);
+  console.log('📊 Portfolio data:', portfolio);
+
+  // After fetching tracks:
+  console.log('Tracks data:', tracksData, 'Error:', tracksError);
+
+  // After fetching gallery items:
+  console.log('Gallery items:', galleryItemsData, 'Error:', galleryError);
+
   return (
     <div className={`min-h-screen ${theme.colors.background}`}>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

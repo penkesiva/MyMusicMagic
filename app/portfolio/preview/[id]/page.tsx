@@ -43,18 +43,7 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
   }
 
   console.log('✅ Portfolio found:', portfolio.name);
-  console.log('📊 Portfolio data:', {
-    id: portfolio.id,
-    name: portfolio.name,
-    artist_name: portfolio.artist_name,
-    hero_title: portfolio.hero_title,
-    hero_subtitle: portfolio.hero_subtitle,
-    about_text: portfolio.about_text?.substring(0, 50) + '...', // Show first 50 chars
-    hobbies_title: portfolio.hobbies_title,
-    hobbies_json: portfolio.hobbies_json,
-    sections_config: portfolio.sections_config,
-    updated_at: portfolio.updated_at
-  });
+  console.log('📊 Portfolio data:', portfolio);
 
   // Get user profile for the portfolio
   const { data: userProfile, error: userError } = await supabase
@@ -81,6 +70,9 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
 
   const tracks = tracksData || [];
   const galleryItems = galleryItemsData || [];
+
+  console.log('Tracks data:', tracksData, 'Error:', tracksError);
+  console.log('Gallery items:', galleryItemsData, 'Error:', galleryError);
 
   let sortedSections: string[] = [];
   if (portfolio.sections_config) {
