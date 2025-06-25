@@ -5,12 +5,41 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 // A helper function to construct the detailed prompt for the AI
-function getPrompt(prompt: string) {
+function getPrompt(prompt: string, templateName?: string) {
+  let templateSpecificInstructions = "";
+  
+  if (templateName === 'Photo Gallery') {
+    templateSpecificInstructions = `
+    Template: Photo Gallery - This is a photography-focused portfolio template.
+    
+    Photography-specific guidelines:
+    - Focus on photography skills, techniques, and styles
+    - Include photography-related hobbies and interests
+    - Emphasize visual storytelling and creative vision
+    - Use photography terminology and concepts
+    - Include both technical and artistic aspects of photography
+    - Consider different photography genres (portrait, landscape, street, wedding, etc.)
+    `;
+  } else if (templateName === 'Music Maestro') {
+    templateSpecificInstructions = `
+    Template: Music Maestro - This is a music-focused portfolio template.
+    
+    Music-specific guidelines:
+    - Focus on musical skills, instruments, and genres
+    - Include music-related hobbies and interests
+    - Emphasize musical creativity and performance
+    - Use music terminology and concepts
+    - Include both performance and production aspects
+    - Consider different musical styles and instruments
+    `;
+  }
+
   return `
     You are a creative assistant that generates content for a personal portfolio website. 
     Based on the user's prompt, generate a JSON object that can be used to populate the portfolio.
 
     User Prompt: "${prompt}"
+    ${templateSpecificInstructions}
 
     Generate a JSON object with the following structure. Do NOT include any markdown or explanatory text around the JSON object.
 
@@ -102,7 +131,9 @@ export async function POST(request: Request) {
         Return only the summary text, no JSON or additional formatting.
       `;
     } else {
-      fullPrompt = getPrompt(prompt);
+      // Get template name from current portfolio if available
+      const templateName = currentPortfolio?.theme_name || null;
+      fullPrompt = getPrompt(prompt, templateName);
     }
     
     const result = await model.generateContent(fullPrompt);

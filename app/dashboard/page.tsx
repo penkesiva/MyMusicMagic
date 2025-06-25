@@ -233,6 +233,46 @@ export default function DashboardPage() {
             contact_description: 'Ready to collaborate on your next musical project? I\'m always excited to work with fellow musicians and creators.',
             footer_about_summary: 'Dedicated to creating beautiful music that inspires and connects people across the world.'
           };
+        } else if (templateData.name === 'Photo Gallery') {
+          defaultThemeName = 'Photo Gallery';
+          defaultSectionsConfig = {
+            hero: { enabled: true, name: 'Welcome', order: 1 },
+            about: { enabled: true, name: 'About My Photography', order: 2 },
+            gallery: { enabled: true, name: 'Portfolio', order: 3 },
+            skills: { enabled: true, name: 'Photography Skills', order: 4 },
+            hobbies: { enabled: true, name: 'Photography Interests', order: 5 },
+            contact: { enabled: true, name: 'Get In Touch', order: 6 },
+            footer: { enabled: true, name: 'Footer', order: 7 }
+          };
+          defaultContent = {
+            hero_title: 'Capturing Life Through the Lens',
+            hero_subtitle: 'Professional Photographer • Visual Storyteller • Creative Artist',
+            about_title: 'About My Photography',
+            about_text: 'I am a passionate photographer who believes that every moment tells a story. Through my lens, I capture the beauty of life, from intimate portraits to breathtaking landscapes. With years of experience in both digital and film photography, I blend technical expertise with artistic vision to create images that resonate with emotion and authenticity.',
+            hobbies_title: 'Photography Interests',
+            hobbies_json: [
+              { name: 'Portrait Photography', icon: '📸' },
+              { name: 'Landscape Photography', icon: '🏔️' },
+              { name: 'Street Photography', icon: '🏙️' },
+              { name: 'Wedding Photography', icon: '💒' },
+              { name: 'Nature Photography', icon: '🌿' },
+              { name: 'Architecture Photography', icon: '🏛️' },
+              { name: 'Travel Photography', icon: '✈️' }
+            ],
+            skills_title: 'Photography Skills',
+            skills_json: [
+              { name: 'Portrait Photography', color: '#DC2626' },
+              { name: 'Landscape Photography', color: '#059669' },
+              { name: 'Street Photography', color: '#7C3AED' },
+              { name: 'Wedding Photography', color: '#F59E0B' },
+              { name: 'Photo Editing', color: '#EF4444' },
+              { name: 'Lighting Techniques', color: '#10B981' },
+              { name: 'Composition', color: '#8B5CF6' }
+            ],
+            contact_title: 'Let\'s Create Something Beautiful',
+            contact_description: 'Ready to bring your vision to life? I\'m always excited to collaborate on new photography projects and capture those special moments that matter most.',
+            footer_about_summary: 'Dedicated to capturing life\'s beautiful moments and creating visual stories that inspire and connect people across the world.'
+          };
         } else {
           // Default sections for other templates
           defaultSectionsConfig = {

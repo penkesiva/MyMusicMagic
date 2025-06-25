@@ -27,6 +27,19 @@ export const THEMES = [
     }
   },
   {
+    name: 'Photo Gallery',
+    colors: {
+      background: 'bg-gradient-to-br from-red-950 via-red-900 to-red-800',
+      text: 'text-red-100',
+      primary: 'text-red-400',
+      primaryStrong: 'text-red-300',
+      card: 'bg-red-900/50 backdrop-blur-sm border border-red-800/50',
+      cardText: 'text-red-200',
+      heading: 'text-white',
+      accent: 'text-amber-400'
+    }
+  },
+  {
     name: 'Midnight Dusk',
     colors: {
       background: 'bg-gray-900',
