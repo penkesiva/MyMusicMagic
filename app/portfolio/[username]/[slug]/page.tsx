@@ -1,3 +1,4 @@
+"use client";
 import { supabase } from '@/lib/supabase/client';
 import { Database } from '@/types/database';
 import Image from 'next/image';
@@ -245,31 +246,37 @@ export default async function PortfolioPage({ params }: PageProps) {
   };
 
   const renderGallery = (portfolio: Portfolio, galleryItems: GalleryItem[]) => {
-    if (galleryItems.length === 0) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.gallery?.name || SECTIONS_CONFIG['gallery'].defaultName;
     
     return (
       <section id="gallery" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {galleryItems.map((item) => (
-              <div key={item.id} className="group relative aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                <Image
-                  src={item.image_url || '/default-track-thumbnail.jpg'}
-                  alt={item.title || 'Gallery image'}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                {item.title && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <p className="text-white text-center font-semibold text-sm">{item.title}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {galleryItems.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {galleryItems.map((item) => (
+                <div key={item.id} className="group relative aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                  <Image
+                    src={item.image_url || '/default-track-thumbnail.jpg'}
+                    alt={item.title || 'Gallery image'}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {item.title && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <p className="text-white text-center font-semibold text-sm">{item.title}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400">
+              <ImageIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">No gallery items yet.</p>
+              <p className="text-sm mt-2">Add photos and videos to showcase your work.</p>
+            </div>
+          )}
         </div>
       </section>
     );
@@ -302,17 +309,24 @@ export default async function PortfolioPage({ params }: PageProps) {
   };
 
   const renderResume = (portfolio: Portfolio) => {
-    if (!portfolio.resume_url) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.resume?.name || SECTIONS_CONFIG['resume'].defaultName;
     
     return (
       <section id="resume" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto text-center">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <a href={portfolio.resume_url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 ${colors.primary} hover:scale-105`}>
-            Download My Resume
-          </a>
+          {portfolio.resume_url ? (
+            <a href={portfolio.resume_url} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 ${colors.primary} hover:scale-105`}>
+              <FileText className="w-6 h-6 mr-2" />
+              Download My Resume
+            </a>
+          ) : (
+            <div className="text-center text-gray-400">
+              <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">No resume uploaded yet.</p>
+              <p className="text-sm mt-2">Upload your resume to share your professional experience.</p>
+            </div>
+          )}
         </div>
       </section>
     );

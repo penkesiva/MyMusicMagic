@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, ArrowRight
+  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -699,7 +699,7 @@ const PortfolioEditorPage = () => {
             <Sparkles className="h-5 w-5 text-purple-400" />
             <h3 className="font-semibold text-sm text-white">AI Assistant</h3>
           </div>
-          <div className="mb-2">
+          <div className="flex items-center gap-2 mb-2">
             <Textarea
               value={aiPrompt}
               onChange={e => setAiPrompt(e.target.value)}
@@ -708,19 +708,29 @@ const PortfolioEditorPage = () => {
               style={{ fontSize: 13, minHeight: 28, height: 60, lineHeight: 1.3 }}
               rows={3}
             />
-            <div className="flex justify-end mt-1">
-              <Button
-                onClick={handleGenerate}
-                size="icon"
-                variant="ghost"
-                className="p-0 h-6 w-6 text-white hover:bg-white/10 rounded flex items-center justify-center"
-                title="Generate with AI"
-                disabled={isGenerating || !aiPrompt}
-                style={{ margin: 0 }}
-              >
-                <ArrowRight size={16} />
-              </Button>
-            </div>
+            <Button
+              onClick={handleGenerate}
+              size="icon"
+              variant="ghost"
+              className="p-1 h-8 w-8 text-white hover:bg-white/10"
+              title="Generate with AI"
+              disabled={isGenerating || !aiPrompt}
+            >
+              <Sparkles size={22} />
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 mb-2">
+            <span
+              onClick={handleReset}
+              className="text-xs text-blue-400 underline cursor-pointer hover:text-blue-300"
+              style={{ padding: 0, background: 'none', border: 'none' }}
+              tabIndex={0}
+              role="button"
+            >
+              Reset
+            </span>
+            {savingStatus === 'saving' && <span className="text-xs text-gray-400 ml-2">Saving...</span>}
+            {savingStatus === 'saved' && <span className="text-xs text-green-400 ml-2">Saved</span>}
           </div>
         </div>
 
@@ -735,26 +745,16 @@ const PortfolioEditorPage = () => {
                 <button
                   key={theme.name}
                   onClick={() => handleFieldChange("theme_name", theme.name)}
-                  className={`rounded-full flex items-center justify-center transition-all focus:outline-none`}
+                  className={`rounded-full transition-all focus:outline-none`}
                   style={{
                     width: 22,
                     height: 22,
+                    background: theme.colors.primary,
                     border: selectedTheme.name === theme.name ? '2px solid #fff' : '1px solid #444',
                     margin: 1,
-                    background: 'transparent',
-                    padding: 0
                   }}
                   aria-label={theme.name}
-                >
-                  <div
-                    style={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: '50%',
-                      background: theme.colors.primary
-                    }}
-                  />
-                </button>
+                />
               ))}
             </div>
           )}
@@ -886,7 +886,7 @@ const PortfolioEditorPage = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                               {/* Left Column: Title & Subtitle */}
                               <div className="space-y-4">
-                                <div className="mb-2">
+                                <div className="mb-2" style={{ fontSize: 22, fontWeight: 700, borderBottom: '1.5px solid #7c3aed', padding: '4px 0', marginBottom: 4, color: '#fff', background: 'transparent' }}>
                                   <EditableField
                                     value={portfolio?.name || ''}
                                     onSave={val => handleFieldChange('name', val)}
