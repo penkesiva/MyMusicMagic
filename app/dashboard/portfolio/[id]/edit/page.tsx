@@ -330,7 +330,7 @@ const PortfolioEditorPage = () => {
     console.log('🔐 User matches portfolio owner:', user?.id === portfolio.user_id);
 
     const validPortfolioKeys = [
-      'hero_title', 'hero_subtitle', 'hero_cta_text', 'hero_cta_link',
+      'hero_title', 'hero_subtitle', 'hero_cta_buttons',
       'about_title', 'about_text', 'profile_photo_url', 'instagram_url', 'twitter_url',
       'youtube_url', 'linkedin_url', 'website_url', 'github_url',
       'hobbies_title', 'hobbies_json', 'skills_title', 'skills_json',
@@ -886,12 +886,16 @@ const PortfolioEditorPage = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                               {/* Left Column: Title & Subtitle */}
                               <div className="space-y-4">
-                                <div className="mb-2" style={{ fontSize: 22, fontWeight: 700, borderBottom: '1.5px solid #7c3aed', padding: '4px 0', marginBottom: 4, color: '#fff', background: 'transparent' }}>
-                                  <EditableField
-                                    value={portfolio?.name || ''}
-                                    onSave={val => handleFieldChange('name', val)}
-                                    fieldType="input"
-                                    theme={selectedTheme}
+                                <div>
+                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                    Hero Title
+                                  </label>
+                                  <Input
+                                    type="text"
+                                    value={portfolio.hero_title || ''}
+                                    onChange={(e) => handleFieldChange('hero_title', e.target.value)}
+                                    placeholder="Your main title"
+                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                   />
                                 </div>
                                 <div>
@@ -953,6 +957,115 @@ const PortfolioEditorPage = () => {
                                     {uploadingHero ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                   </Button>
                                 </div>
+                              </div>
+                            </div>
+
+                            {/* CTA Buttons Section */}
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                  Call-to-Action Buttons
+                                </label>
+                                <Button
+                                  onClick={() => {
+                                    const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                    buttons.push({ text: '', link: '', style: 'primary', order: buttons.length + 1 });
+                                    handleFieldChange('hero_cta_buttons', buttons);
+                                  }}
+                                  variant="outline" size="sm"
+                                  className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                                >
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Add Button
+                                </Button>
+                              </div>
+                              
+                              <div className="space-y-3">
+                                {safeGetArray(portfolio.hero_cta_buttons).map((button: any, index: number) => (
+                                  <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
+                                    <Input
+                                      type="text"
+                                      value={button.text || ''}
+                                      onChange={(e) => {
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        buttons[index] = { ...button, text: e.target.value };
+                                        handleFieldChange('hero_cta_buttons', buttons);
+                                      }}
+                                      placeholder="Button text"
+                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                    <Input
+                                      type="url"
+                                      value={button.link || ''}
+                                      onChange={(e) => {
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        buttons[index] = { ...button, link: e.target.value };
+                                        handleFieldChange('hero_cta_buttons', buttons);
+                                      }}
+                                      placeholder="Button URL"
+                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                    <select
+                                      value={button.style || 'primary'}
+                                      onChange={(e) => {
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        buttons[index] = { ...button, style: e.target.value };
+                                        handleFieldChange('hero_cta_buttons', buttons);
+                                      }}
+                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 rounded-md`}
+                                    >
+                                      <option value="primary">Primary</option>
+                                      <option value="secondary">Secondary</option>
+                                      <option value="outline">Outline</option>
+                                    </select>
+                                    <div className="flex gap-1">
+                                      <Button
+                                        onClick={() => {
+                                          const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                          if (index > 0) {
+                                            [buttons[index], buttons[index - 1]] = [buttons[index - 1], buttons[index]];
+                                            handleFieldChange('hero_cta_buttons', buttons);
+                                          }
+                                        }}
+                                        variant="outline" size="sm" disabled={index === 0}
+                                        className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
+                                      >
+                                        ↑
+                                      </Button>
+                                      <Button
+                                        onClick={() => {
+                                          const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                          if (index < buttons.length - 1) {
+                                            [buttons[index], buttons[index + 1]] = [buttons[index + 1], buttons[index]];
+                                            handleFieldChange('hero_cta_buttons', buttons);
+                                          }
+                                        }}
+                                        variant="outline" size="sm" disabled={index === safeGetArray(portfolio.hero_cta_buttons).length - 1}
+                                        className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
+                                      >
+                                        ↓
+                                      </Button>
+                                      <Button
+                                        onClick={() => {
+                                          const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                          buttons.splice(index, 1);
+                                          handleFieldChange('hero_cta_buttons', buttons);
+                                        }}
+                                        variant="outline" size="sm"
+                                        className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))}
+                                {safeGetArray(portfolio.hero_cta_buttons).length === 0 && (
+                                  <div className="text-center p-4 border-2 border-dashed border-white/20 rounded-lg">
+                                    <p className={`text-sm ${selectedTheme.colors.text} opacity-70`}>
+                                      No CTA buttons added yet. Click "Add Button" to get started.
+                                    </p>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>

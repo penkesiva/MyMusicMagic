@@ -19,8 +19,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         fields: {
             hero_title: 'text',
             hero_subtitle: 'text',
-            hero_cta_text: 'text',
-            hero_cta_link: 'url',
+            hero_cta_buttons: 'json',
             hero_image_url: 'url'
         }
     },

@@ -605,26 +605,45 @@ export default function PortfolioPage({ params }: PageProps) {
                      {portfolio.hero_image_url && (
                        <Image
                          src={portfolio.hero_image_url}
-                         alt={portfolio.artist_name || 'Hero image'}
+                         alt={portfolio.hero_title || 'Hero image'}
                          fill
                          className="object-cover brightness-50"
                        />
                      )}
                      <div className="relative z-10 text-white max-w-3xl">
-                       <h1 className="text-5xl md:text-7xl font-extrabold mb-4" style={{ color: theme.colors.heading }}>
-                         {portfolio.artist_name || 'Artist Name'}
-                       </h1>
-                       <p className="text-xl md:text-2xl mb-8 opacity-90" style={{ color: theme.colors.text }}>
-                         {portfolio.hero_title || 'Welcome to my portfolio'}
-                       </p>
-                       {portfolio.hero_cta_text && portfolio.hero_cta_link && (
-                         <a
-                           href={portfolio.hero_cta_link}
-                           className="inline-block px-8 py-3 bg-white text-black font-bold rounded-full text-lg hover:bg-opacity-90 transition-all duration-300"
-                           style={{ backgroundColor: theme.colors.primary, color: theme.colors.background }}
-                         >
-                           {portfolio.hero_cta_text}
-                         </a>
+                       {portfolio.hero_title && (
+                         <h1 className="text-5xl md:text-7xl font-extrabold mb-4" style={{ color: theme.colors.heading }}>
+                           {portfolio.hero_title}
+                         </h1>
+                       )}
+                       {portfolio.hero_subtitle && (
+                         <p className="text-xl md:text-2xl mb-8 opacity-90" style={{ color: theme.colors.text }}>
+                           {portfolio.hero_subtitle}
+                         </p>
+                       )}
+                       {safeGetArray(portfolio.hero_cta_buttons).length > 0 && (
+                         <div className="flex flex-wrap justify-center gap-4">
+                           {safeGetArray(portfolio.hero_cta_buttons)
+                             .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+                             .map((button: any, index: number) => (
+                               <a
+                                 key={index}
+                                 href={button.link}
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                                 className={`inline-block px-8 py-3 font-bold rounded-full text-lg transition-all duration-300 hover:scale-105 ${
+                                   button.style === 'secondary' 
+                                     ? 'bg-transparent border-2 border-white text-white hover:bg-white hover:text-black'
+                                     : button.style === 'outline'
+                                     ? 'bg-transparent border-2 border-white text-white hover:bg-white hover:text-black'
+                                     : 'bg-white text-black hover:bg-opacity-90'
+                                 }`}
+                                 style={button.style !== 'secondary' && button.style !== 'outline' ? { backgroundColor: theme.colors.primary, color: theme.colors.background } : {}}
+                               >
+                                 {button.text}
+                               </a>
+                             ))}
+                         </div>
                        )}
                      </div>
                    </div>

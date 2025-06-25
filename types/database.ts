@@ -241,6 +241,11 @@ export interface Database {
           updated_at: string
           subtitle: string | null
           hero_image_url: string | null
+          hero_title: string | null
+          hero_subtitle: string | null
+          hero_cta_text: string | null
+          hero_cta_link: string | null
+          hero_cta_buttons: Json | null
           about_title: string | null
           about_text: string | null
           profile_photo_url: string | null
@@ -286,6 +291,11 @@ export interface Database {
           updated_at?: string
           subtitle?: string | null
           hero_image_url?: string | null
+          hero_title?: string | null
+          hero_subtitle?: string | null
+          hero_cta_text?: string | null
+          hero_cta_link?: string | null
+          hero_cta_buttons?: Json | null
           about_title?: string | null
           about_text?: string | null
           profile_photo_url?: string | null
@@ -331,6 +341,11 @@ export interface Database {
           updated_at?: string
           subtitle?: string | null
           hero_image_url?: string | null
+          hero_title?: string | null
+          hero_subtitle?: string | null
+          hero_cta_text?: string | null
+          hero_cta_link?: string | null
+          hero_cta_buttons?: Json | null
           about_title?: string | null
           about_text?: string | null
           profile_photo_url?: string | null

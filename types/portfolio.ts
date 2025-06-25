@@ -21,8 +21,7 @@ export type Portfolio = {
   // Hero Section
   hero_title: string | null;
   hero_subtitle: string | null;
-  hero_cta_text: string | null;
-  hero_cta_link: string | null;
+  hero_cta_buttons: any; // JSON array of CTA buttons
   
   // About Section
   about_title: string | null;
