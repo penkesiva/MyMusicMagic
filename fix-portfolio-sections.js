@@ -62,24 +62,21 @@ async function fixPortfolioSections() {
         title: 'Studio Session',
         description: 'Recording in the studio',
         image_url: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?w=800&h=600&fit=crop',
-        type: 'photo',
-        order: 1
+        media_type: 'image'
       },
       {
         portfolio_id: portfolio.id,
         title: 'Live Performance',
         description: 'On stage performing live',
         image_url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop',
-        type: 'photo',
-        order: 2
+        media_type: 'image'
       },
       {
         portfolio_id: portfolio.id,
         title: 'Music Production',
         description: 'Working on new tracks',
         image_url: 'https://images.unsplash.com/photo-1598387993448-9440c6d3227c?w=800&h=600&fit=crop',
-        type: 'photo',
-        order: 3
+        media_type: 'image'
       }
     ];
     

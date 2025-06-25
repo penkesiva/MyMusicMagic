@@ -67,7 +67,7 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
     .from('gallery')
     .select('*')
     .eq('portfolio_id', portfolio.id)
-    .order('order', { ascending: true });
+    .order('created_at', { ascending: true });
 
   const tracks = tracksData || [];
   const galleryItems = galleryItemsData || [];

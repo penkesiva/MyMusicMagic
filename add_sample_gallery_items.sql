@@ -10,16 +10,14 @@ INSERT INTO gallery (
   title,
   description,
   image_url,
-  type,
-  order
+  media_type
 )
 SELECT 
   portfolio_info.id,
   'Studio Session',
   'Recording in the studio',
   'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?w=800&h=600&fit=crop',
-  'photo',
-  1
+  'image'
 FROM portfolio_info
 UNION ALL
 SELECT 
@@ -27,8 +25,7 @@ SELECT
   'Live Performance',
   'On stage performing live',
   'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop',
-  'photo',
-  2
+  'image'
 FROM portfolio_info
 UNION ALL
 SELECT 
@@ -36,8 +33,7 @@ SELECT
   'Music Production',
   'Working on new tracks',
   'https://images.unsplash.com/photo-1598387993448-9440c6d3227c?w=800&h=600&fit=crop',
-  'photo',
-  3
+  'image'
 FROM portfolio_info;
 
 -- Verify the gallery items were added
@@ -46,10 +42,10 @@ SELECT
   g.title,
   g.description,
   g.image_url,
-  g.type,
-  g.order,
+  g.media_type,
+  g.created_at,
   p.name as portfolio_name
 FROM gallery g
 JOIN user_portfolios p ON g.portfolio_id = p.id
 WHERE p.slug = 'mm1'
-ORDER BY g.order; 
+ORDER BY g.created_at; 
