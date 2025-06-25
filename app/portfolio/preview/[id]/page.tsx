@@ -15,6 +15,8 @@ import {
 } from 'react-icons/fa'
 import { TrackCard } from '@/app/components/tracks/TrackCard';
 import { SECTIONS_CONFIG } from '@/lib/sections';
+import { useState, useEffect } from 'react';
+import AudioPlayer from '@/app/components/AudioPlayer';
 
 // Force dynamic rendering to prevent caching
 export const dynamic = 'force-dynamic';
@@ -27,53 +29,118 @@ type PageProps = {
 type Track = Database['public']['Tables']['tracks']['Row'];
 type GalleryItem = Database['public']['Tables']['gallery']['Row'];
 
-export default async function PortfolioPreviewPage({ params }: PageProps) {
+export default function PortfolioPreviewPage({ params }: PageProps) {
   console.log('🎯 Preview route called with ID:', params.id);
   console.log('⏰ Timestamp:', new Date().toISOString());
   
-  // Get the portfolio by ID (allows unpublished portfolios for preview)
-  const { data: portfolio, error: portfolioError } = await supabase
-    .from('user_portfolios')
-    .select('*')
-    .eq('id', params.id)
-    .single();
+  // State for data fetching
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Audio player state
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(false);
 
-  if (portfolioError || !portfolio) {
-    console.error('❌ Portfolio not found:', portfolioError);
-    notFound();
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // Get the portfolio by ID (allows unpublished portfolios for preview)
+        const { data: portfolioData, error: portfolioError } = await supabase
+          .from('user_portfolios')
+          .select('*')
+          .eq('id', params.id)
+          .single();
+
+        if (portfolioError || !portfolioData) {
+          console.error('❌ Portfolio not found:', portfolioError);
+          setError('Portfolio not found');
+          return;
+        }
+
+        console.log('✅ Portfolio found:', portfolioData.name);
+        console.log('📊 Portfolio data:', portfolioData);
+        setPortfolio(portfolioData);
+
+        // Get user profile for the portfolio
+        const { data: userProfileData, error: userError } = await supabase
+          .from('user_profiles')
+          .select('id, username, full_name')
+          .eq('id', portfolioData.user_id)
+          .single();
+
+        if (userError || !userProfileData) {
+          setError('User profile not found');
+          return;
+        }
+
+        setUserProfile(userProfileData);
+
+        // Fetch tracks
+        const { data: tracksData, error: tracksError } = await supabase
+          .from('tracks')
+          .select('*')
+          .eq('portfolio_id', portfolioData.id)
+          .order('order', { ascending: true });
+
+        if (tracksError) {
+          console.error('Error fetching tracks:', tracksError);
+        } else {
+          setTracks(tracksData || []);
+        }
+
+        // Fetch gallery items
+        const { data: galleryItemsData, error: galleryError } = await supabase
+          .from('gallery')
+          .select('*')
+          .eq('portfolio_id', portfolioData.id)
+          .order('created_at', { ascending: true });
+
+        if (galleryError) {
+          console.error('Error fetching gallery items:', galleryError);
+        } else {
+          setGalleryItems(galleryItemsData || []);
+        }
+
+        console.log('Tracks data:', tracksData, 'Error:', tracksError);
+        console.log('Gallery items:', galleryItemsData, 'Error:', galleryError);
+
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load portfolio');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params.id]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading portfolio...</div>
+      </div>
+    );
   }
 
-  console.log('✅ Portfolio found:', portfolio.name);
-  console.log('📊 Portfolio data:', portfolio);
-
-  // Get user profile for the portfolio
-  const { data: userProfile, error: userError } = await supabase
-    .from('user_profiles')
-    .select('id, username, full_name')
-    .eq('id', portfolio.user_id)
-    .single();
-
-  if (userError || !userProfile) {
-    notFound();
+  // Show error state
+  if (error || !portfolio) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-xl">{error || 'Portfolio not found'}</div>
+      </div>
+    );
   }
-
-  const { data: tracksData, error: tracksError } = await supabase
-    .from('tracks')
-    .select('*')
-    .eq('portfolio_id', portfolio.id)
-    .order('order', { ascending: true });
-    
-  const { data: galleryItemsData, error: galleryError } = await supabase
-    .from('gallery')
-    .select('*')
-    .eq('portfolio_id', portfolio.id)
-    .order('created_at', { ascending: true });
-
-  const tracks = tracksData || [];
-  const galleryItems = galleryItemsData || [];
-
-  console.log('Tracks data:', tracksData, 'Error:', tracksError);
-  console.log('Gallery items:', galleryItemsData, 'Error:', galleryError);
 
   let sortedSections: string[] = [];
   if (portfolio.sections_config) {
@@ -145,7 +212,7 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
 
   const renderHobbies = (portfolio: Portfolio) => {
     const sectionTitle = (portfolio.sections_config as any)?.hobbies?.name || portfolio.hobbies_title || SECTIONS_CONFIG['hobbies'].defaultName;
-    const hobbies = portfolio.hobbies_json as any[] || [];
+    const hobbies = safeGetArray(portfolio.hobbies_json);
     return (
       <section id="hobbies" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
@@ -169,7 +236,7 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
 
   const renderSkills = (portfolio: Portfolio) => {
     const sectionTitle = (portfolio.sections_config as any)?.skills?.name || portfolio.skills_title || SECTIONS_CONFIG['skills'].defaultName;
-    const skills = portfolio.skills_json as any[] || [];
+    const skills = safeGetArray(portfolio.skills_json);
     return (
       <section id="skills" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
@@ -248,8 +315,10 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
                 <TrackCard 
                   key={track.id} 
                   track={track}
-                  onPlay={() => {}}
+                  theme={theme}
+                  onPlay={handlePlay}
                   onInfo={() => {}}
+                  isPlaying={currentTrack?.id === track.id && isPlaying}
                 />
               ))}
             </div>
@@ -498,6 +567,24 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
     );
   };
 
+  // Audio player handlers
+  const handlePlay = (track: Track) => {
+    if (currentTrack?.id === track.id) {
+      setIsPlaying(!isPlaying);
+      return;
+    }
+
+    setCurrentTrack(track);
+    setShowPlayer(true);
+    setIsPlaying(true);
+  };
+
+  const handleClose = () => {
+    setShowPlayer(false);
+    setIsPlaying(false);
+    setCurrentTrack(null);
+  };
+
   return (
     <div className={`min-h-screen ${theme.colors.background}`}>
       {/* Preview Banner */}
@@ -513,44 +600,44 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
             .map(key => (
               <section key={key} id={key} className="scroll-mt-20">
                 {key === 'hero' && (
-                  <div className="relative w-full min-h-[80vh] flex items-center justify-center text-center p-4 overflow-hidden">
-                    {portfolio.hero_image_url && (
-                      <Image
-                        src={portfolio.hero_image_url}
-                        alt={portfolio.artist_name || 'Hero image'}
-                        fill
-                        className="object-cover brightness-50"
-                      />
-                    )}
-                    <div className="relative z-10 text-white max-w-3xl">
-                      {portfolio.hero_title ? (
-                        <>
-                          <h1 className="text-5xl md:text-7xl font-extrabold mb-4" style={{ color: theme.colors.heading }}>
-                            {portfolio.hero_title}
-                          </h1>
-                          {portfolio.hero_subtitle && (
-                            <p className="text-xl md:text-2xl mb-8 opacity-90" style={{ color: theme.colors.text }}>
-                              {portfolio.hero_subtitle}
-                            </p>
-                          )}
-                        </>
-                      ) : (
-                        <h1 className="text-5xl md:text-7xl font-extrabold mb-4" style={{ color: theme.colors.heading }}>
-                          {portfolio.artist_name || 'Artist Name'}
-                        </h1>
-                      )}
-                      {portfolio.hero_cta_text && portfolio.hero_cta_link && (
-                        <a
-                          href={portfolio.hero_cta_link}
-                          className="inline-block px-8 py-3 bg-white text-black font-bold rounded-full text-lg hover:bg-opacity-90 transition-all duration-300"
-                          style={{ backgroundColor: theme.colors.primary, color: theme.colors.background }}
-                        >
-                          {portfolio.hero_cta_text}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
+                   <div className="relative w-full min-h-[80vh] flex items-center justify-center text-center p-4 overflow-hidden">
+                     {portfolio.hero_image_url && (
+                       <Image
+                         src={portfolio.hero_image_url}
+                         alt={portfolio.artist_name || 'Hero image'}
+                         fill
+                         className="object-cover brightness-50"
+                       />
+                     )}
+                     <div className="relative z-10 text-white max-w-3xl">
+                       {portfolio.hero_title ? (
+                         <>
+                           <h1 className="text-5xl md:text-7xl font-extrabold mb-4" style={{ color: theme.colors.heading }}>
+                             {portfolio.hero_title}
+                           </h1>
+                           {portfolio.hero_subtitle && (
+                             <p className="text-xl md:text-2xl mb-8 opacity-90" style={{ color: theme.colors.text }}>
+                               {portfolio.hero_subtitle}
+                             </p>
+                           )}
+                         </>
+                       ) : (
+                         <h1 className="text-5xl md:text-7xl font-extrabold mb-4" style={{ color: theme.colors.heading }}>
+                           {portfolio.artist_name || 'Artist Name'}
+                         </h1>
+                       )}
+                       {portfolio.hero_cta_text && portfolio.hero_cta_link && (
+                         <a
+                           href={portfolio.hero_cta_link}
+                           className="inline-block px-8 py-3 bg-white text-black font-bold rounded-full text-lg hover:bg-opacity-90 transition-all duration-300"
+                           style={{ backgroundColor: theme.colors.primary, color: theme.colors.background }}
+                         >
+                           {portfolio.hero_cta_text}
+                         </a>
+                       )}
+                     </div>
+                   </div>
+                 )}
                 {key === 'about' && renderAbout(portfolio)}
                 {key === 'tracks' && renderTracks(portfolio, tracks)}
                 {key === 'gallery' && renderGallery(portfolio, galleryItems)}
@@ -569,6 +656,29 @@ export default async function PortfolioPreviewPage({ params }: PageProps) {
           {(portfolio.sections_config?.footer?.enabled ?? true) && renderFooter(portfolio)}
         </div>
       </main>
+
+      {/* Audio Player */}
+      {showPlayer && currentTrack && (
+        <div className="fixed bottom-0 left-0 right-0 bg-transparent p-4 z-50">
+          <div className="relative">
+            <AudioPlayer
+              audioUrl={currentTrack.audio_url}
+              title={currentTrack.title}
+              onPlay={() => {
+                console.log('AudioPlayer: Play requested');
+                setIsPlaying(true);
+              }}
+              onPause={() => {
+                console.log('AudioPlayer: Pause requested');
+                setIsPlaying(false);
+              }}
+              onClose={handleClose}
+              isPlaying={isPlaying}
+              onTrackEnd={() => setIsPlaying(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
-} 
+}

@@ -15,6 +15,8 @@ import {
 } from 'react-icons/fa'
 import { TrackCard } from '@/app/components/tracks/TrackCard';
 import { SECTIONS_CONFIG } from '@/lib/sections';
+import { useState, useEffect } from 'react';
+import AudioPlayer from '@/app/components/AudioPlayer';
 
 type PageProps = {
   params: { username: string; slug: string };
@@ -23,45 +25,111 @@ type PageProps = {
 type Track = Database['public']['Tables']['tracks']['Row'];
 type GalleryItem = Database['public']['Tables']['gallery']['Row'];
 
-export default async function PortfolioPage({ params }: PageProps) {
-  // First, get the user profile by username
-  const { data: userProfile, error: userError } = await supabase
-    .from('user_profiles')
-    .select('id, username, full_name')
-    .eq('username', params.username)
-    .single();
+export default function PortfolioPage({ params }: PageProps) {
+  // State for data fetching
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Audio player state
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(false);
 
-  if (userError || !userProfile) {
-    notFound();
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // First, get the user profile by username
+        const { data: userProfileData, error: userError } = await supabase
+          .from('user_profiles')
+          .select('id, username, full_name')
+          .eq('username', params.username)
+          .single();
+
+        if (userError || !userProfileData) {
+          setError('User not found');
+          return;
+        }
+
+        setUserProfile(userProfileData);
+
+        // Then get the portfolio for that specific user
+        const { data: portfolioData, error: portfolioError } = await supabase
+          .from('user_portfolios')
+          .select('*')
+          .eq('user_id', userProfileData.id)
+          .eq('slug', params.slug)
+          .eq('is_published', true)
+          .single();
+
+        if (portfolioError || !portfolioData) {
+          setError('Portfolio not found');
+          return;
+        }
+
+        setPortfolio(portfolioData);
+
+        // Fetch tracks
+        const { data: tracksData, error: tracksError } = await supabase
+          .from('tracks')
+          .select('*')
+          .eq('portfolio_id', portfolioData.id)
+          .order('order', { ascending: true });
+
+        if (tracksError) {
+          console.error('Error fetching tracks:', tracksError);
+        } else {
+          setTracks(tracksData || []);
+        }
+
+        // Fetch gallery items
+        const { data: galleryItemsData, error: galleryError } = await supabase
+          .from('gallery')
+          .select('*')
+          .eq('portfolio_id', portfolioData.id)
+          .order('created_at', { ascending: true });
+
+        if (galleryError) {
+          console.error('Error fetching gallery items:', galleryError);
+        } else {
+          setGalleryItems(galleryItemsData || []);
+        }
+
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load portfolio');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params.username, params.slug]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading portfolio...</div>
+      </div>
+    );
   }
 
-  // Then get the portfolio for that specific user
-  const { data: portfolio, error: portfolioError } = await supabase
-    .from('user_portfolios')
-    .select('*')
-    .eq('user_id', userProfile.id)
-    .eq('slug', params.slug)
-    .eq('is_published', true)
-    .single();
-
-  if (portfolioError || !portfolio) {
-    notFound();
+  // Show error state
+  if (error || !portfolio) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-xl">{error || 'Portfolio not found'}</div>
+      </div>
+    );
   }
-
-  const { data: tracksData, error: tracksError } = await supabase
-    .from('tracks')
-    .select('*')
-    .eq('portfolio_id', portfolio.id)
-    .order('order', { ascending: true });
-    
-  const { data: galleryItemsData, error: galleryError } = await supabase
-    .from('gallery')
-    .select('*')
-    .eq('portfolio_id', portfolio.id)
-    .order('created_at', { ascending: true });
-
-  const tracks = tracksData || [];
-  const galleryItems = galleryItemsData || [];
 
   let sortedSections: string[] = [];
   if (portfolio.sections_config) {
@@ -132,7 +200,7 @@ export default async function PortfolioPage({ params }: PageProps) {
   };
 
   const renderHobbies = (portfolio: Portfolio) => {
-    if (!portfolio.hobbies_title || !portfolio.hobbies_json || (portfolio.hobbies_json as any[]).length === 0) return null;
+    if (!portfolio.hobbies_title || !portfolio.hobbies_json || safeGetArray(portfolio.hobbies_json).length === 0) return null;
     
     const sectionTitle = (portfolio.sections_config as any)?.hobbies?.name || portfolio.hobbies_title || SECTIONS_CONFIG['hobbies'].defaultName;
     
@@ -140,7 +208,7 @@ export default async function PortfolioPage({ params }: PageProps) {
       <div className="container mx-auto">
         <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
         <div className="flex flex-wrap justify-center gap-6">
-          {(portfolio.hobbies_json as any[])?.map((hobby: any) => (
+          {safeGetArray(portfolio.hobbies_json)?.map((hobby: any) => (
             <div key={hobby.name} className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-lg w-32">
               <span className="text-4xl">{hobby.icon}</span>
               <span className="text-sm font-medium text-center">{hobby.name}</span>
@@ -152,7 +220,7 @@ export default async function PortfolioPage({ params }: PageProps) {
   };
 
   const renderSkills = (portfolio: Portfolio) => {
-    if (!portfolio.skills_title || !portfolio.skills_json || (portfolio.skills_json as any[]).length === 0) return null;
+    if (!portfolio.skills_title || !portfolio.skills_json || safeGetArray(portfolio.skills_json).length === 0) return null;
     
     const sectionTitle = (portfolio.sections_config as any)?.skills?.name || portfolio.skills_title || SECTIONS_CONFIG['skills'].defaultName;
     
@@ -161,7 +229,7 @@ export default async function PortfolioPage({ params }: PageProps) {
         <div className="container mx-auto">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
           <div className="flex flex-wrap justify-center items-center gap-6">
-            {(portfolio.skills_json as any[])?.map((skill: any) => {
+            {safeGetArray(portfolio.skills_json)?.map((skill: any) => {
               const skillDef = SKILLS_LIST.find(s => s.name === skill.name);
               const IconComponent = skillDef ? skillDef.icon : null;
 
@@ -235,8 +303,10 @@ export default async function PortfolioPage({ params }: PageProps) {
               <TrackCard 
                 key={track.id} 
                 track={track}
-                onPlay={() => {}}
+                theme={theme}
+                onPlay={handlePlay}
                 onInfo={() => {}}
+                isPlaying={currentTrack?.id === track.id && isPlaying}
               />
             ))}
           </div>
@@ -493,15 +563,33 @@ export default async function PortfolioPage({ params }: PageProps) {
     );
   };
 
+  // Audio player handlers
+  const handlePlay = (track: Track) => {
+    if (currentTrack?.id === track.id) {
+      setIsPlaying(!isPlaying);
+      return;
+    }
+
+    setCurrentTrack(track);
+    setShowPlayer(true);
+    setIsPlaying(true);
+  };
+
+  const handleClose = () => {
+    setShowPlayer(false);
+    setIsPlaying(false);
+    setCurrentTrack(null);
+  };
+
   // After fetching portfolio:
   console.log('✅ Portfolio found:', portfolio.name);
   console.log('📊 Portfolio data:', portfolio);
 
   // After fetching tracks:
-  console.log('Tracks data:', tracksData, 'Error:', tracksError);
+  console.log('Tracks data:', tracks, 'Error:', error);
 
   // After fetching gallery items:
-  console.log('Gallery items:', galleryItemsData, 'Error:', galleryError);
+  console.log('Gallery items:', galleryItems, 'Error:', error);
 
   return (
     <div className={`min-h-screen ${theme.colors.background}`}>
@@ -559,6 +647,29 @@ export default async function PortfolioPage({ params }: PageProps) {
           {(portfolio.sections_config?.footer?.enabled ?? true) && renderFooter(portfolio)}
         </div>
       </main>
+
+      {/* Audio Player */}
+      {showPlayer && currentTrack && (
+        <div className="fixed bottom-0 left-0 right-0 bg-transparent p-4 z-50">
+          <div className="relative">
+            <AudioPlayer
+              audioUrl={currentTrack.audio_url}
+              title={currentTrack.title}
+              onPlay={() => {
+                console.log('AudioPlayer: Play requested');
+                setIsPlaying(true);
+              }}
+              onPause={() => {
+                console.log('AudioPlayer: Pause requested');
+                setIsPlaying(false);
+              }}
+              onClose={handleClose}
+              isPlaying={isPlaying}
+              onTrackEnd={() => setIsPlaying(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
