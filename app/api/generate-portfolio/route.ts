@@ -17,7 +17,27 @@ function getPrompt(prompt: string) {
     {
       "name": "A creative and professional title for the portfolio. (string)",
       "subtitle": "An engaging one-sentence subtitle or tagline. (string)",
+      "hero_title": "A compelling hero section title. (string)",
+      "hero_subtitle": "A brief hero section subtitle or tagline. (string)",
+      "about_title": "Title for the about section. (string)",
       "about_text": "A compelling 'About Me' section, written in the first person, approximately 2-3 paragraphs long. It should capture the essence of the user's prompt. (string)",
+      "contact_title": "Title for the contact section. (string)",
+      "contact_description": "A brief description for the contact section. (string)",
+      "contact_email": "A professional email address based on the user's profession. (string)",
+      "skills_title": "Title for the skills section. (string)",
+      "skills_json": [
+        { "name": "A relevant skill (string)", "color": "hex color code (string)" },
+        { "name": "Another relevant skill (string)", "color": "hex color code (string)" },
+        { "name": "A third relevant skill (string)", "color": "hex color code (string)" }
+      ],
+      "hobbies_title": "Title for the hobbies section. (string)",
+      "hobbies_json": [
+        { "name": "A relevant hobby or interest (string)", "icon": "emoji (string)" },
+        { "name": "Another relevant hobby or interest (string)", "icon": "emoji (string)" },
+        { "name": "A third relevant hobby or interest (string)", "icon": "emoji (string)" }
+      ],
+      "resume_title": "Title for the resume section. (string)",
+      "footer_about_summary": "A brief 2-3 sentence summary for the footer section based on the about text. (string)",
       "sections_config": {
         "hero": { "enabled": true },
         "about": { "enabled": true },
@@ -30,20 +50,19 @@ function getPrompt(prompt: string) {
         "status": { "enabled": boolean },
         "skills": { "enabled": boolean },
         "resume": { "enabled": boolean },
-        "ai_advantage": { "enabled": boolean },
+        "hobbies": { "enabled": boolean },
         "contact": { "enabled": true }
-      },
-      "ai_advantages_json": [
-        { "name": "A relevant hobby or skill (string)", "icon": "emoji (string)" },
-        { "name": "Another relevant hobby or skill (string)", "icon": "emoji (string)" },
-        { "name": "A third relevant hobby or skill (string)", "icon": "emoji (string)" }
-      ]
+      }
     }
 
     Instructions:
-    - The "name", "subtitle", and "about_text" fields should be creative and directly inspired by the user's prompt.
+    - The "name", "subtitle", "hero_title", "hero_subtitle", "about_title", and "about_text" fields should be creative and directly inspired by the user's prompt.
+    - For "contact_title", "contact_description", and "contact_email", generate appropriate contact information based on the profession.
+    - For "skills_title" and "skills_json", generate 3-5 relevant technical or professional skills with appropriate colors (use hex codes like "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7").
+    - For "hobbies_title" and "hobbies_json", generate 3-5 relevant hobbies or interests with appropriate emojis.
+    - For "resume_title", generate an appropriate title for the resume section.
+    - For "footer_about_summary", create a concise 2-3 sentence summary based on the about_text that's suitable for a footer section.
     - For "sections_config", intelligently enable or disable sections based on what would be most relevant for the user's described profession (e.g., enable 'tracks' for a musician, 'key_projects' for a developer, 'gallery' for a photographer). 'hero', 'about', and 'contact' should always be enabled.
-    - For "ai_advantages_json" (which represents hobbies/skills), generate 3-5 relevant items with appropriate emojis.
     - Only output the raw JSON.
     `;
 }

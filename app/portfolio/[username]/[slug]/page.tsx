@@ -290,26 +290,32 @@ export default function PortfolioPage({ params }: PageProps) {
   };
 
   const renderTracks = (portfolio: Portfolio, tracks: Track[]) => {
-    if (tracks.length === 0) return null;
-    
     const sectionTitle = (portfolio.sections_config as any)?.tracks?.name || SECTIONS_CONFIG['tracks'].defaultName;
     
     return (
       <section id="tracks" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {tracks.map(track => (
-              <TrackCard 
-                key={track.id} 
-                track={track}
-                theme={theme}
-                onPlay={handlePlay}
-                onInfo={() => {}}
-                isPlaying={currentTrack?.id === track.id && isPlaying}
-              />
-            ))}
-          </div>
+          {tracks.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {tracks.map(track => (
+                <TrackCard 
+                  key={track.id} 
+                  track={track}
+                  theme={theme}
+                  onPlay={handlePlay}
+                  onInfo={() => {}}
+                  isPlaying={currentTrack?.id === track.id && isPlaying}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-400">
+              <Music className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">No tracks added yet.</p>
+              <p className="text-sm mt-2">Add your music tracks to showcase your work.</p>
+            </div>
+          )}
         </div>
       </section>
     );

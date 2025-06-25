@@ -323,7 +323,11 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
               ))}
             </div>
           ) : (
-            <div className="text-center text-gray-400">No tracks added yet.</div>
+            <div className="text-center text-gray-400">
+              <Music className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">No tracks added yet.</p>
+              <p className="text-sm mt-2">Add your music tracks to showcase your work.</p>
+            </div>
           )}
         </div>
       </section>
@@ -355,7 +359,11 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
               ))}
             </div>
           ) : (
-            <div className="text-center text-gray-400">No gallery items yet.</div>
+            <div className="text-center text-gray-400">
+              <ImageIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p className="text-lg">No gallery items yet.</p>
+              <p className="text-sm mt-2">Add photos and videos to showcase your work.</p>
+            </div>
           )}
         </div>
       </section>

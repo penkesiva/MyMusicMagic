@@ -775,7 +775,7 @@ const PortfolioEditorPage = () => {
                         key={key}
                         id={key}
                         name={SECTIONS_CONFIG[key]?.defaultName || key}
-                        enabled={portfolio?.sections_config?.[key]?.enabled ?? false}
+                        enabled={(portfolio.sections_config as any)?.[key]?.enabled ?? false}
                         onToggle={(e) => handleSectionConfigChange(key, 'enabled', e.target.checked)}
                         dragHandleProps={{}}
                       />
@@ -863,24 +863,41 @@ const PortfolioEditorPage = () => {
                   <Button onClick={collapseAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Collapse All</Button>
               </div>
 
-              {sortedEditorSections.filter(key => (portfolio.sections_config as any)?.[key]?.enabled).map(key => {
+              {sortedEditorSections.map(key => {
                 const sectionConfig = SECTIONS_CONFIG[key];
                 if (!sectionConfig) return null;
                 
+                const isEnabled = (portfolio.sections_config as any)?.[key]?.enabled;
+                
                 return (
-                  <section key={key} id={key} className="bg-white/5 rounded-xl border border-white/10 overflow-hidden transition-all duration-300">
+                  <section key={key} id={key} className={`bg-white/5 rounded-xl border border-white/10 overflow-hidden transition-all duration-300 ${!isEnabled ? 'opacity-50' : ''}`}>
                     <button 
                       onClick={() => toggleSection(key)} 
-                      className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 transition-colors"
+                      className={`w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
                     >
-                      <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
-                        {SECTIONS_CONFIG[key]?.defaultName}
-                      </h2>
+                      <div className="flex items-center gap-3">
+                        <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
+                          {SECTIONS_CONFIG[key]?.defaultName}
+                        </h2>
+                        {!isEnabled && (
+                          <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded-full">
+                            Disabled
+                          </span>
+                        )}
+                      </div>
                       <ChevronDown className={`w-6 h-6 transform transition-transform text-white ${openSections[key] ? 'rotate-180' : ''}`} />
                     </button>
                     
                     {openSections[key] && (
                       <div className="p-6">
+                        {!isEnabled && (
+                          <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                            <p className="text-yellow-300 text-sm">
+                              This section is currently disabled. Enable it in the Sections panel to the left to start editing.
+                            </p>
+                          </div>
+                        )}
+                        
                         {key === 'hero' && (
                           <div className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -1002,7 +1019,7 @@ const PortfolioEditorPage = () => {
                                         buttons[index] = { ...button, link: e.target.value };
                                         handleFieldChange('hero_cta_buttons', buttons);
                                       }}
-                                      placeholder="Button URL"
+                                      placeholder="URL"
                                       className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                     />
                                     <select
@@ -1090,23 +1107,25 @@ const PortfolioEditorPage = () => {
                                
                                {/* Right Column: Profile Photo */}
                                <div className="space-y-2">
-                                 <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
+                                 <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                   Profile Photo
+                                 </label>
                                  {portfolio.profile_photo_url ? (
-                                   <div className="relative group">
-                                     <img src={portfolio.profile_photo_url} alt="Profile" className="w-40 h-40 object-cover rounded-lg border border-white/10" />
-                                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                       <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
-                                         <Trash2 className="h-4 w-4" />
-                                       </button>
+                                     <div className="relative group">
+                                         <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                             <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
+                                                 <Trash2 className="h-4 w-4" />
+                                             </button>
+                                         </div>
                                      </div>
-                                   </div>
                                  ) : (
-                                   <div className="w-40 h-40 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center justify-center text-center">
-                                     <Image className="h-8 w-8 text-gray-400 mb-2" />
-                                     <p className={`text-xs ${selectedTheme.colors.text}`}>No photo</p>
-                                   </div>
+                                     <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                       <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                       <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
+                                     </div>
                                  )}
-                                 <div className="flex gap-2 max-w-sm">
+                                 <div className="flex gap-2">
                                    <Input
                                      type="url"
                                      value={portfolio.profile_photo_url || ''}
@@ -1163,7 +1182,7 @@ const PortfolioEditorPage = () => {
                             </div>
                           )
                         )}
-                        
+
                         {key === 'gallery' && (
                           (showAddGalleryForm || !!editingGalleryItem) ? (
                             <PortfolioGalleryForm
@@ -1177,19 +1196,19 @@ const PortfolioEditorPage = () => {
                             />
                           ) : (
                             <div className="space-y-4">
-                              <div className="flex justify-between items-center mb-4">
-                                <div className="flex-1 flex justify-center">
-                                  <div className="inline-flex items-center bg-white/10 p-1 rounded-lg">
-                                    <Button onClick={() => setGalleryFilter('all')} size="sm" variant="ghost" className={galleryFilter === 'all' ? 'bg-purple-500 text-white hover:bg-purple-600' : 'text-gray-300 hover:bg-white/20 hover:text-white'}>All</Button>
-                                    <Button onClick={() => setGalleryFilter('photo')} size="sm" variant="ghost" className={galleryFilter === 'photo' ? 'bg-purple-500 text-white hover:bg-purple-600' : 'text-gray-300 hover:bg-white/20 hover:text-white'}>Photos</Button>
-                                    <Button onClick={() => setGalleryFilter('video')} size="sm" variant="ghost" className={galleryFilter === 'video' ? 'bg-purple-500 text-white hover:bg-purple-600' : 'text-gray-300 hover:bg-white/20 hover:text-white'}>Videos</Button>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Button onClick={() => setGalleryViewMode('list')} variant="ghost" size="icon" className={galleryViewMode === 'list' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><List className="h-5 w-5" /></Button>
-                                  <Button onClick={() => setGalleryViewMode('grid')} variant="ghost" size="icon" className={galleryViewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><Grid className="h-5 w-5" /></Button>
-                                  <Button onClick={() => setShowAddGalleryForm(true)} className="bg-white/10 border-white/20 text-white hover:bg-white/20"><PlusCircle className="mr-2 h-4 w-4" /> Add Item</Button>
-                                </div>
+                              <div className="flex justify-end items-center mb-4 gap-2">
+                                <Button onClick={() => setGalleryViewMode('grid')} variant="ghost" size="icon" className={galleryViewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><Grid className="h-5 w-5" /></Button>
+                                <Button onClick={() => setGalleryViewMode('list')} variant="ghost" size="icon" className={galleryViewMode === 'list' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><List className="h-5 w-5" /></Button>
+                                <select
+                                  value={galleryFilter}
+                                  onChange={(e) => setGalleryFilter(e.target.value as 'all' | 'photo' | 'video')}
+                                  className="bg-white/10 border border-white/20 text-white rounded px-3 py-1 text-sm"
+                                >
+                                  <option value="all">All Items</option>
+                                  <option value="photo">Photos Only</option>
+                                  <option value="video">Videos Only</option>
+                                </select>
+                                <Button onClick={() => setShowAddGalleryForm(true)} className="bg-white/10 border-white/20 text-white hover:bg-white/20"><PlusCircle className="mr-2 h-4 w-4" /> Add Item</Button>
                               </div>
                               <PortfolioGalleryDisplay
                                 portfolioId={portfolio.id}
@@ -1202,189 +1221,299 @@ const PortfolioEditorPage = () => {
                           )
                         )}
 
-                        {key === 'key_projects' && (
-                          <div className="text-center p-8 border-2 border-dashed border-white/20 rounded-lg">
-                            <h3 className="text-lg font-semibold text-white/80">Key Projects Section</h3>
-                            <p className="text-sm text-white/50 mt-2">Customization options for this section are coming soon!</p>
-                          </div>
-                        )}
-
-                        {key === 'press' && (
-                          <div className="text-center p-8 border-2 border-dashed border-white/20 rounded-lg">
-                            <h3 className="text-lg font-semibold text-white/80">Press Section</h3>
-                            <p className="text-sm text-white/50 mt-2">Customization options for this section are coming soon!</p>
-                          </div>
-                        )}
-
                         {key === 'hobbies' && (
-                          <div className="space-y-4">
+                          <div className="space-y-6">
                             <div>
-                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Add a Hobby</label>
-                               <div className="relative max-w-sm">
-                                 <Input
-                                    type="text"
-                                    placeholder="Search for hobbies..."
-                                    value={hobbySearch}
-                                    onChange={(e) => setHobbySearch(e.target.value)}
-                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                  />
-                                  {hobbySearch && (
-                                    <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-white/20 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                        {filteredHobbies.map(hobby => (
-                                            <button
-                                              key={hobby.name}
-                                              onClick={() => handleAddHobby(hobby)}
-                                              className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
-                                            >
-                                              <span className="text-xl">{hobby.icon}</span>
-                                              <span>{hobby.name}</span>
-                                            </button>
-                                        ))}
-                                        {filteredHobbies.length === 0 && !isHobbyAlreadyAdded && (
-                                           <button
-                                              onClick={() => handleAddHobby({ name: hobbySearch, icon: '⭐' })}
-                                              className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
-                                            >
-                                              <span className="text-xl">⭐</span>
-                                              <span>Add "{hobbySearch}"</span>
-                                            </button>
-                                        )}
-                                    </div>
-                                  )}
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Hobbies Title
+                              </label>
+                              <Input
+                                type="text"
+                                value={portfolio.hobbies_title || ''}
+                                onChange={(e) => handleFieldChange('hobbies_title', e.target.value)}
+                                placeholder="My Hobbies & Interests"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Add Hobbies
+                              </label>
+                              <div className="flex gap-2 mb-4">
+                                <Input
+                                  type="text"
+                                  value={hobbySearch}
+                                  onChange={(e) => setHobbySearch(e.target.value)}
+                                  placeholder="Search hobbies..."
+                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                              
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-40 overflow-y-auto">
+                                {filteredHobbies.map((hobby) => (
+                                  <button
+                                    key={hobby.name}
+                                    onClick={() => handleAddHobby(hobby)}
+                                    className="flex flex-col items-center p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                                  >
+                                    <span className="text-2xl mb-1">{hobby.icon}</span>
+                                    <span className="text-xs text-center">{hobby.name}</span>
+                                  </button>
+                                ))}
                               </div>
                             </div>
+                            
                             <div>
-                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Your Hobbies</label>
-                               <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10 min-h-[40px]">
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Selected Hobbies
+                              </label>
+                              <div className="flex flex-wrap gap-2">
                                 {safeGetArray(portfolio.hobbies_json).map((hobby: any) => (
-                                  <div key={hobby.name} className="flex items-center gap-2 bg-purple-500/20 text-white px-3 py-1 rounded-full text-sm">
-                                    <span>{hobby.icon}</span>
-                                    <span>{hobby.name}</span>
-                                    <button onClick={() => handleRemoveHobby(hobby.name)} className="text-purple-300 hover:text-white">
-                                      <X className="h-3 w-3" />
+                                  <div key={hobby.name} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
+                                    <span className="text-lg">{hobby.icon}</span>
+                                    <span className="text-sm">{hobby.name}</span>
+                                    <button
+                                      onClick={() => handleRemoveHobby(hobby.name)}
+                                      className="text-red-400 hover:text-red-300"
+                                    >
+                                      <X className="h-4 w-4" />
                                     </button>
                                   </div>
                                 ))}
-                                {safeGetArray(portfolio.hobbies_json).length === 0 && (
-                                   <p className="text-sm text-gray-400">Add hobbies from the list above.</p>
-                                )}
-                               </div>
+                              </div>
                             </div>
                           </div>
                         )}
 
                         {key === 'skills' && (
-                          <div className="space-y-4">
+                          <div className="space-y-6">
                             <div>
-                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Add a Skill or Tool</label>
-                               <div className="relative max-w-sm">
-                                 <Input
-                                    type="text"
-                                    placeholder="Search for skills..."
-                                    value={skillSearch}
-                                    onChange={(e) => setSkillSearch(e.target.value)}
-                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                  />
-                                  {skillSearch && (
-                                    <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-white/20 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                        {filteredSkills.map(skill => {
-                                          const IconComponent = skill.icon;
-                                          return (
-                                            <button
-                                              key={skill.name}
-                                              onClick={() => handleAddSkill(skill)}
-                                              className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
-                                            >
-                                              <IconComponent className="h-5 w-5" style={{ color: skill.color }}/>
-                                              <span>{skill.name}</span>
-                                            </button>
-                                          );
-                                        })}
-                                        {filteredSkills.length === 0 && !isSkillAlreadyAdded && (
-                                           <button
-                                              onClick={() => handleAddSkill({ name: skillSearch, color: '#FFFFFF' })}
-                                              className="w-full text-left px-4 py-2 text-white hover:bg-purple-500/20 flex items-center gap-3"
-                                            >
-                                              <Star className="h-5 w-5" style={{ color: '#FFFFFF' }}/>
-                                              <span>Add "{skillSearch}"</span>
-                                            </button>
-                                        )}
-                                    </div>
-                                  )}
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Skills Title
+                              </label>
+                              <Input
+                                type="text"
+                                value={portfolio.skills_title || ''}
+                                onChange={(e) => handleFieldChange('skills_title', e.target.value)}
+                                placeholder="Skills & Tools"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Add Skills
+                              </label>
+                              <div className="flex gap-2 mb-4">
+                                <Input
+                                  type="text"
+                                  value={skillSearch}
+                                  onChange={(e) => setSkillSearch(e.target.value)}
+                                  placeholder="Search skills..."
+                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                              
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-40 overflow-y-auto">
+                                {filteredSkills.map((skill) => (
+                                  <button
+                                    key={skill.name}
+                                    onClick={() => handleAddSkill(skill)}
+                                    className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                                  >
+                                    <skill.icon className="h-5 w-5" style={{ color: skill.color }} />
+                                    <span className="text-sm">{skill.name}</span>
+                                  </button>
+                                ))}
                               </div>
                             </div>
+                            
                             <div>
-                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Your Skills</label>
-                               <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10 min-h-[40px]">
-                                {safeGetArray(portfolio.skills_json).map((skill: any) => {
-                                  const skillDef = SKILLS_LIST.find(s => s.name === skill.name);
-                                  const IconComponent = skillDef ? skillDef.icon : Star;
-                                  return(
-                                    <div key={skill.name} className="flex items-center gap-2 bg-purple-500/20 text-white px-3 py-1 rounded-full text-sm">
-                                      <IconComponent className="h-4 w-4" style={{ color: skill.color || '#FFFFFF' }}/>
-                                      <span>{skill.name}</span>
-                                      <button onClick={() => handleRemoveSkill(skill.name)} className="text-purple-300 hover:text-white">
-                                        <X className="h-3 w-3" />
-                                      </button>
-                                    </div>
-                                  );
-                                })}
-                                {safeGetArray(portfolio.skills_json).length === 0 && (
-                                   <p className="text-sm text-gray-400">Add skills from the list above.</p>
-                                )}
-                               </div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Selected Skills
+                              </label>
+                              <div className="flex flex-wrap gap-2">
+                                {safeGetArray(portfolio.skills_json).map((skill: any) => (
+                                  <div key={skill.name} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
+                                    <span className="text-sm">{skill.name}</span>
+                                    <button
+                                      onClick={() => handleRemoveSkill(skill.name)}
+                                      className="text-red-400 hover:text-red-300"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         )}
 
                         {key === 'resume' && (
-                           <div className="space-y-4">
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                              Resume Document
-                            </label>
-                            {portfolio.resume_url ? (
-                                <div className="flex items-center gap-4 p-3 bg-white/10 rounded-lg">
-                                    <FileText className="h-6 w-6 text-purple-400" />
-                                    <a href={portfolio.resume_url} target="_blank" rel="noopener noreferrer" className="flex-1 text-sm text-white truncate hover:underline">
-                                      {portfolio.resume_url.split('/').pop()}
-                                    </a>
-                                    <button onClick={() => handleFieldChange('resume_url', null)} className="p-2 text-red-400 hover:text-red-300 transition-colors" title="Remove resume">
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                  <FileText className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                  <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No resume uploaded</p>
-                                </div>
-                            )}
-                            <div className="flex gap-2">
+                          <div className="space-y-6">
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Resume Title
+                              </label>
                               <Input
-                                type="url"
-                                value={portfolio.resume_url || ''}
-                                onChange={(e) => handleFieldChange('resume_url', e.target.value)}
-                                placeholder="Or paste public URL to resume"
-                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                type="text"
+                                value={portfolio.resume_title || ''}
+                                onChange={(e) => handleFieldChange('resume_title', e.target.value)}
+                                placeholder="Resume"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                               />
-                              <input
-                                type="file" id="resume-upload" accept=".pdf,.doc,.docx"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) uploadResume(file);
-                                  e.target.value = '';
-                                }}
-                                className="hidden"
-                              />
-                              <Button
-                                onClick={() => document.getElementById('resume-upload')?.click()}
-                                variant="outline" size="sm" disabled={uploadingResume}
-                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                              >
-                                {uploadingResume ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                <span className="ml-2">Upload</span>
-                              </Button>
                             </div>
-                           </div>
+                            
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Resume File
+                              </label>
+                              <div className="flex gap-2">
+                                <Input
+                                  type="url"
+                                  value={portfolio.resume_url || ''}
+                                  onChange={(e) => handleFieldChange('resume_url', e.target.value)}
+                                  placeholder="Paste resume URL"
+                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                                <input
+                                  type="file" id="resume-upload" accept=".pdf,.doc,.docx"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) uploadResume(file);
+                                    e.target.value = '';
+                                  }}
+                                  className="hidden"
+                                />
+                                <Button
+                                  onClick={() => document.getElementById('resume-upload')?.click()}
+                                  variant="outline" size="sm" disabled={uploadingResume}
+                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                >
+                                  {uploadingResume ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {key === 'contact' && (
+                          <div className="space-y-6">
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Contact Title
+                              </label>
+                              <Input
+                                type="text"
+                                value={portfolio.contact_title || ''}
+                                onChange={(e) => handleFieldChange('contact_title', e.target.value)}
+                                placeholder="Get in Touch"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Contact Description
+                              </label>
+                              <Textarea
+                                value={portfolio.contact_description || ''}
+                                onChange={(e) => handleFieldChange('contact_description', e.target.value)}
+                                placeholder="Ready to work together? Let's talk!"
+                                rows={3}
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Contact Email
+                              </label>
+                              <Input
+                                type="email"
+                                value={portfolio.contact_email || ''}
+                                onChange={(e) => handleFieldChange('contact_email', e.target.value)}
+                                placeholder="your.email@example.com"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  Instagram URL
+                                </label>
+                                <Input
+                                  type="url"
+                                  value={portfolio.instagram_url || ''}
+                                  onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
+                                  placeholder="https://instagram.com/username"
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  Twitter URL
+                                </label>
+                                <Input
+                                  type="url"
+                                  value={portfolio.twitter_url || ''}
+                                  onChange={(e) => handleFieldChange('twitter_url', e.target.value)}
+                                  placeholder="https://twitter.com/username"
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  YouTube URL
+                                </label>
+                                <Input
+                                  type="url"
+                                  value={portfolio.youtube_url || ''}
+                                  onChange={(e) => handleFieldChange('youtube_url', e.target.value)}
+                                  placeholder="https://youtube.com/@username"
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  LinkedIn URL
+                                </label>
+                                <Input
+                                  type="url"
+                                  value={portfolio.linkedin_url || ''}
+                                  onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
+                                  placeholder="https://linkedin.com/in/username"
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  Website URL
+                                </label>
+                                <Input
+                                  type="url"
+                                  value={portfolio.website_url || ''}
+                                  onChange={(e) => handleFieldChange('website_url', e.target.value)}
+                                  placeholder="https://yourwebsite.com"
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  GitHub URL
+                                </label>
+                                <Input
+                                  type="url"
+                                  value={portfolio.github_url || ''}
+                                  onChange={(e) => handleFieldChange('github_url', e.target.value)}
+                                  placeholder="https://github.com/username"
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                            </div>
+                          </div>
                         )}
 
                         {key === 'footer' && (
@@ -1422,28 +1551,12 @@ const PortfolioEditorPage = () => {
                                       alert('Please add some content to your About section first.');
                                       return;
                                     }
-                                    try {
-                                      const response = await fetch('/api/generate-portfolio', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({
-                                          type: 'footer_about_summary',
-                                          about_text: portfolio.about_text,
-                                          artist_name: portfolio.artist_name
-                                        })
-                                      });
-                                      const data = await response.json();
-                                      if (data.content) {
-                                        handleFieldChange('footer_about_summary', data.content);
-                                      }
-                                    } catch (error) {
-                                      console.error('Error generating footer about summary:', error);
-                                    }
+                                    handleFieldChange('footer_about_summary', portfolio.about_text.substring(0, 200) + (portfolio.about_text.length > 200 ? '...' : ''));
                                   }}
                                   variant="outline" size="sm"
-                                  className="bg-purple-600/20 border-purple-500/30 text-purple-300 hover:bg-purple-600/30"
+                                  className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
                                 >
-                                  <Sparkles className="h-4 w-4" />
+                                  Auto-fill
                                 </Button>
                               </div>
                             </div>
@@ -1553,7 +1666,7 @@ const PortfolioEditorPage = () => {
                                 type="text"
                                 value={portfolio.footer_copyright_text || ''}
                                 onChange={(e) => handleFieldChange('footer_copyright_text', e.target.value)}
-                                placeholder={`© ${new Date().getFullYear()} ${portfolio.artist_name || 'Hero Portfolio'}. All rights reserved.`}
+                                placeholder={`© ${new Date().getFullYear()} ${portfolio?.artist_name || 'Hero Portfolio'}. All rights reserved.`}
                                 className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                               />
                               <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>

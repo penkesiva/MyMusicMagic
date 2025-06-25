@@ -275,9 +275,19 @@ export interface Database {
           contact_location: string | null
           footer_text: string | null
           footer_links_json: Json | null
+          footer_about_summary: string | null
+          footer_social_links_json: Json | null
+          footer_copyright_text: string | null
+          footer_show_social_links: boolean | null
+          footer_show_about_summary: boolean | null
+          footer_show_links: boolean | null
           sections_config: Json | null
           theme_name: string | null
           resume_url: string | null
+          resume_title: string | null
+          hobbies_title: string | null
+          hobbies_json: Json | null
+          github_url: string | null
         }
         Insert: {
           id?: string
@@ -325,9 +335,19 @@ export interface Database {
           contact_location?: string | null
           footer_text?: string | null
           footer_links_json?: Json | null
+          footer_about_summary?: string | null
+          footer_social_links_json?: Json | null
+          footer_copyright_text?: string | null
+          footer_show_social_links?: boolean | null
+          footer_show_about_summary?: boolean | null
+          footer_show_links?: boolean | null
           sections_config?: Json | null
           theme_name?: string | null
           resume_url?: string | null
+          resume_title?: string | null
+          hobbies_title?: string | null
+          hobbies_json?: Json | null
+          github_url?: string | null
         }
         Update: {
           id?: string
@@ -375,9 +395,19 @@ export interface Database {
           contact_location?: string | null
           footer_text?: string | null
           footer_links_json?: Json | null
+          footer_about_summary?: string | null
+          footer_social_links_json?: Json | null
+          footer_copyright_text?: string | null
+          footer_show_social_links?: boolean | null
+          footer_show_about_summary?: boolean | null
+          footer_show_links?: boolean | null
           sections_config?: Json | null
           theme_name?: string | null
           resume_url?: string | null
+          resume_title?: string | null
+          hobbies_title?: string | null
+          hobbies_json?: Json | null
+          github_url?: string | null
         }
       }
       artist_info: {
