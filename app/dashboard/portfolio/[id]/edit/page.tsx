@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus
+  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, ArrowRight
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -21,6 +21,9 @@ import PortfolioGalleryForm from "@/components/portfolio/PortfolioGalleryForm";
 import { THEMES } from "@/lib/themes";
 import PortfolioTracksDisplay from "@/components/portfolio/PortfolioTracksDisplay";
 import PortfolioGalleryDisplay from "@/components/portfolio/PortfolioGalleryDisplay";
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const EditableField = ({ value, onSave, fieldType = 'input', theme }: { value: string; onSave: (newValue: string) => void; fieldType?: 'input' | 'textarea', theme: any }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -65,6 +68,46 @@ const EditableField = ({ value, onSave, fieldType = 'input', theme }: { value: s
   );
 };
 
+// Sortable Section Item component
+type SortableSectionItemProps = {
+  id: string;
+  name: string;
+  enabled: boolean;
+  onToggle: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  dragHandleProps: React.HTMLAttributes<HTMLSpanElement>;
+  onNameEdit?: () => void;
+};
+function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onNameEdit }: SortableSectionItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    background: enabled ? 'rgba(255,255,255,0.04)' : 'transparent',
+    borderRadius: 6,
+    padding: '4px 8px',
+    marginBottom: 4,
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: 14,
+    minHeight: 32,
+    cursor: 'grab',
+  };
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <span {...listeners} {...dragHandleProps} style={{ marginRight: 8, cursor: 'grab', color: '#aaa' }}>
+        <List size={16} />
+      </span>
+      <span style={{ flex: 1, fontWeight: enabled ? 500 : 400, color: enabled ? '#fff' : '#888' }}>{name}</span>
+      <Switch
+        id={`enable-${id}`}
+        isChecked={enabled}
+        onChange={onToggle}
+        style={{ transform: 'scale(0.8)' }}
+      />
+    </div>
+  );
+}
 
 const PortfolioEditorPage = () => {
   const router = useRouter();
@@ -97,6 +140,7 @@ const PortfolioEditorPage = () => {
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [placeholder, setPlaceholder] = useState("");
+  const [sectionOrder, setSectionOrder] = useState<string[]>([]);
 
   const placeholders = [
     "Build a portfolio for an upcoming cello artist...",
@@ -154,7 +198,7 @@ const PortfolioEditorPage = () => {
     }
   };
 
-  const sortedEditorSections = useMemo(() => {
+  const sortedEditorSections: string[] = useMemo(() => {
     if (!portfolio) return [];
     return Object.keys(SECTIONS_CONFIG)
       .sort((a, b) => (portfolio?.sections_config as any)?.[a]?.order - (portfolio?.sections_config as any)?.[b]?.order);
@@ -585,6 +629,30 @@ const PortfolioEditorPage = () => {
   
   const isSkillAlreadyAdded = safeGetArray(portfolio?.skills_json).some(s => s.name.toLowerCase() === skillSearch.toLowerCase());
 
+  useEffect(() => {
+    setSectionOrder(sortedEditorSections);
+  }, [sortedEditorSections]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+    if (active.id !== over.id) {
+      const oldIndex = sectionOrder.indexOf(active.id as string);
+      const newIndex = sectionOrder.indexOf(over.id as string);
+      const newOrder = arrayMove(sectionOrder, oldIndex, newIndex);
+      setSectionOrder(newOrder);
+      // Update sections_config order and save
+      if (portfolio) {
+        const updatedConfig = { ...portfolio.sections_config };
+        newOrder.forEach((key: string, idx: number) => {
+          if (updatedConfig[key]) updatedConfig[key].order = idx + 1;
+        });
+        setPortfolio({ ...portfolio, sections_config: updatedConfig });
+        saveChanges({ sections_config: updatedConfig });
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900">
@@ -604,7 +672,7 @@ const PortfolioEditorPage = () => {
   return (
     <div className="flex h-full min-h-screen font-sans bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
       {/* --- Left Sidebar (Hero Portfolio Theme) --- */}
-      <aside className="w-[280px] bg-white/5 backdrop-blur-sm border-r border-white/10 text-white p-6 flex flex-col gap-6 overflow-y-auto">
+      <aside className="flex flex-col gap-4 bg-black/40 p-2 md:p-3 rounded-xl w-full max-w-xs min-w-[220px] text-sm overflow-y-auto max-h-screen" style={{ fontSize: 13 }}>
         <button
           onClick={() => router.push('/dashboard')}
           className="w-full mb-4 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm font-medium"
@@ -631,28 +699,28 @@ const PortfolioEditorPage = () => {
             <Sparkles className="h-5 w-5 text-purple-400" />
             <h3 className="font-semibold text-sm text-white">AI Assistant</h3>
           </div>
-          <Textarea
-            placeholder={placeholder}
-            value={aiPrompt}
-            onChange={(e) => setAiPrompt(e.target.value)}
-            rows={3}
-            className="w-full text-sm bg-gray-900/50 border-white/20 placeholder:text-gray-500 focus:ring-purple-400"
-          />
-          <div className="flex items-center gap-2">
-            <Button 
-                onClick={handleGenerate} 
+          <div className="mb-2">
+            <Textarea
+              value={aiPrompt}
+              onChange={e => setAiPrompt(e.target.value)}
+              placeholder={placeholder}
+              className="flex-1 px-2 py-1 text-xs rounded-md border border-white/10 bg-white/5 text-white placeholder:text-gray-400 resize-none"
+              style={{ fontSize: 13, minHeight: 28, height: 60, lineHeight: 1.3 }}
+              rows={3}
+            />
+            <div className="flex justify-end mt-1">
+              <Button
+                onClick={handleGenerate}
+                size="icon"
+                variant="ghost"
+                className="p-0 h-6 w-6 text-white hover:bg-white/10 rounded flex items-center justify-center"
+                title="Generate with AI"
                 disabled={isGenerating || !aiPrompt}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 disabled:opacity-50"
-            >
-              {isGenerating ? 'Generating...' : 'Generate'}
-            </Button>
-            <Button 
-                onClick={handleReset}
-                variant="outline"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-            >
-              Reset
-            </Button>
+                style={{ margin: 0 }}
+              >
+                <ArrowRight size={16} />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -662,16 +730,31 @@ const PortfolioEditorPage = () => {
             <ChevronDown className={`w-4 h-4 transition-transform ${colorThemeOpen ? 'rotate-180' : ''}`} />
           </button>
           {colorThemeOpen && (
-            <div className="grid grid-cols-5 gap-2 pt-2">
+            <div className="flex gap-1 flex-wrap">
               {THEMES.map((theme) => (
                 <button
                   key={theme.name}
                   onClick={() => handleFieldChange("theme_name", theme.name)}
-                  className={`w-full aspect-square rounded-full border-2 transition-all ${
-                    portfolio.theme_name === theme.name ? 'border-purple-400 ring-2 ring-purple-400' : 'border-white/20 hover:border-white/40'
-                  } ${theme.colors.background}`}
-                  title={theme.name}
-                ><div className={`h-1/2 w-1/2 rounded-full ${theme.colors.primary}`}></div></button>
+                  className={`rounded-full flex items-center justify-center transition-all focus:outline-none`}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    border: selectedTheme.name === theme.name ? '2px solid #fff' : '1px solid #444',
+                    margin: 1,
+                    background: 'transparent',
+                    padding: 0
+                  }}
+                  aria-label={theme.name}
+                >
+                  <div
+                    style={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: '50%',
+                      background: theme.colors.primary
+                    }}
+                  />
+                </button>
               ))}
             </div>
           )}
@@ -684,20 +767,22 @@ const PortfolioEditorPage = () => {
           </button>
           {sectionsOpen && (
             <div className="space-y-2 pt-2">
-              {sortedEditorSections.map((key) => (
-                <div key={key} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-colors">
-                  <Label htmlFor={`enable-${key}`} className="font-medium text-white text-sm cursor-pointer">
-                    {SECTIONS_CONFIG[key].defaultName}
-                  </Label>
-                  <Switch
-                    id={`enable-${key}`}
-                    isChecked={(portfolio.sections_config as any)?.[key]?.enabled ?? false}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleSectionConfigChange(key as any, "enabled", e.target.checked)
-                    }
-                  />
-                </div>
-              ))}
+              <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
+                  <div>
+                    {sectionOrder.map((key) => (
+                      <SortableSectionItem
+                        key={key}
+                        id={key}
+                        name={SECTIONS_CONFIG[key]?.defaultName || key}
+                        enabled={portfolio?.sections_config?.[key]?.enabled ?? false}
+                        onToggle={(e) => handleSectionConfigChange(key, 'enabled', e.target.checked)}
+                        dragHandleProps={{}}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
           )}
         </div>
@@ -801,16 +886,12 @@ const PortfolioEditorPage = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                               {/* Left Column: Title & Subtitle */}
                               <div className="space-y-4">
-                                <div>
-                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                    Portfolio Title
-                                  </label>
-                                  <Input
-                                    type="text"
-                                    value={portfolio.name}
-                                    onChange={(e) => handleFieldChange('name', e.target.value)}
-                                    placeholder="Your portfolio title"
-                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                <div className="mb-2">
+                                  <EditableField
+                                    value={portfolio?.name || ''}
+                                    onSave={val => handleFieldChange('name', val)}
+                                    fieldType="input"
+                                    theme={selectedTheme}
                                   />
                                 </div>
                                 <div>
