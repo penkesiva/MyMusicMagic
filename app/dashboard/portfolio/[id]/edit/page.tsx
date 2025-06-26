@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  Eye, PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -124,10 +124,8 @@ const PortfolioEditorPage = () => {
   
   const [editingGalleryItem, setEditingGalleryItem] = useState<any | null>(null);
   const [showAddGalleryForm, setShowAddGalleryForm] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
   const [uploadingProfile, setUploadingProfile] = useState(false);
-  const [previewMode, setPreviewMode] = useState<'fullscreen' | 'side-by-side'>('side-by-side');
   const [colorThemeOpen, setColorThemeOpen] = useState(true);
   const [sectionsOpen, setSectionsOpen] = useState(true);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
@@ -669,6 +667,16 @@ const PortfolioEditorPage = () => {
     );
   }
 
+  // About Me View Types logic
+  const aboutViewType = (portfolio.sections_config as any)?.about?.view_type || 'image-left';
+  const setAboutViewType = (type: string) => {
+    const updatedConfig = { ...portfolio.sections_config };
+    if (!updatedConfig.about) updatedConfig.about = {};
+    updatedConfig.about.view_type = type;
+    setPortfolio({ ...portfolio, sections_config: updatedConfig });
+    saveChanges({ sections_config: updatedConfig });
+  };
+
   return (
     <div className="flex h-full min-h-screen font-sans bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
       {/* --- Left Sidebar (Hero Portfolio Theme) --- */}
@@ -820,34 +828,13 @@ const PortfolioEditorPage = () => {
               <Label htmlFor="publish-switch" className="text-white font-medium">
                 {portfolio.is_published ? 'Published' : 'Unpublished'}
               </Label>
-              <button 
-                onClick={() => setShowPreview(!showPreview)} 
-                className={`px-4 py-2 rounded-lg transition-all duration-300 text-sm font-medium ${
-                  showPreview 
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg hover:shadow-purple-500/25' 
-                    : 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
-                }`}
+              <button
+                onClick={() => window.open(`/portfolio/${userProfile?.username || 'user'}/${portfolio.slug}`, "_blank")} 
+                className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm font-medium flex items-center"
               >
-                <Eye className="mr-2 h-4 w-4 inline" /> {showPreview ? 'Hide Preview' : 'Live Preview'}
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Preview
               </button>
-              {showPreview && (
-                <button 
-                  onClick={() => setPreviewMode(previewMode === 'fullscreen' ? 'side-by-side' : 'fullscreen')} 
-                  className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm font-medium"
-                >
-                  {previewMode === 'fullscreen' ? 'Side-by-Side' : 'Fullscreen'}
-                </button>
-              )}
-              <div title={!portfolio.is_published ? "You must publish your portfolio to make it public." : "Open public page"}>
-                <button
-                  onClick={() => portfolio.is_published && window.open(`/portfolio/${userProfile?.username || 'user'}/${portfolio.slug}`, "_blank")} 
-                  disabled={!portfolio.is_published}
-                  className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Open in New Tab
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -1089,70 +1076,211 @@ const PortfolioEditorPage = () => {
                         )}
                         
                         {key === 'about' && (
-                           <div className="space-y-6">
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                               {/* Left Column: About Text */}
-                               <div className="space-y-4">
-                                 <div>
-                                   <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
-                                   <Textarea
-                                     value={portfolio.about_text || ''}
-                                     onChange={(e) => handleFieldChange('about_text', e.target.value)}
-                                     placeholder="Tell your story..."
-                                     rows={8}
-                                     className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
-                                   />
-                                 </div>
-                               </div>
-                               
-                               {/* Right Column: Profile Photo */}
-                               <div className="space-y-2">
-                                 <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                   Profile Photo
-                                 </label>
-                                 {portfolio.profile_photo_url ? (
-                                     <div className="relative group">
-                                         <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-32 object-cover rounded-lg border border-white/10" />
-                                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                             <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
-                                                 <Trash2 className="h-4 w-4" />
-                                             </button>
-                                         </div>
-                                     </div>
-                                 ) : (
-                                     <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                       <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                       <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
-                                     </div>
-                                 )}
-                                 <div className="flex gap-2">
-                                   <Input
-                                     type="url"
-                                     value={portfolio.profile_photo_url || ''}
-                                     onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
-                                     placeholder="Paste image URL"
-                                     className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                   />
-                                   <input
-                                     type="file" id="profile-upload" accept="image/*"
-                                     onChange={(e) => {
-                                       const file = e.target.files?.[0];
-                                       if (file) uploadProfilePhoto(file);
-                                       e.target.value = '';
-                                     }}
-                                     className="hidden"
-                                   />
-                                   <Button
-                                     onClick={() => document.getElementById('profile-upload')?.click()}
-                                     variant="outline" size="sm" disabled={uploadingProfile}
-                                     className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                                   >
-                                     {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                   </Button>
-                                 </div>
-                               </div>
-                             </div>
-                           </div>
+                          <div className="space-y-6">
+                            {/* View Type Tabs */}
+                            <div className="flex gap-2 mb-4">
+                              <button
+                                className={`px-4 py-2 rounded-t-lg font-semibold transition-all border-b-2 ${aboutViewType === 'image-left' ? 'border-purple-500 bg-white/10 text-white' : 'border-transparent text-white/60 hover:bg-white/5'}`}
+                                onClick={() => setAboutViewType('image-left')}
+                              >
+                                Image Left
+                              </button>
+                              <button
+                                className={`px-4 py-2 rounded-t-lg font-semibold transition-all border-b-2 ${aboutViewType === 'image-right' ? 'border-purple-500 bg-white/10 text-white' : 'border-transparent text-white/60 hover:bg-white/5'}`}
+                                onClick={() => setAboutViewType('image-right')}
+                              >
+                                Image Right
+                              </button>
+                              <button
+                                className={`px-4 py-2 rounded-t-lg font-semibold transition-all border-b-2 ${aboutViewType === 'centered' ? 'border-purple-500 bg-white/10 text-white' : 'border-transparent text-white/60 hover:bg-white/5'}`}
+                                onClick={() => setAboutViewType('centered')}
+                              >
+                                Centered
+                              </button>
+                            </div>
+                            {/* About Me Section Layouts */}
+                            {aboutViewType === 'image-left' && (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                {/* Left: Image */}
+                                <div className="space-y-2">
+                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
+                                  {portfolio.profile_photo_url ? (
+                                    <div className="relative group">
+                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                        <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
+                                          <Trash2 className="h-4 w-4" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                      <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                      <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
+                                    </div>
+                                  )}
+                                  <div className="flex gap-2">
+                                    <Input
+                                      type="url"
+                                      value={portfolio.profile_photo_url || ''}
+                                      onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
+                                      placeholder="Paste image URL"
+                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                    <input
+                                      type="file" id="profile-upload" accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) uploadProfilePhoto(file);
+                                        e.target.value = '';
+                                      }}
+                                      className="hidden"
+                                    />
+                                    <Button
+                                      onClick={() => document.getElementById('profile-upload')?.click()}
+                                      variant="outline" size="sm" disabled={uploadingProfile}
+                                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                    >
+                                      {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                    </Button>
+                                  </div>
+                                </div>
+                                {/* Right: About Text */}
+                                <div className="space-y-4">
+                                  <div>
+                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
+                                    <Textarea
+                                      value={portfolio.about_text || ''}
+                                      onChange={(e) => handleFieldChange('about_text', e.target.value)}
+                                      placeholder="Tell your story..."
+                                      rows={8}
+                                      className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {aboutViewType === 'image-right' && (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                                {/* Left: About Text */}
+                                <div className="space-y-4">
+                                  <div>
+                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
+                                    <Textarea
+                                      value={portfolio.about_text || ''}
+                                      onChange={(e) => handleFieldChange('about_text', e.target.value)}
+                                      placeholder="Tell your story..."
+                                      rows={8}
+                                      className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
+                                    />
+                                  </div>
+                                </div>
+                                {/* Right: Image */}
+                                <div className="space-y-2">
+                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
+                                  {portfolio.profile_photo_url ? (
+                                    <div className="relative group">
+                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                        <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
+                                          <Trash2 className="h-4 w-4" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                      <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                      <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
+                                    </div>
+                                  )}
+                                  <div className="flex gap-2">
+                                    <Input
+                                      type="url"
+                                      value={portfolio.profile_photo_url || ''}
+                                      onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
+                                      placeholder="Paste image URL"
+                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                    <input
+                                      type="file" id="profile-upload" accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) uploadProfilePhoto(file);
+                                        e.target.value = '';
+                                      }}
+                                      className="hidden"
+                                    />
+                                    <Button
+                                      onClick={() => document.getElementById('profile-upload')?.click()}
+                                      variant="outline" size="sm" disabled={uploadingProfile}
+                                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                    >
+                                      {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {aboutViewType === 'centered' && (
+                              <div className="flex flex-col items-center gap-6">
+                                {/* Centered Image */}
+                                <div className="space-y-2 w-full max-w-xs">
+                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
+                                  {portfolio.profile_photo_url ? (
+                                    <div className="relative group">
+                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                        <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
+                                          <Trash2 className="h-4 w-4" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                      <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                      <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
+                                    </div>
+                                  )}
+                                  <div className="flex gap-2">
+                                    <Input
+                                      type="url"
+                                      value={portfolio.profile_photo_url || ''}
+                                      onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
+                                      placeholder="Paste image URL"
+                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                    <input
+                                      type="file" id="profile-upload" accept="image/*"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) uploadProfilePhoto(file);
+                                        e.target.value = '';
+                                      }}
+                                      className="hidden"
+                                    />
+                                    <Button
+                                      onClick={() => document.getElementById('profile-upload')?.click()}
+                                      variant="outline" size="sm" disabled={uploadingProfile}
+                                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                    >
+                                      {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                    </Button>
+                                  </div>
+                                </div>
+                                {/* Centered About Text */}
+                                <div className="w-full max-w-2xl">
+                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
+                                  <Textarea
+                                    value={portfolio.about_text || ''}
+                                    onChange={(e) => handleFieldChange('about_text', e.target.value)}
+                                    placeholder="Tell your story..."
+                                    rows={8}
+                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         )}
 
                         {key === 'tracks' && (
@@ -1701,47 +1829,6 @@ const PortfolioEditorPage = () => {
           </div>
         </main>
       </div>
-
-      {showPreview && (
-        <div className={`fixed inset-0 z-50 bg-black ${previewMode === 'fullscreen' ? '' : 'p-4'}`}>
-          <div className={`relative h-full ${previewMode === 'fullscreen' ? '' : 'rounded-lg overflow-hidden'}`}>
-            <div className="absolute top-4 right-4 z-10 flex gap-2">
-              <button
-                onClick={() => setShowPreview(false)}
-                className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  const iframe = document.getElementById('preview-iframe') as HTMLIFrameElement;
-                  if (iframe) {
-                    const newUrl = `/portfolio/preview/${portfolio?.id}?t=${Date.now()}&v=${Math.random()}&cache=${new Date().getTime()}&refresh=true`;
-                    console.log('🔄 Refreshing preview with URL:', newUrl);
-                    iframe.src = newUrl;
-                  }
-                }}
-                className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
-              >
-                Refresh
-              </button>
-            </div>
-            {!portfolio.is_published && (
-              <div className="absolute top-4 left-4 z-10">
-                <div className="px-3 py-1 bg-yellow-500/90 text-yellow-900 rounded text-sm font-medium">
-                  ⚠️ Portfolio is unpublished - some content may not display
-                </div>
-              </div>
-            )}
-            <iframe
-              id="preview-iframe"
-              src={`/portfolio/preview/${portfolio?.id}?t=${Date.now()}&v=${Math.random()}&cache=${new Date().getTime()}`}
-              className="w-full h-full border-0"
-              title="Portfolio Preview"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
