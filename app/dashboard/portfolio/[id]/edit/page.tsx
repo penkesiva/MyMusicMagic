@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -828,12 +828,23 @@ const PortfolioEditorPage = () => {
               <Label htmlFor="publish-switch" className="text-white font-medium">
                 {portfolio.is_published ? 'Published' : 'Unpublished'}
               </Label>
+              
+              {/* Preview Button - Shows unpublished changes */}
+              <button
+                onClick={() => window.open(`/portfolio/preview/${portfolio.id}`, "_blank")} 
+                className="px-4 py-2 bg-blue-600/20 border border-blue-500/30 text-blue-300 rounded-lg hover:bg-blue-600/30 transition-all duration-300 text-sm font-medium flex items-center"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Preview
+              </button>
+              
+              {/* View Public Button - Shows published version */}
               <button
                 onClick={() => window.open(`/portfolio/${userProfile?.username || 'user'}/${portfolio.slug}`, "_blank")} 
-                className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm font-medium flex items-center"
+                className="px-4 py-2 bg-green-600/20 border border-green-500/30 text-green-300 rounded-lg hover:bg-green-600/30 transition-all duration-300 text-sm font-medium flex items-center"
               >
                 <ExternalLink className="mr-2 h-4 w-4" />
-                Preview
+                View Public
               </button>
             </div>
           </div>
