@@ -335,7 +335,7 @@ const PortfolioEditorPage = () => {
       'youtube_url', 'linkedin_url', 'website_url', 'github_url',
       'hobbies_title', 'hobbies_json', 'skills_title', 'skills_json',
       'press_title', 'press_json', 'key_projects_title', 'key_projects_json',
-      'contact_title', 'contact_description', 'contact_email', 'footer_text',
+      'contact_title', 'contact_description', 'contact_email', 'contact_phone', 'contact_location', 'footer_text',
       'footer_about_summary', 'footer_links_json', 'footer_social_links_json', 'footer_copyright_text',
       'footer_show_social_links', 'footer_show_about_summary', 'footer_show_links',
       'sections_config', 'theme_name', 'resume_url', 'resume_title', 'artist_name', 'bio',
@@ -1435,6 +1435,32 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.contact_email || ''}
                                 onChange={(e) => handleFieldChange('contact_email', e.target.value)}
                                 placeholder="your.email@example.com"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Contact Phone
+                              </label>
+                              <Input
+                                type="tel"
+                                value={portfolio.contact_phone || ''}
+                                onChange={(e) => handleFieldChange('contact_phone', e.target.value)}
+                                placeholder="e.g. +1 555-123-4567"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Location
+                              </label>
+                              <Input
+                                type="text"
+                                value={portfolio.contact_location || ''}
+                                onChange={(e) => handleFieldChange('contact_location', e.target.value)}
+                                placeholder="e.g. San Francisco, CA"
                                 className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                               />
                             </div>

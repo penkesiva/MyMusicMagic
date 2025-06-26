@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Database } from '@/types/database';
 import Image from 'next/image';
 import {
-  Play, Mail, Music, Image as ImageIcon, User, ArrowRight, ExternalLink, Globe, FileText, Briefcase, Award, Star
+  Play, Mail, Music, Image as ImageIcon, User, ArrowRight, ExternalLink, Globe, FileText, Briefcase, Award, Star, Phone, MapPin
 } from 'lucide-react'
 import { Portfolio } from '@/types/portfolio'
 import { notFound } from 'next/navigation'
@@ -415,8 +415,7 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
   };
 
   const renderContact = (portfolio: Portfolio) => {
-    const sectionTitle = (portfolio.sections_config as any)?.contact?.name || SECTIONS_CONFIG['contact'].defaultName;
-    
+    const sectionTitle = portfolio.contact_title || (portfolio.sections_config as any)?.contact?.name || SECTIONS_CONFIG['contact'].defaultName;
     return (
       <section id="contact" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto text-center">
@@ -424,15 +423,26 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
           {portfolio.contact_description && (
             <p className={`${colors.text} text-lg max-w-2xl mx-auto mb-8`}>{portfolio.contact_description}</p>
           )}
-          {portfolio.contact_email && (
-            <a href={`mailto:${portfolio.contact_email}`} className={`inline-block text-xl font-semibold ${colors.primaryStrong} hover:underline mb-8`}>{portfolio.contact_email}</a>
-          )}
+          <div className="flex flex-col items-center gap-4 mb-8">
+            {portfolio.contact_email && (
+              <a href={`mailto:${portfolio.contact_email}`} className={`flex items-center gap-2 text-xl font-semibold ${colors.primaryStrong} hover:underline`}><Mail className="w-5 h-5" />{portfolio.contact_email}</a>
+            )}
+            {portfolio.contact_phone && (
+              <a href={`tel:${portfolio.contact_phone}`} className={`flex items-center gap-2 text-lg ${colors.text} hover:${colors.primaryStrong}`}><Phone className="w-5 h-5" />{portfolio.contact_phone}</a>
+            )}
+            {portfolio.contact_location && (
+              <div className={`flex items-center gap-2 text-lg ${colors.text}`}><MapPin className="w-5 h-5" />{portfolio.contact_location}</div>
+            )}
+            {portfolio.website_url && (
+              <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-lg ${colors.text} hover:${colors.primaryStrong}`}><Globe className="w-5 h-5" />{portfolio.website_url}</a>
+            )}
+          </div>
           <div className="flex justify-center gap-6 mt-4">
-            {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><FaInstagram className="w-6 h-6"/></a>}
-            {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><FaTwitter className="w-6 h-6"/></a>}
-            {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><FaYoutube className="w-6 h-6"/></a>}
-            {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><FaLinkedin className="w-6 h-6"/></a>}
-            {portfolio.website_url && <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`}><Globe className="w-6 h-6"/></a>}
+            {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="LinkedIn"><FaLinkedin className="w-6 h-6"/></a>}
+            {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="Twitter"><FaTwitter className="w-6 h-6"/></a>}
+            {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="Instagram"><FaInstagram className="w-6 h-6"/></a>}
+            {portfolio.github_url && <a href={portfolio.github_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="GitHub"><FaGithub className="w-6 h-6"/></a>}
+            {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="YouTube"><FaYoutube className="w-6 h-6"/></a>}
           </div>
         </div>
       </section>

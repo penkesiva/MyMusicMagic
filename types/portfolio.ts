@@ -51,6 +51,8 @@ export type Portfolio = {
   contact_title: string | null;
   contact_description: string | null;
   contact_email: string | null;
+  contact_phone: string | null;
+  contact_location: string | null;
   
   // Social Links
   twitter_url: string | null;
