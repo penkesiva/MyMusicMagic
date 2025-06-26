@@ -17,6 +17,7 @@ import { TrackCard } from '@/app/components/tracks/TrackCard';
 import { SECTIONS_CONFIG } from '@/lib/sections';
 import { useState, useEffect } from 'react';
 import AudioPlayer from '@/app/components/AudioPlayer';
+import PortfolioGalleryDisplay from '@/components/portfolio/PortfolioGalleryDisplay';
 
 // Force dynamic rendering to prevent caching
 export const dynamic = 'force-dynamic';
@@ -336,33 +337,72 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
 
   const renderGallery = (portfolio: Portfolio, galleryItems: GalleryItem[]) => {
     const sectionTitle = (portfolio.sections_config as any)?.gallery?.name || SECTIONS_CONFIG['gallery'].defaultName;
+    const [tab, setTab] = useState<'photo' | 'video'>('photo');
+    // Filter items by tab
+    const filteredItems = galleryItems.filter(item => {
+      if (tab === 'photo') return item.media_type === 'image';
+      if (tab === 'video') return item.media_type === 'video';
+      return true;
+    });
     return (
       <section id="gallery" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
           <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          {galleryItems.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {galleryItems.map((item) => (
-                <div key={item.id} className="group relative aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                  <Image
-                    src={item.image_url || '/default-track-thumbnail.jpg'}
-                    alt={item.title || 'Gallery image'}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  {item.title && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <p className="text-white text-center font-semibold text-sm">{item.title}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+          {/* Tabs for Photos and Videos */}
+          <div className="flex justify-center gap-4 mb-6">
+            <button
+              className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'photo' ? 'bg-purple-600 text-white shadow' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+              onClick={() => setTab('photo')}
+            >
+              Photos
+            </button>
+            <button
+              className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'video' ? 'bg-purple-600 text-white shadow' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+              onClick={() => setTab('video')}
+            >
+              Videos
+            </button>
+          </div>
+          {/* Grid display */}
+          {filteredItems.length === 0 ? (
+            <div className="text-center p-8 border-2 border-dashed border-white/20 rounded-lg">
+              <h3 className="text-lg font-semibold text-white/80">No {tab === 'photo' ? 'Photos' : 'Videos'} Found</h3>
+              <p className="text-sm text-white/50 mt-2">
+                {tab === 'photo' ? 'Add your first photo to get started.' : 'No videos found. Try uploading a video.'}
+              </p>
             </div>
           ) : (
-            <div className="text-center text-gray-400">
-              <ImageIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg">No gallery items yet.</p>
-              <p className="text-sm mt-2">Add photos and videos to showcase your work.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+              {filteredItems.map((item) => (
+                <div key={item.id} className="bg-white/5 rounded-xl overflow-hidden border border-white/10 group flex flex-col">
+                  {/* Image/Video Preview */}
+                  <div className="relative aspect-square w-full min-h-[220px] max-h-[320px]">
+                    <img src={item.image_url} alt={item.title} className="w-full h-full object-cover"/>
+                    {item.media_type === 'video' && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <div className="w-14 h-14 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                          <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                      </div>
+                    )}
+                    {/* Optional: Featured badge */}
+                    {Boolean((item as any)['is_featured']) ? (
+                      <span className="absolute top-3 left-3 bg-gradient-to-r from-purple-500 to-pink-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow">Featured</span>
+                    ) : null}
+                  </div>
+                  {/* Content */}
+                  <div className="p-3 flex-1 flex flex-col justify-between">
+                    <h4 className="font-medium text-sm mb-1 line-clamp-1 text-white">{item.title}</h4>
+                    <p className="text-gray-400 text-xs mb-2 line-clamp-2">{item.description}</p>
+                    <div className="flex justify-between items-center mt-auto">
+                      <p className="text-gray-500 text-xs">{new Date(item.created_at).toLocaleDateString()}</p>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        item.media_type === 'video' ? 'bg-blue-900/20 text-blue-300 border border-blue-500/20' : 'bg-green-900/20 text-green-300 border border-green-500/20'
+                      }`}>{item.media_type === 'video' ? 'Video' : 'Image'}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -563,7 +603,7 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
 
               {key === 'about' && renderAbout(portfolio)}
               {key === 'tracks' && renderTracks(portfolio, tracks)}
-              {key === 'gallery' && renderGallery(portfolio, galleryItems)}
+              {key === 'gallery' && <PortfolioGalleryDisplay portfolioId={portfolio.id} viewMode="grid" filter="all" />}
               {key === 'hobbies' && renderHobbies(portfolio)}
               {key === 'skills' && renderSkills(portfolio)}
               {key === 'press' && renderPress(portfolio)}

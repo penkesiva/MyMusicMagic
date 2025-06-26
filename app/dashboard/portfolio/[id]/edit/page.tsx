@@ -1197,17 +1197,8 @@ const PortfolioEditorPage = () => {
                           ) : (
                             <div className="space-y-4">
                               <div className="flex justify-end items-center mb-4 gap-2">
-                                <Button onClick={() => setGalleryViewMode('grid')} variant="ghost" size="icon" className={galleryViewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><Grid className="h-5 w-5" /></Button>
                                 <Button onClick={() => setGalleryViewMode('list')} variant="ghost" size="icon" className={galleryViewMode === 'list' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><List className="h-5 w-5" /></Button>
-                                <select
-                                  value={galleryFilter}
-                                  onChange={(e) => setGalleryFilter(e.target.value as 'all' | 'photo' | 'video')}
-                                  className="bg-white/10 border border-white/20 text-white rounded px-3 py-1 text-sm"
-                                >
-                                  <option value="all">All Items</option>
-                                  <option value="photo">Photos Only</option>
-                                  <option value="video">Videos Only</option>
-                                </select>
+                                <Button onClick={() => setGalleryViewMode('grid')} variant="ghost" size="icon" className={galleryViewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><Grid className="h-5 w-5" /></Button>
                                 <Button onClick={() => setShowAddGalleryForm(true)} className="bg-white/10 border-white/20 text-white hover:bg-white/20"><PlusCircle className="mr-2 h-4 w-4" /> Add Item</Button>
                               </div>
                               <PortfolioGalleryDisplay
