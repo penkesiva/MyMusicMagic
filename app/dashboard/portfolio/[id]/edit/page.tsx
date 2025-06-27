@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -24,8 +24,9 @@ import PortfolioGalleryDisplay from "@/components/portfolio/PortfolioGalleryDisp
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+// import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import PressMentionsForm from '@/components/portfolio/PressMentionsForm';
+import { generateEnhancedAITitle } from '@/lib/utils';
 
 const EditableField = ({ value, onSave, fieldType = 'input', theme }: { value: string; onSave: (newValue: string) => void; fieldType?: 'input' | 'textarea', theme: any }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -180,8 +181,7 @@ const PortfolioEditorPage = () => {
       const updatedPortfolio = { ...portfolio, ...data };
       setPortfolio(updatedPortfolio);
       
-      // Save the AI-generated changes
-      saveChanges(data);
+      // The portfolio state update will trigger automatic saving through the existing debounced save mechanism
 
     } catch (error) {
       console.error("AI Generation Error:", error);
@@ -573,13 +573,71 @@ const PortfolioEditorPage = () => {
   
   const handleSectionConfigChange = (
     sectionKey: keyof typeof SECTIONS_CONFIG,
-    configKey: "enabled" | "name",
+    configKey: "enabled" | "name" | "title",
     value: boolean | string
   ) => {
     if (!portfolio || !portfolio.sections_config) return;
     const newConfig = { ...(portfolio.sections_config as Record<string, any>) };
+    
+    if (!newConfig[sectionKey]) {
+      newConfig[sectionKey] = {};
+    }
+    
+    // Track manual user choices for enabled/disabled sections
+    if (configKey === "enabled") {
+      const currentEnabled = newConfig[sectionKey].enabled;
+      const newEnabled = value as boolean;
+      
+      // If user is changing the enabled state, mark it as a manual choice
+      if (currentEnabled !== newEnabled) {
+        if (newEnabled) {
+          newConfig[sectionKey].user_manually_enabled = true;
+          newConfig[sectionKey].user_manually_disabled = false;
+        } else {
+          newConfig[sectionKey].user_manually_disabled = true;
+          newConfig[sectionKey].user_manually_enabled = false;
+        }
+      }
+    }
+    
     (newConfig[sectionKey] as any)[configKey] = value;
     handleFieldChange("sections_config", newConfig);
+  };
+
+  // AI Title Suggestion Handler
+  const handleAITitleSuggestion = async (sectionKey: string) => {
+    if (!portfolio) return;
+    
+    try {
+      const suggestedTitle = await generateEnhancedAITitle(
+        sectionKey, 
+        portfolio, 
+        portfolio.template_id || undefined
+      );
+      
+      if (suggestedTitle) {
+        handleSectionConfigChange(sectionKey as keyof typeof SECTIONS_CONFIG, 'title', suggestedTitle);
+      }
+    } catch (error) {
+      console.error('Error generating AI title:', error);
+    }
+  };
+
+  // Get section title with fallback logic
+  const getSectionTitle = (sectionKey: string): string => {
+    if (!portfolio?.sections_config) return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
+    
+    const sectionConfig = (portfolio.sections_config as any)?.[sectionKey];
+    if (!sectionConfig) return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
+    
+    // Check for custom title first
+    if (sectionConfig.title) return sectionConfig.title;
+    
+    // Fallback to name field
+    if (sectionConfig.name) return sectionConfig.name;
+    
+    // Final fallback to default
+    return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
   };
 
   const handleAddHobby = (hobby: { name: string; icon: string }) => {
@@ -723,10 +781,10 @@ const PortfolioEditorPage = () => {
               size="icon"
               variant="ghost"
               className="p-1 h-8 w-8 text-white hover:bg-white/10"
-              title="Generate with AI"
+              title="Fill all editable fields with AI"
               disabled={isGenerating || !aiPrompt}
             >
-              <Sparkles size={22} />
+              <Wand2 size={22} />
             </Button>
           </div>
           <div className="flex items-center gap-2 mb-2">
@@ -741,6 +799,9 @@ const PortfolioEditorPage = () => {
             </span>
             {savingStatus === 'saving' && <span className="text-xs text-gray-400 ml-2">Saving...</span>}
             {savingStatus === 'saved' && <span className="text-xs text-green-400 ml-2">Saved</span>}
+          </div>
+          <div className="text-xs text-gray-400">
+            <p>✨ <strong>Magic Wand:</strong> Fill all editable fields with AI</p>
           </div>
         </div>
 
@@ -877,7 +938,7 @@ const PortfolioEditorPage = () => {
                     >
                       <div className="flex items-center gap-3">
                         <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
-                          {SECTIONS_CONFIG[key]?.defaultName}
+                          {getSectionTitle(key)}
                         </h2>
                         {!isEnabled && (
                           <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded-full">
@@ -894,6 +955,27 @@ const PortfolioEditorPage = () => {
                           <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                             <p className="text-yellow-300 text-sm">
                               This section is currently disabled. Enable it in the Sections panel to the left to start editing.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Section Title Editor - Only show for sections that support custom titles */}
+                        {sectionConfig.hasCustomTitle && (
+                          <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                            <div className="flex items-center justify-between mb-3">
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                Section Title
+                              </label>
+                            </div>
+                            <Input
+                              type="text"
+                              value={getSectionTitle(key)}
+                              onChange={(e) => handleSectionConfigChange(key as keyof typeof SECTIONS_CONFIG, 'title', e.target.value)}
+                              placeholder={`Enter title for ${sectionConfig.defaultName} section`}
+                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                            />
+                            <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
+                              This title will be displayed at the top of the {sectionConfig.defaultName} section on your portfolio. Use the AI Assistant to generate creative titles.
                             </p>
                           </div>
                         )}

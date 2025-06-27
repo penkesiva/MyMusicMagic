@@ -70,6 +70,23 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
     return [];
   };
 
+  // Get section title with fallback logic
+  const getSectionTitle = (sectionKey: string): string => {
+    if (!portfolio?.sections_config) return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
+    
+    const sectionConfig = (portfolio.sections_config as any)?.[sectionKey];
+    if (!sectionConfig) return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
+    
+    // Check for custom title first
+    if (sectionConfig.title) return sectionConfig.title;
+    
+    // Fallback to name field
+    if (sectionConfig.name) return sectionConfig.name;
+    
+    // Final fallback to default
+    return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
+  };
+
   return (
     <div className={`min-h-screen ${theme.colors.background} overflow-x-hidden`}>
       {showPreviewBanner && (
@@ -107,8 +124,22 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
               </div>
             )}
             {/* Add other section renderings here, e.g. about, tracks, gallery, press, etc. */}
-            {key === 'gallery' && <PortfolioGalleryDisplay portfolioId={portfolio.id} viewMode="grid" filter="all" />}
-            {key === 'press' && <PressMentionsDisplay portfolioId={portfolio.id} theme={theme} layout="featured" />}
+            {key === 'gallery' && (
+              <section id="gallery" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('gallery')}</h2>
+                  <PortfolioGalleryDisplay portfolioId={portfolio.id} viewMode="grid" filter="all" />
+                </div>
+              </section>
+            )}
+            {key === 'press' && (
+              <section id="press" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('press')}</h2>
+                  <PressMentionsDisplay portfolioId={portfolio.id} theme={theme} layout="featured" />
+                </div>
+              </section>
+            )}
             {key === 'about' && (
               <section id="about" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto flex flex-col md:flex-row items-center gap-12">
@@ -118,7 +149,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                     </div>
                   )}
                   <div className="flex-1">
-                    <h2 className={`text-4xl font-bold mb-6 ${theme.colors.heading}`}>{portfolio.about_title || SECTIONS_CONFIG['about'].defaultName}</h2>
+                    <h2 className={`text-4xl font-bold mb-6 ${theme.colors.heading}`}>{getSectionTitle('about')}</h2>
                     <p className={`${theme.colors.text} text-lg leading-relaxed whitespace-pre-line`}>{portfolio.about_text}</p>
                   </div>
                 </div>
@@ -127,7 +158,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
             {key === 'tracks' && (
               <section id="tracks" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto">
-                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{SECTIONS_CONFIG['tracks'].defaultName}</h2>
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('tracks')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {tracks.map((track: any) => (
                       <TrackCard key={track.id} track={track} theme={theme} />
@@ -139,7 +170,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
             {key === 'hobbies' && (
               <section id="hobbies" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto">
-                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{portfolio.hobbies_title || SECTIONS_CONFIG['hobbies'].defaultName}</h2>
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('hobbies')}</h2>
                   <div className="flex flex-wrap justify-center gap-6">
                     {safeGetArray(portfolio.hobbies_json)?.map((hobby: any) => (
                       <div key={hobby.name} className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-lg w-32">
@@ -154,7 +185,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
             {key === 'skills' && (
               <section id="skills" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto">
-                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{portfolio.skills_title || SECTIONS_CONFIG['skills'].defaultName}</h2>
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('skills')}</h2>
                   <div className="flex flex-wrap justify-center gap-6">
                     {safeGetArray(portfolio.skills_json)?.map((skill: any) => {
                       const skillDef = SKILLS_LIST.find(s => s.name === skill.name);
@@ -173,7 +204,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
             {key === 'contact' && (
               <section id="contact" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto max-w-2xl">
-                  <h2 className={`text-4xl font-bold mb-8 text-center ${theme.colors.heading}`}>{portfolio.contact_title || SECTIONS_CONFIG['contact'].defaultName}</h2>
+                  <h2 className={`text-4xl font-bold mb-8 text-center ${theme.colors.heading}`}>{getSectionTitle('contact')}</h2>
                   <p className="text-lg mb-8 text-center">{portfolio.contact_description}</p>
                   <div className="flex flex-col gap-4 items-center">
                     {portfolio.contact_email && <a href={`mailto:${portfolio.contact_email}`} className="text-blue-400 hover:underline">{portfolio.contact_email}</a>}
@@ -188,6 +219,47 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                       {portfolio.website_url && <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className="text-green-400"><Globe className="w-6 h-6" /></a>}
                     </div>
                   </div>
+                </div>
+              </section>
+            )}
+            {/* Add other sections with custom titles */}
+            {key === 'key_projects' && (
+              <section id="key_projects" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('key_projects')}</h2>
+                  {/* Add key projects content here */}
+                </div>
+              </section>
+            )}
+            {key === 'testimonials' && (
+              <section id="testimonials" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('testimonials')}</h2>
+                  {/* Add testimonials content here */}
+                </div>
+              </section>
+            )}
+            {key === 'blog' && (
+              <section id="blog" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('blog')}</h2>
+                  {/* Add blog content here */}
+                </div>
+              </section>
+            )}
+            {key === 'status' && (
+              <section id="status" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('status')}</h2>
+                  {/* Add status content here */}
+                </div>
+              </section>
+            )}
+            {key === 'resume' && (
+              <section id="resume" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('resume')}</h2>
+                  {/* Add resume content here */}
                 </div>
               </section>
             )}

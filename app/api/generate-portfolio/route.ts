@@ -69,18 +69,18 @@ function getPrompt(prompt: string, templateName?: string) {
       "footer_about_summary": "A brief 2-3 sentence summary for the footer section based on the about text. (string)",
       "sections_config": {
         "hero": { "enabled": true },
-        "about": { "enabled": true },
-        "tracks": { "enabled": boolean },
-        "gallery": { "enabled": boolean },
-        "key_projects": { "enabled": boolean },
-        "testimonials": { "enabled": boolean },
-        "press": { "enabled": boolean },
-        "blog": { "enabled": boolean },
-        "status": { "enabled": boolean },
-        "skills": { "enabled": boolean },
-        "resume": { "enabled": boolean },
-        "hobbies": { "enabled": boolean },
-        "contact": { "enabled": true }
+        "about": { "enabled": true, "title": "About Me" },
+        "tracks": { "enabled": boolean, "title": "string" },
+        "gallery": { "enabled": boolean, "title": "string" },
+        "key_projects": { "enabled": boolean, "title": "string" },
+        "testimonials": { "enabled": boolean, "title": "string" },
+        "press": { "enabled": boolean, "title": "string" },
+        "blog": { "enabled": boolean, "title": "string" },
+        "status": { "enabled": boolean, "title": "string" },
+        "skills": { "enabled": boolean, "title": "string" },
+        "resume": { "enabled": boolean, "title": "string" },
+        "hobbies": { "enabled": boolean, "title": "string" },
+        "contact": { "enabled": true, "title": "string" }
       }
     }
 
@@ -91,8 +91,81 @@ function getPrompt(prompt: string, templateName?: string) {
     - For "hobbies_title" and "hobbies_json", generate 3-5 relevant hobbies or interests with appropriate emojis.
     - For "resume_title", generate an appropriate title for the resume section.
     - For "footer_about_summary", create a concise 2-3 sentence summary based on the about_text that's suitable for a footer section.
-    - For "sections_config", intelligently enable or disable sections based on what would be most relevant for the user's described profession (e.g., enable 'tracks' for a musician, 'key_projects' for a developer, 'gallery' for a photographer). 'hero', 'about', and 'contact' should always be enabled.
+    - For "sections_config", intelligently enable or disable sections based on what would be most relevant for the user's described profession. Enable sections that make sense for their work:
+      * For musicians: enable 'tracks', 'gallery' (performance photos), 'press' (reviews), 'skills' (instruments), 'hobbies' (music-related interests)
+      * For photographers: enable 'gallery', 'press' (exhibitions), 'skills' (photography tools), 'hobbies' (visual arts interests)
+      * For developers: enable 'key_projects', 'skills', 'blog', 'status' (current work), 'resume'
+      * For designers: enable 'gallery', 'key_projects', 'skills', 'blog', 'testimonials'
+      * For writers: enable 'blog', 'press' (publications), 'key_projects', 'testimonials'
+      * For educators: enable 'resume', 'skills', 'blog', 'testimonials', 'status'
+      * Always enable 'hero', 'about', and 'contact' sections
+      * Enable 'testimonials' for client-facing professions
+      * Enable 'press' for public-facing work
+      * Enable 'hobbies' for personal touch
+    - For each section in "sections_config", generate an appropriate "title" that matches the user's profession and the section's purpose. For example:
+      * "tracks" for a musician might be "My Compositions" or "Discography"
+      * "gallery" for a photographer might be "Photo Portfolio" or "Visual Stories"
+      * "press" might be "Press & Media" or "In the News"
+      * "skills" might be "Skills & Tools" or "Expertise"
+      * "hobbies" might be "Hobbies & Interests" or "What I Love"
     - Only output the raw JSON.
+    `;
+}
+
+// Helper function to generate section titles specifically
+function getSectionTitlesPrompt(prompt: string, templateName?: string) {
+  let templateSpecificInstructions = "";
+  
+  if (templateName === 'Photo Gallery') {
+    templateSpecificInstructions = `
+    Template: Photo Gallery - This is a photography-focused portfolio template.
+    Photography-specific section titles:
+    - tracks: "Audio Stories", "Soundscapes", "Audio Work"
+    - gallery: "Photo Portfolio", "My Photography", "Visual Stories"
+    - press: "Exhibitions", "Publications", "Press Features"
+    `;
+  } else if (templateName === 'Music Maestro') {
+    templateSpecificInstructions = `
+    Template: Music Maestro - This is a music-focused portfolio template.
+    Music-specific section titles:
+    - tracks: "My Compositions", "Musical Works", "Discography"
+    - gallery: "Performance Photos", "Behind the Scenes", "Studio Sessions"
+    - press: "Press Coverage", "Reviews & Features", "Media Mentions"
+    `;
+  }
+
+  return `
+    You are a creative assistant that generates section titles for a portfolio website.
+    Based on the user's prompt, generate appropriate titles for each portfolio section.
+
+    User Prompt: "${prompt}"
+    ${templateSpecificInstructions}
+
+    Generate a JSON object with section titles that match the user's profession and style.
+    Only include sections that would be relevant for the user's described profession.
+
+    {
+      "sections_config": {
+        "about": { "title": "string" },
+        "tracks": { "title": "string" },
+        "gallery": { "title": "string" },
+        "press": { "title": "string" },
+        "contact": { "title": "string" },
+        "skills": { "title": "string" },
+        "hobbies": { "title": "string" },
+        "resume": { "title": "string" },
+        "testimonials": { "title": "string" },
+        "blog": { "title": "string" },
+        "status": { "title": "string" }
+      }
+    }
+
+    Instructions:
+    - Generate creative, professional section titles that match the user's profession
+    - Use 2-4 words for each title
+    - Make titles engaging and descriptive
+    - Consider the template type when generating titles
+    - Only output the raw JSON with relevant sections
     `;
 }
 
@@ -130,6 +203,10 @@ export async function POST(request: Request) {
         
         Return only the summary text, no JSON or additional formatting.
       `;
+    } else if (type === 'section_titles') {
+      // Get template name from current portfolio if available
+      const templateName = currentPortfolio?.theme_name || null;
+      fullPrompt = getSectionTitlesPrompt(prompt, templateName);
     } else {
       // Get template name from current portfolio if available
       const templateName = currentPortfolio?.theme_name || null;
@@ -143,18 +220,56 @@ export async function POST(request: Request) {
     if (type === 'footer_about_summary') {
       // For footer about summary, return the text directly
       return NextResponse.json({ content: text.trim() });
+    } else if (type === 'section_titles') {
+      // For section titles only, parse and return the sections_config
+      const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const generatedData = JSON.parse(jsonString);
+      
+      // Merge with existing sections_config, preserving enabled state and order
+      const finalSectionsConfig = { ...currentPortfolio.sections_config };
+      for (const key in generatedData.sections_config) {
+        if (finalSectionsConfig[key]) {
+          finalSectionsConfig[key] = {
+            ...finalSectionsConfig[key],
+            title: generatedData.sections_config[key].title
+          };
+        }
+      }
+      
+      return NextResponse.json({ sections_config: finalSectionsConfig });
     } else {
-      // For full portfolio generation, parse as JSON
+      // For full portfolio generation (default), parse as JSON and include section titles
       const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
       const generatedData = JSON.parse(jsonString);
 
-      // Combine generated section toggles with the user's existing config order and names
+      // Smart section enabling logic: respect user's manual choices
       const finalSectionsConfig = { ...currentPortfolio.sections_config };
       for (const key in generatedData.sections_config) {
           if (finalSectionsConfig[key]) {
-              finalSectionsConfig[key].enabled = generatedData.sections_config[key].enabled;
+              const currentSection = finalSectionsConfig[key];
+              const generatedSection = generatedData.sections_config[key];
+              
+              // Check if user has manually enabled this section (user_manually_enabled flag)
+              const userManuallyEnabled = currentSection.user_manually_enabled === true;
+              const userManuallyDisabled = currentSection.user_manually_disabled === true;
+              
+              // If user hasn't made a manual choice, use AI's suggestion
+              if (!userManuallyEnabled && !userManuallyDisabled) {
+                  finalSectionsConfig[key] = {
+                    ...currentSection,
+                    enabled: generatedSection.enabled,
+                    title: generatedSection.title
+                  };
+              } else {
+                  // If user has made a manual choice, preserve it and only update the title
+                  finalSectionsConfig[key] = {
+                    ...currentSection,
+                    title: generatedSection.title
+                  };
+              }
           }
       }
+
       generatedData.sections_config = finalSectionsConfig;
 
       return NextResponse.json(generatedData);

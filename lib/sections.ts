@@ -4,6 +4,7 @@ export type Section = {
     defaultOrder: number;
     enabled: boolean;
     defaultEnabled: boolean;
+    hasCustomTitle: boolean;
     fields: {
         [key: string]: 'text' | 'textarea' | 'url' | 'boolean' | 'json';
     };
@@ -16,6 +17,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 0,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: false,
         fields: {
             hero_title: 'text',
             hero_subtitle: 'text',
@@ -29,6 +31,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 1,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: true,
         fields: {
             about_title: 'text',
             about_text: 'textarea',
@@ -41,7 +44,10 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 2,
         enabled: true,
         defaultEnabled: true,
-        fields: {}
+        hasCustomTitle: true,
+        fields: {
+            tracks_title: 'text'
+        }
     },
     gallery: {
         key: 'gallery',
@@ -49,7 +55,10 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 3,
         enabled: true,
         defaultEnabled: true,
-        fields: {}
+        hasCustomTitle: true,
+        fields: {
+            gallery_title: 'text'
+        }
     },
     key_projects: {
         key: 'key_projects',
@@ -57,6 +66,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 5,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: true,
         fields: {
             key_projects_title: 'text',
             key_projects_json: 'json'
@@ -68,7 +78,10 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 6,
         enabled: false,
         defaultEnabled: false,
-        fields: {}
+        hasCustomTitle: true,
+        fields: {
+            testimonials_title: 'text'
+        }
     },
     press: {
         key: 'press',
@@ -76,6 +89,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 4,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: true,
         fields: {
             press_title: 'text',
             press_json: 'json'
@@ -87,7 +101,10 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 8,
         enabled: false,
         defaultEnabled: false,
-        fields: {}
+        hasCustomTitle: true,
+        fields: {
+            blog_title: 'text'
+        }
     },
     status: {
         key: 'status',
@@ -95,7 +112,10 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 9,
         enabled: false,
         defaultEnabled: false,
-        fields: {}
+        hasCustomTitle: true,
+        fields: {
+            status_title: 'text'
+        }
     },
     skills: {
         key: 'skills',
@@ -103,6 +123,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 6,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: true,
         fields: {
             skills_title: 'text',
             skills_json: 'json'
@@ -114,6 +135,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 9,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: true,
         fields: {
             resume_title: 'text',
             resume_url: 'url'
@@ -125,6 +147,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 7,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: true,
         fields: {
             hobbies_title: 'text',
             hobbies_json: 'json'
@@ -136,6 +159,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 9,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: true,
         fields: {
             contact_title: 'text',
             contact_description: 'textarea',
@@ -154,6 +178,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultOrder: 14,
         enabled: true,
         defaultEnabled: true,
+        hasCustomTitle: false,
         fields: {
             footer_about_summary: 'textarea',
             footer_links_json: 'json',
