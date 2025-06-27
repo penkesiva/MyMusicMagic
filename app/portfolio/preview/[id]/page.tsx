@@ -19,6 +19,7 @@ import { useState, useEffect } from 'react';
 import AudioPlayer from '@/app/components/AudioPlayer';
 import PortfolioGalleryDisplay from '@/components/portfolio/PortfolioGalleryDisplay';
 import PressMentionsDisplay from '@/components/portfolio/PressMentionsDisplay';
+import PortfolioSectionsRenderer from '@/components/portfolio/PortfolioSectionsRenderer';
 
 // Force dynamic rendering to prevent caching
 export const dynamic = 'force-dynamic';
@@ -548,139 +549,12 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
   };
 
   return (
-    <div className={`min-h-screen ${theme.colors.background} overflow-x-hidden`}>
-      {/* Preview Banner */}
-      <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
-        🎯 PREVIEW MODE - This is how your portfolio will look when published
-      </div>
-      
-      <main className="relative">
-        {/* Main sections rendering with improved layout */}
-        {sortedSections
-          .filter(key => key !== 'footer')
-          .map((key, index) => (
-            <section key={key} id={key} className="scroll-mt-20">
-              {key === 'hero' && (
-                <div className="relative w-full min-h-[90vh] flex items-center justify-center text-center p-4 overflow-hidden">
-                  {portfolio.hero_image_url && (
-                    <Image
-                      src={portfolio.hero_image_url}
-                      alt={portfolio.hero_title || 'Hero image'}
-                      fill
-                      className="object-cover brightness-50"
-                    />
-                  )}
-                  <div className="relative z-10 text-white max-w-4xl mx-auto">
-                    {portfolio.hero_title && (
-                      <h1 className="text-6xl md:text-8xl font-extrabold mb-6 leading-tight" style={{ color: theme.colors.heading }}>
-                        {portfolio.hero_title}
-                      </h1>
-                    )}
-                    {portfolio.hero_subtitle && (
-                      <p className="text-xl md:text-2xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed" style={{ color: theme.colors.text }}>
-                        {portfolio.hero_subtitle}
-                      </p>
-                    )}
-                    {safeGetArray(portfolio.hero_cta_buttons).length > 0 && (
-                      <div className="flex flex-wrap justify-center gap-6">
-                        {safeGetArray(portfolio.hero_cta_buttons).map((button: any, btnIndex: number) => (
-                          <a
-                            key={btnIndex}
-                            href={button.url || '#'}
-                            className={`inline-flex items-center px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 ${btnIndex === 0 ? 'bg-white text-gray-900 hover:bg-gray-100' : 'border-2 border-white text-white hover:bg-white hover:text-gray-900'}`}
-                          >
-                            {button.text}
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Floating decorative elements */}
-                  <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-                  <div className="absolute bottom-20 right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl animate-pulse delay-1000"></div>
-                </div>
-              )}
-
-              {key === 'about' && renderAbout(portfolio)}
-              {key === 'tracks' && renderTracks(portfolio, tracks)}
-              {key === 'gallery' && <PortfolioGalleryDisplay portfolioId={portfolio.id} viewMode="grid" filter="all" />}
-              {key === 'hobbies' && renderHobbies(portfolio)}
-              {key === 'skills' && renderSkills(portfolio)}
-              {key === 'press' && (
-                <PressMentionsDisplay portfolioId={portfolio.id} theme={theme} layout="featured" />
-              )}
-              {key === 'key_projects' && renderKeyProjects(portfolio)}
-              {key === 'resume' && renderResume(portfolio)}
-              {key === 'contact' && renderContact(portfolio)}
-              {key === 'testimonials' && renderTestimonials(portfolio)}
-              {key === 'blog' && renderBlog(portfolio)}
-              {key === 'status' && renderStatus(portfolio)}
-            </section>
-          ))}
-
-        {/* Footer */}
-        {sortedSections.includes('footer') && (
-          <footer className={`${theme.colors.background} ${theme.colors.text} py-16 px-4 md:px-8 border-t border-white/10`}>
-            <div className="container mx-auto text-center">
-              <div className="grid md:grid-cols-3 gap-8 items-start">
-                <div className="text-left">
-                  <h3 className={`text-2xl font-bold mb-4 ${theme.colors.heading}`}>{portfolio.artist_name}</h3>
-                  {portfolio.footer_about_summary && (
-                    <p className={`${theme.colors.text} opacity-80 leading-relaxed`}>{portfolio.footer_about_summary}</p>
-                  )}
-                </div>
-                <div className="text-center">
-                  <h4 className={`text-lg font-semibold mb-4 ${theme.colors.heading}`}>Quick Links</h4>
-                  <div className="flex flex-col gap-2">
-                    {sortedSections.filter(s => s !== 'hero' && s !== 'footer').map(section => (
-                      <a key={section} href={`#${section}`} className={`${theme.colors.text} hover:${theme.colors.primary} transition-colors`}>
-                        {SECTIONS_CONFIG[section]?.defaultName || section}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <h4 className={`text-lg font-semibold mb-4 ${theme.colors.heading}`}>Connect</h4>
-                  <div className="flex justify-end gap-4">
-                    {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.text} hover:${theme.colors.primary} transition-colors`} title="LinkedIn"><FaLinkedin className="w-5 h-5"/></a>}
-                    {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.text} hover:${theme.colors.primary} transition-colors`} title="Twitter"><FaTwitter className="w-5 h-5"/></a>}
-                    {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.text} hover:${theme.colors.primary} transition-colors`} title="Instagram"><FaInstagram className="w-5 h-5"/></a>}
-                    {portfolio.github_url && <a href={portfolio.github_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.text} hover:${theme.colors.primary} transition-colors`} title="GitHub"><FaGithub className="w-5 h-5"/></a>}
-                    {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.text} hover:${theme.colors.primary} transition-colors`} title="YouTube"><FaYoutube className="w-5 h-5"/></a>}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-12 pt-8 border-t border-white/10">
-                <p className={`${theme.colors.text} opacity-60`}>© 2024 {portfolio.artist_name}. All rights reserved.</p>
-              </div>
-            </div>
-          </footer>
-        )}
-      </main>
-
-      {/* Audio Player */}
-      {showPlayer && currentTrack && (
-        <div className="fixed bottom-0 left-0 right-0 bg-transparent p-4 z-50">
-          <div className="relative">
-            <AudioPlayer
-              audioUrl={currentTrack.audio_url}
-              title={currentTrack.title}
-              onPlay={() => {
-                console.log('AudioPlayer: Play requested');
-                setIsPlaying(true);
-              }}
-              onPause={() => {
-                console.log('AudioPlayer: Pause requested');
-                setIsPlaying(false);
-              }}
-              onClose={handleClose}
-              isPlaying={isPlaying}
-              onTrackEnd={() => setIsPlaying(false)}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+    <PortfolioSectionsRenderer
+      portfolio={portfolio}
+      tracks={tracks}
+      galleryItems={galleryItems}
+      theme={theme}
+      showPreviewBanner={true}
+    />
   );
 }
