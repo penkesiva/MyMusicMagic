@@ -24,6 +24,8 @@ import PortfolioGalleryDisplay from "@/components/portfolio/PortfolioGalleryDisp
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import PressMentionsForm from '@/components/portfolio/PressMentionsForm';
 
 const EditableField = ({ value, onSave, fieldType = 'input', theme }: { value: string; onSave: (newValue: string) => void; fieldType?: 'input' | 'textarea', theme: any }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -1526,6 +1528,10 @@ const PortfolioEditorPage = () => {
                               </div>
                             </div>
                           </div>
+                        )}
+
+                        {key === 'press' && (
+                          <PressMentionsForm portfolioId={portfolio.id} theme={selectedTheme} />
                         )}
 
                         {key === 'contact' && (

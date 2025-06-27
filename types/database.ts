@@ -515,6 +515,50 @@ export interface Database {
           portfolio_id?: string | null
         }
       }
+      press_mentions: {
+        Row: {
+          id: string
+          portfolio_id: string
+          title: string
+          description: string | null
+          url: string
+          image_url: string | null
+          date: string | null
+          source: string | null
+          featured: boolean
+          order_index: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          portfolio_id: string
+          title: string
+          description?: string | null
+          url: string
+          image_url?: string | null
+          date?: string | null
+          source?: string | null
+          featured?: boolean
+          order_index?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          portfolio_id?: string
+          title?: string
+          description?: string | null
+          url?: string
+          image_url?: string | null
+          date?: string | null
+          source?: string | null
+          featured?: boolean
+          order_index?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
       messages: {
         Row: {
           id: string
