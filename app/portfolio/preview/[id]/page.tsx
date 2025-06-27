@@ -18,6 +18,7 @@ import { SECTIONS_CONFIG } from '@/lib/sections';
 import { useState, useEffect } from 'react';
 import AudioPlayer from '@/app/components/AudioPlayer';
 import PortfolioGalleryDisplay from '@/components/portfolio/PortfolioGalleryDisplay';
+import PressMentionsDisplay from '@/components/portfolio/PressMentionsDisplay';
 
 // Force dynamic rendering to prevent caching
 export const dynamic = 'force-dynamic';
@@ -606,7 +607,9 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
               {key === 'gallery' && <PortfolioGalleryDisplay portfolioId={portfolio.id} viewMode="grid" filter="all" />}
               {key === 'hobbies' && renderHobbies(portfolio)}
               {key === 'skills' && renderSkills(portfolio)}
-              {key === 'press' && renderPress(portfolio)}
+              {key === 'press' && (
+                <PressMentionsDisplay portfolioId={portfolio.id} theme={theme} layout="featured" />
+              )}
               {key === 'key_projects' && renderKeyProjects(portfolio)}
               {key === 'resume' && renderResume(portfolio)}
               {key === 'contact' && renderContact(portfolio)}

@@ -17,6 +17,7 @@ import { TrackCard } from '@/app/components/tracks/TrackCard';
 import { SECTIONS_CONFIG } from '@/lib/sections';
 import { useState, useEffect } from 'react';
 import AudioPlayer from '@/app/components/AudioPlayer';
+import PressMentionsDisplay from '@/components/portfolio/PressMentionsDisplay';
 
 type PageProps = {
   params: { username: string; slug: string };
@@ -956,7 +957,9 @@ export default function PortfolioPage({ params }: PageProps) {
               {key === 'gallery' && renderGallery(portfolio, galleryItems)}
               {key === 'hobbies' && renderHobbies(portfolio)}
               {key === 'skills' && renderSkills(portfolio)}
-              {key === 'press' && renderPress(portfolio)}
+              {key === 'press' && (
+                <PressMentionsDisplay portfolioId={portfolio.id} theme={theme} layout="featured" />
+              )}
               {key === 'key_projects' && renderKeyProjects(portfolio)}
               {key === 'resume' && renderResume(portfolio)}
               {key === 'contact' && renderContact(portfolio)}
