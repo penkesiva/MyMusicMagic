@@ -155,10 +155,17 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
               <section id="skills" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto">
                   <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{portfolio.skills_title || SECTIONS_CONFIG['skills'].defaultName}</h2>
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {safeGetArray(portfolio.skills_json)?.map((skill: any) => (
-                      <span key={skill.name} className="px-4 py-2 rounded-full bg-white/10 text-sm font-medium" style={{ color: skill.color }}>{skill.name}</span>
-                    ))}
+                  <div className="flex flex-wrap justify-center gap-6">
+                    {safeGetArray(portfolio.skills_json)?.map((skill: any) => {
+                      const skillDef = SKILLS_LIST.find(s => s.name === skill.name);
+                      const Icon = skillDef?.icon;
+                      return (
+                        <div key={skill.name} className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-lg w-32">
+                          {Icon && <span className="text-4xl"><Icon className="h-8 w-8" style={{ color: skill.color }} /></span>}
+                          <span className="text-sm font-medium text-center">{skill.name}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </section>
