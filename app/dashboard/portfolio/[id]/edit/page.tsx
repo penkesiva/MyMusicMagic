@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import {
   PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2
 } from "lucide-react";
@@ -24,93 +22,18 @@ import PortfolioGalleryDisplay from "@/components/portfolio/PortfolioGalleryDisp
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-// import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import PressMentionsForm from '@/components/portfolio/PressMentionsForm';
 import { generateEnhancedAITitle } from '@/lib/utils';
+import PortfolioAIAssistant from '@/components/portfolio/PortfolioAIAssistant';
+import PortfolioThemeSelector from '@/components/portfolio/PortfolioThemeSelector';
+import PortfolioSectionManager from '@/components/portfolio/PortfolioSectionManager';
+import { PortfolioFileUploader } from '@/components/portfolio/PortfolioFileUploader';
+import { safeGetArray, getSectionTitle, getSortedEditorSections } from '@/lib/portfolioEditorUtils';
 
-const EditableField = ({ value, onSave, fieldType = 'input', theme }: { value: string; onSave: (newValue: string) => void; fieldType?: 'input' | 'textarea', theme: any }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentValue, setCurrentValue] = useState(value);
-
-  const handleSave = () => {
-    onSave(currentValue);
-    setIsEditing(false);
-  };
-
-  if (isEditing) {
-    const inputClasses = `w-full ${theme.colors.card} ${theme.colors.text} border border-transparent focus:ring-2 focus:ring-blue-400`;
-    return (
-      <div className="flex items-center gap-2">
-        {fieldType === 'input' ? (
-          <Input
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-            onBlur={handleSave}
-            onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-            autoFocus
-            className={inputClasses}
-          />
-        ) : (
-          <Textarea
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-            onBlur={handleSave}
-            autoFocus
-            className={inputClasses}
-            rows={5}
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div onClick={() => setIsEditing(true)} className={`cursor-pointer hover:bg-white/5 p-2 rounded-md transition-colors w-full min-h-[40px]`}>
-      {value || <span className="text-gray-400">Click to edit</span>}
-    </div>
-  );
-};
-
-// Sortable Section Item component
-type SortableSectionItemProps = {
-  id: string;
-  name: string;
-  enabled: boolean;
-  onToggle: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  dragHandleProps: React.HTMLAttributes<HTMLSpanElement>;
-  onNameEdit?: () => void;
-};
-function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onNameEdit }: SortableSectionItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    background: enabled ? 'rgba(255,255,255,0.04)' : 'transparent',
-    borderRadius: 6,
-    padding: '4px 8px',
-    marginBottom: 4,
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: 14,
-    minHeight: 32,
-    cursor: 'grab',
-  };
-  return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <span {...listeners} {...dragHandleProps} style={{ marginRight: 8, cursor: 'grab', color: '#aaa' }}>
-        <List size={16} />
-      </span>
-      <span style={{ flex: 1, fontWeight: enabled ? 500 : 400, color: enabled ? '#fff' : '#888' }}>{name}</span>
-      <Switch
-        id={`enable-${id}`}
-        isChecked={enabled}
-        onChange={onToggle}
-        style={{ transform: 'scale(0.8)' }}
-      />
-    </div>
-  );
-}
+const NAVBAR_HEIGHT = 56;
+const SIDEBAR_MIN_WIDTH = 220;
+const SIDEBAR_DEFAULT_WIDTH = 240;
+const SIDEBAR_MAX_WIDTH = 320;
 
 const PortfolioEditorPage = () => {
   const router = useRouter();
@@ -129,8 +52,6 @@ const PortfolioEditorPage = () => {
   const [showAddGalleryForm, setShowAddGalleryForm] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
   const [uploadingProfile, setUploadingProfile] = useState(false);
-  const [colorThemeOpen, setColorThemeOpen] = useState(true);
-  const [sectionsOpen, setSectionsOpen] = useState(true);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [galleryViewMode, setGalleryViewMode] = useState<'list' | 'grid'>('list');
   const [galleryFilter, setGalleryFilter] = useState<'all' | 'photo' | 'video'>('all');
@@ -138,183 +59,16 @@ const PortfolioEditorPage = () => {
   const [uploadingResume, setUploadingResume] = useState(false);
   const [hobbySearch, setHobbySearch] = useState("");
   const [skillSearch, setSkillSearch] = useState("");
-  const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [placeholder, setPlaceholder] = useState("");
   const [sectionOrder, setSectionOrder] = useState<string[]>([]);
-
-  const placeholders = [
-    "Build a portfolio for an upcoming cello artist...",
-    "A full-stack developer specializing in React and Node.js...",
-    "Create a page for a freelance photographer...",
-    "A UI/UX designer with a passion for mobile apps...",
-  ];
-
-  useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      setPlaceholder(placeholders[i]);
-      i = (i + 1) % placeholders.length;
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
+  const fileUploader = useMemo(() => new PortfolioFileUploader(), []);
 
-  const handleGenerate = async () => {
-    if (!aiPrompt || !portfolio) return;
-    setIsGenerating(true);
-    try {
-      const response = await fetch('/api/generate-portfolio', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: aiPrompt, currentPortfolio: portfolio }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate content from AI.');
-      }
-
-      const data = await response.json();
-      
-      // Merge AI data with existing portfolio, keeping IDs and other essential fields
-      const updatedPortfolio = { ...portfolio, ...data };
-      setPortfolio(updatedPortfolio);
-      
-      // The portfolio state update will trigger automatic saving through the existing debounced save mechanism
-
-    } catch (error) {
-      console.error("AI Generation Error:", error);
-      alert("There was an error generating the portfolio content. Please try again.");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleReset = () => {
-    if (window.confirm("Are you sure you want to reset the entire portfolio? All your current content will be cleared.")) {
-      fetchPortfolio(); // Re-fetches the original data from the database
-      alert("Portfolio has been reset to its last saved state.");
-    }
-  };
-
-  const sortedEditorSections: string[] = useMemo(() => {
-    if (!portfolio) return [];
-    return Object.keys(SECTIONS_CONFIG)
-      .sort((a, b) => (portfolio?.sections_config as any)?.[a]?.order - (portfolio?.sections_config as any)?.[b]?.order);
-  }, [portfolio]);
-
-  useEffect(() => {
-    // Initialize sections to open only when a portfolio is first loaded
-    if (portfolio && sortedEditorSections.length > 0 && Object.keys(openSections).length === 0) {
-      const allOpen: Record<string, boolean> = {};
-      sortedEditorSections.forEach(key => { allOpen[key] = true; });
-      setOpenSections(allOpen);
-    }
-  }, [portfolio, sortedEditorSections, openSections]);
-
-  const toggleSection = (key: string) => {
-    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const expandAll = () => {
-    const allOpen: Record<string, boolean> = {};
-    sortedEditorSections.forEach(key => { allOpen[key] = true; });
-    setOpenSections(allOpen);
-  };
-
-  const collapseAll = () => {
-    const allClosed: Record<string, boolean> = {};
-    sortedEditorSections.forEach(key => { allClosed[key] = false; });
-    setOpenSections(allClosed);
-  };
-
-  const safeGetArray = (field: any) => {
-    if (Array.isArray(field)) {
-      return field;
-    }
-    if (typeof field === 'string') {
-      try {
-        const parsed = JSON.parse(field);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
-  };
-
-  const selectedTheme = useMemo(() => THEMES.find(t => t.name === portfolio?.theme_name) || THEMES[0], [portfolio?.theme_name]);
-
-  const fetchPortfolio = async () => {
-    if (!id) return;
-    setLoading(true);
-    
-    // First get the current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      router.push("/auth/signin");
-      return;
-    }
-
-    // Get user profile
-    const { data: profileData, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-    
-    if (profileData) {
-      setUserProfile(profileData);
-    }
-
-    const { data, error } = await supabase
-      .from("user_portfolios")
-      .select("*, tracks(*), gallery(*)")
-      .eq("id", id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching portfolio:", error);
-      router.push("/dashboard");
-    } else if (data) {
-      const portfolioData = data as any;
-      console.log('📥 Fetched portfolio data:', {
-        name: portfolioData.name,
-        hobbies_title: portfolioData.hobbies_title,
-        hobbies_json: portfolioData.hobbies_json,
-        sections_config: portfolioData.sections_config
-      });
-      
-      if (!portfolioData.sections_config || typeof portfolioData.sections_config !== 'object') {
-          portfolioData.sections_config = {};
-      }
-
-      for (const key in SECTIONS_CONFIG) {
-          if (!(portfolioData.sections_config as any)[key]) {
-              (portfolioData.sections_config as any)[key] = {
-                  enabled: SECTIONS_CONFIG[key].defaultEnabled,
-                  name: SECTIONS_CONFIG[key].defaultName,
-                  order: SECTIONS_CONFIG[key].defaultOrder,
-              };
-          }
-      }
-      
-      console.log('🔧 Initialized sections_config:', portfolioData.sections_config);
-      console.log('🎯 Hobbies section enabled:', (portfolioData.sections_config as any)?.hobbies?.enabled);
-      
-      setPortfolio(portfolioData);
-    }
-    setLoading(false);
-  };
-
-
-  useEffect(() => {
-    fetchPortfolio();
-  }, [id, router, supabase]);
-
+  // Save changes to database
   const saveChanges = useDebouncedCallback(async (fields: Partial<Portfolio>) => {
     if (!portfolio) return;
     const { id } = portfolio;
@@ -325,181 +79,58 @@ const PortfolioEditorPage = () => {
     setSavingStatus(error ? "error" : "saved");
   }, 600);
 
+  // Fetch portfolio data
+  const fetchPortfolio = async () => {
+    if (!id) return;
+    
+    try {
+      setLoading(true);
+      
+      // Get portfolio data
+      const { data: portfolioData, error: portfolioError } = await supabase
+        .from('user_portfolios')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (portfolioError) {
+        console.error('Error fetching portfolio:', portfolioError);
+        return;
+      }
+
+      setPortfolio(portfolioData);
+      setSectionOrder(getSortedEditorSections(portfolioData));
+
+      // Get user profile
+      const { data: userData, error: userError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', portfolioData.user_id)
+        .single();
+
+      if (!userError) {
+        setUserProfile(userData);
+      }
+
+    } catch (error) {
+      console.error('Error in fetchPortfolio:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPortfolio();
+  }, [id, router, supabase]);
+
+  // Handle field changes
   const handleFieldChange = (field: keyof Portfolio, value: any) => {
-    // Set saving status immediately when changes start
     setSavingStatus("saving");
-    
-    // Update local state immediately for responsive UI
     setPortfolio(prev => ({ ...prev!, [field]: value }));
-    
-    // Debounce the actual save to database
     saveChanges({ [field]: value });
   };
 
-  const uploadHeroImage = async (file: File) => {
-    if (!portfolio) return;
-    
-    setUploadingHero(true);
-    try {
-      console.log('Starting hero image upload...', { file: file.name, size: file.size });
-      
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${portfolio.id}/hero-${Date.now()}.${fileExt}`;
-      
-      console.log('Uploading to path:', fileName);
-      
-      // Try site-bg-images first, fallback to gallery-images
-      let bucketName = 'site-bg-images';
-      let uploadError = null;
-      
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-      
-      if (error) {
-        console.log('site-bg-images failed, trying gallery-images...', error);
-        uploadError = error;
-        
-        // Fallback to gallery-images bucket
-        bucketName = 'gallery-images';
-        const fallbackResult = await supabase.storage
-          .from(bucketName)
-          .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-        
-        if (fallbackResult.error) {
-          console.error('Both buckets failed:', fallbackResult.error);
-          throw fallbackResult.error;
-        }
-        
-        console.log('Upload successful to gallery-images, getting public URL...');
-        const { data: { publicUrl } } = supabase.storage
-          .from(bucketName)
-          .getPublicUrl(fileName);
-        
-        console.log('Public URL generated:', publicUrl);
-        handleFieldChange('hero_image_url', publicUrl);
-        return;
-      }
-      
-      console.log('Upload successful to site-bg-images, getting public URL...');
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(fileName);
-      
-      console.log('Public URL generated:', publicUrl);
-      handleFieldChange('hero_image_url', publicUrl);
-    } catch (error: any) {
-      console.error('Error uploading hero image:', error);
-      alert(`Failed to upload image: ${error.message || 'Unknown error'}`);
-    } finally {
-      setUploadingHero(false);
-    }
-  };
-
-  const uploadProfilePhoto = async (file: File) => {
-    if (!portfolio) return;
-    
-    setUploadingProfile(true);
-    try {
-      console.log('Starting profile photo upload...', { file: file.name, size: file.size });
-      
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${portfolio.id}/profile-${Date.now()}.${fileExt}`;
-      
-      console.log('Uploading to path:', fileName);
-      
-      // Try site-bg-images first, fallback to gallery-images
-      let bucketName = 'site-bg-images';
-      let uploadError = null;
-      
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-      
-      if (error) {
-        console.log('site-bg-images failed, trying gallery-images...', error);
-        uploadError = error;
-        
-        // Fallback to gallery-images bucket
-        bucketName = 'gallery-images';
-        const fallbackResult = await supabase.storage
-          .from(bucketName)
-          .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-        
-        if (fallbackResult.error) {
-          console.error('Both buckets failed:', fallbackResult.error);
-          throw fallbackResult.error;
-        }
-        
-        console.log('Upload successful to gallery-images, getting public URL...');
-        const { data: { publicUrl } } = supabase.storage
-          .from(bucketName)
-          .getPublicUrl(fileName);
-        
-        console.log('Public URL generated:', publicUrl);
-        handleFieldChange('profile_photo_url', publicUrl);
-        return;
-      }
-      
-      console.log('Upload successful to site-bg-images, getting public URL...');
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from(bucketName)
-        .getPublicUrl(fileName);
-      
-      console.log('Public URL generated:', publicUrl);
-      handleFieldChange('profile_photo_url', publicUrl);
-    } catch (error: any) {
-      console.error('Error uploading profile photo:', error);
-      alert(`Failed to upload image: ${error.message || 'Unknown error'}`);
-    } finally {
-      setUploadingProfile(false);
-    }
-  };
-
-  const uploadResume = async (file: File) => {
-    if (!portfolio) return;
-    
-    setUploadingResume(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${portfolio.id}/resume-${Date.now()}.${fileExt}`;
-      
-      const { data, error } = await supabase.storage
-        .from('resumes')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: true 
-        });
-
-      if (error) throw error;
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from('resumes')
-        .getPublicUrl(fileName);
-      
-      handleFieldChange('resume_url', publicUrl);
-    } catch (error: any) {
-      console.error('Error uploading resume:', error);
-      alert(`Failed to upload resume: ${error.message || 'Unknown error'}`);
-    } finally {
-      setUploadingResume(false);
-    }
-  };
-  
+  // Handle section config changes
   const handleSectionConfigChange = (
     sectionKey: keyof typeof SECTIONS_CONFIG,
     configKey: "enabled" | "name" | "title",
@@ -517,7 +148,6 @@ const PortfolioEditorPage = () => {
       const currentEnabled = newConfig[sectionKey].enabled;
       const newEnabled = value as boolean;
       
-      // If user is changing the enabled state, mark it as a manual choice
       if (currentEnabled !== newEnabled) {
         if (newEnabled) {
           newConfig[sectionKey].user_manually_enabled = true;
@@ -533,93 +163,7 @@ const PortfolioEditorPage = () => {
     handleFieldChange("sections_config", newConfig);
   };
 
-  // AI Title Suggestion Handler
-  const handleAITitleSuggestion = async (sectionKey: string) => {
-    if (!portfolio) return;
-    
-    try {
-      const suggestedTitle = await generateEnhancedAITitle(
-        sectionKey, 
-        portfolio, 
-        portfolio.template_id || undefined
-      );
-      
-      if (suggestedTitle) {
-        handleSectionConfigChange(sectionKey as keyof typeof SECTIONS_CONFIG, 'title', suggestedTitle);
-      }
-    } catch (error) {
-      console.error('Error generating AI title:', error);
-    }
-  };
-
-  // Get section title with fallback logic
-  const getSectionTitle = (sectionKey: string): string => {
-    if (!portfolio?.sections_config) return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
-    
-    const sectionConfig = (portfolio.sections_config as any)?.[sectionKey];
-    if (!sectionConfig) return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
-    
-    // Check for custom title first
-    if (sectionConfig.title) return sectionConfig.title;
-    
-    // Fallback to name field
-    if (sectionConfig.name) return sectionConfig.name;
-    
-    // Final fallback to default
-    return SECTIONS_CONFIG[sectionKey]?.defaultName || sectionKey;
-  };
-
-  const handleAddHobby = (hobby: { name: string; icon: string }) => {
-    console.log('➕ Adding hobby:', JSON.stringify(hobby, null, 2));
-    const currentHobbies = safeGetArray(portfolio?.hobbies_json);
-    console.log('Current hobbies:', JSON.stringify(currentHobbies, null, 2));
-    if (!currentHobbies.some(h => h.name === hobby.name)) {
-        const newHobbies = [...currentHobbies, hobby];
-        console.log('New hobbies array:', JSON.stringify(newHobbies, null, 2));
-        handleFieldChange('hobbies_json', newHobbies);
-    }
-    setHobbySearch("");
-  };
-
-  const handleRemoveHobby = (hobbyName: string) => {
-    console.log('➖ Removing hobby:', hobbyName);
-    const currentHobbies = safeGetArray(portfolio?.hobbies_json);
-    const filteredHobbies = currentHobbies.filter(h => h.name !== hobbyName);
-    console.log('Filtered hobbies:', JSON.stringify(filteredHobbies, null, 2));
-    handleFieldChange('hobbies_json', filteredHobbies);
-  };
-
-  const filteredHobbies = HOBBIES_LIST.filter(hobby => 
-    hobby.name.toLowerCase().includes(hobbySearch.toLowerCase()) &&
-    !safeGetArray(portfolio?.hobbies_json).some(h => h.name === hobby.name)
-  );
-
-  const isHobbyAlreadyAdded = safeGetArray(portfolio?.hobbies_json).some(h => h.name.toLowerCase() === hobbySearch.toLowerCase());
-
-  const handleAddSkill = (skill: { name: string; color: string }) => {
-    const currentSkills = safeGetArray(portfolio?.skills_json);
-    if (!currentSkills.some(s => s.name === skill.name)) {
-        handleFieldChange('skills_json', [...currentSkills, skill]);
-    }
-    setSkillSearch("");
-  };
-
-  const handleRemoveSkill = (skillName: string) => {
-    const currentSkills = safeGetArray(portfolio?.skills_json);
-    handleFieldChange('skills_json', currentSkills.filter(s => s.name !== skillName));
-  };
-
-  const filteredSkills = SKILLS_LIST.filter(skill => 
-    skill.name.toLowerCase().includes(skillSearch.toLowerCase()) &&
-    !safeGetArray(portfolio?.skills_json).some(s => s.name === skill.name)
-  );
-  
-  const isSkillAlreadyAdded = safeGetArray(portfolio?.skills_json).some(s => s.name.toLowerCase() === skillSearch.toLowerCase());
-
-  useEffect(() => {
-    setSectionOrder(sortedEditorSections);
-  }, [sortedEditorSections]);
-
+  // Handle drag end for section reordering
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
@@ -628,7 +172,7 @@ const PortfolioEditorPage = () => {
       const newIndex = sectionOrder.indexOf(over.id as string);
       const newOrder = arrayMove(sectionOrder, oldIndex, newIndex);
       setSectionOrder(newOrder);
-      // Update sections_config order and save
+      
       if (portfolio) {
         const updatedConfig = { ...portfolio.sections_config };
         newOrder.forEach((key: string, idx: number) => {
@@ -639,6 +183,103 @@ const PortfolioEditorPage = () => {
       }
     }
   };
+
+  // File upload handlers
+  const uploadHeroImage = async (file: File) => {
+    if (!portfolio) return;
+    setUploadingHero(true);
+    try {
+      const publicUrl = await fileUploader.uploadHeroImage(file, portfolio.id);
+      handleFieldChange('hero_image_url', publicUrl);
+    } catch (error: any) {
+      console.error('Error uploading hero image:', error);
+      alert(`Failed to upload image: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUploadingHero(false);
+    }
+  };
+
+  const uploadProfilePhoto = async (file: File) => {
+    if (!portfolio) return;
+    setUploadingProfile(true);
+    try {
+      const publicUrl = await fileUploader.uploadProfilePhoto(file, portfolio.id);
+      handleFieldChange('profile_photo_url', publicUrl);
+    } catch (error: any) {
+      console.error('Error uploading profile photo:', error);
+      alert(`Failed to upload image: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUploadingProfile(false);
+    }
+  };
+
+  const uploadResume = async (file: File) => {
+    if (!portfolio) return;
+    setUploadingResume(true);
+    try {
+      const publicUrl = await fileUploader.uploadResume(file, portfolio.id);
+      handleFieldChange('resume_url', publicUrl);
+    } catch (error: any) {
+      console.error('Error uploading resume:', error);
+      alert(`Failed to upload resume: ${error.message || 'Unknown error'}`);
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
+  // Hobby and skill handlers
+  const handleAddHobby = (hobby: { name: string; icon: string }) => {
+    const currentHobbies = safeGetArray(portfolio?.hobbies_json);
+    if (!currentHobbies.some(h => h.name === hobby.name)) {
+      const newHobbies = [...currentHobbies, hobby];
+      handleFieldChange('hobbies_json', newHobbies);
+    }
+    setHobbySearch("");
+  };
+
+  const handleRemoveHobby = (hobbyName: string) => {
+    const currentHobbies = safeGetArray(portfolio?.hobbies_json);
+    const filteredHobbies = currentHobbies.filter(h => h.name !== hobbyName);
+    handleFieldChange('hobbies_json', filteredHobbies);
+  };
+
+  const handleAddSkill = (skill: { name: string; color: string }) => {
+    const currentSkills = safeGetArray(portfolio?.skills_json);
+    if (!currentSkills.some(s => s.name === skill.name)) {
+      handleFieldChange('skills_json', [...currentSkills, skill]);
+    }
+    setSkillSearch("");
+  };
+
+  const handleRemoveSkill = (skillName: string) => {
+    const currentSkills = safeGetArray(portfolio?.skills_json);
+    handleFieldChange('skills_json', currentSkills.filter(s => s.name !== skillName));
+  };
+
+  // Section toggle handlers
+  const toggleSection = (key: string) => {
+    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const expandAll = () => {
+    const allOpen = Object.keys(SECTIONS_CONFIG).reduce((acc, key) => ({ ...acc, [key]: true }), {});
+    setOpenSections(allOpen);
+  };
+
+  const collapseAll = () => {
+    setOpenSections({});
+  };
+
+  // Filtered lists
+  const filteredHobbies = HOBBIES_LIST.filter(hobby => 
+    hobby.name.toLowerCase().includes(hobbySearch.toLowerCase()) &&
+    !safeGetArray(portfolio?.hobbies_json).some(h => h.name === hobby.name)
+  );
+
+  const filteredSkills = SKILLS_LIST.filter(skill => 
+    skill.name.toLowerCase().includes(skillSearch.toLowerCase()) &&
+    !safeGetArray(portfolio?.skills_json).some(s => s.name === skill.name)
+  );
 
   if (loading) {
     return (
@@ -656,1133 +297,363 @@ const PortfolioEditorPage = () => {
     );
   }
 
-  // About Me View Types logic
-  const aboutViewType = (portfolio.sections_config as any)?.about?.view_type || 'image-left';
-  const setAboutViewType = (type: string) => {
-    const updatedConfig = { ...portfolio.sections_config };
-    if (!updatedConfig.about) updatedConfig.about = {};
-    updatedConfig.about.view_type = type;
-    setPortfolio({ ...portfolio, sections_config: updatedConfig });
-    saveChanges({ sections_config: updatedConfig });
-  };
+  const selectedTheme = THEMES.find(t => t.name === portfolio.theme_name) || THEMES[0];
 
   return (
-    <div className="flex h-full min-h-screen font-sans bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
-      {/* --- Left Sidebar (Hero Portfolio Theme) --- */}
-      <aside className="flex flex-col gap-4 bg-black/40 p-2 md:p-3 rounded-xl w-full max-w-xs min-w-[220px] text-sm overflow-y-auto max-h-screen" style={{ fontSize: 13 }}>
+    <div className="h-screen w-screen flex flex-row bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+      {/* Left Sidebar - Full height, from top to bottom */}
+      <aside
+        className={`flex flex-col gap-4 bg-black/40 text-sm overflow-y-auto h-full border-r border-white/10 transition-all duration-200 relative ${sidebarOpen ? '' : 'hidden md:flex'} pt-4 px-2 custom-scrollbar-hide`}
+        style={{
+          width: 320,
+          minWidth: 320,
+          maxWidth: 320,
+          transition: 'width 0.2s',
+        }}
+      >
         <button
           onClick={() => router.push('/dashboard')}
-          className="w-full mb-4 px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm font-medium"
+          className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/15 hover:border-white/20 transition-all duration-200 text-sm font-medium group mx-auto justify-center"
         >
-          ← Back to Dashboard
+          <svg className="w-4 h-4 text-white group-hover:text-purple-300 transition" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="whitespace-nowrap">Back to Dashboard</span>
         </button>
-
-        <div>
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            </div>
-            <h2 className="text-lg font-bold text-white">Portfolio Editor</h2>
+        <div className="flex flex-row items-center justify-center text-center mb-4 gap-3">
+          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
           </div>
-          <p className="text-xs text-gray-300">
-            Customize your hero-portfolio.
-          </p>
+          <div className="flex flex-col items-start text-left">
+            <h2 className="text-lg font-bold text-white">Portfolio Editor</h2>
+            <p className="text-xs text-gray-300 mt-1">Customize your hero-portfolio.</p>
+          </div>
         </div>
 
-        <div className="space-y-3 p-4 rounded-lg bg-white/5 border border-white/10">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-400" />
-            <h3 className="font-semibold text-sm text-white">AI Assistant</h3>
-          </div>
-          <div className="flex items-center gap-2 mb-2">
-            <Textarea
-              value={aiPrompt}
-              onChange={e => setAiPrompt(e.target.value)}
-              placeholder={placeholder}
-              className="flex-1 px-2 py-1 text-xs rounded-md border border-white/10 bg-white/5 text-white placeholder:text-gray-400 resize-none"
-              style={{ fontSize: 13, minHeight: 28, height: 60, lineHeight: 1.3 }}
-              rows={3}
-            />
-            <Button
-              onClick={handleGenerate}
-              size="icon"
-              variant="ghost"
-              className="p-1 h-8 w-8 text-white hover:bg-white/10"
-              title="Fill all editable fields with AI"
-              disabled={isGenerating || !aiPrompt}
+        {/* AI Assistant Component */}
+        <PortfolioAIAssistant
+          portfolio={portfolio}
+          onPortfolioUpdate={setPortfolio}
+          isGenerating={isGenerating}
+          setIsGenerating={setIsGenerating}
+          theme={selectedTheme}
+        />
+
+        {/* Theme Selector Component */}
+        <PortfolioThemeSelector
+          portfolio={portfolio}
+          onFieldChange={handleFieldChange}
+          theme={selectedTheme}
+        />
+
+        {/* Section Manager Component */}
+        <PortfolioSectionManager
+          portfolio={portfolio}
+          onSectionConfigChange={handleSectionConfigChange}
+          onDragEnd={handleDragEnd}
+          sectionOrder={sectionOrder}
+          theme={selectedTheme}
+        />
+      </aside>
+      {/* Main Area: Nav-Bar + Editor */}
+      <div className="flex flex-col flex-1 min-h-0">
+        {/* Nav-Bar - Only above editor area */}
+        <div
+          className="flex items-center justify-between px-6"
+          style={{
+            height: NAVBAR_HEIGHT,
+            minHeight: NAVBAR_HEIGHT,
+            maxHeight: NAVBAR_HEIGHT,
+            background: 'rgba(20,20,30,0.95)',
+            boxShadow: '0 2px 8px 0 rgba(0,0,0,0.10)',
+            borderBottom: '1px solid rgba(255,255,255,0.07)',
+            zIndex: 50,
+            position: 'relative',
+          }}
+        >
+          <div className="flex items-center gap-4">
+            <button
+              className="md:hidden p-2 text-white"
+              onClick={() => setSidebarOpen((v) => !v)}
+              aria-label="Toggle sidebar"
             >
-              <Wand2 size={22} />
+              <span className="material-icons">menu</span>
+            </button>
+            <span className="text-lg font-semibold text-gray-300">Editing:</span>
+            <span className="text-xl font-bold text-white">{portfolio.name || 'Untitled Portfolio'}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">Status:</span>
+              <span className={`text-xs px-2 py-1 rounded-full ${
+                savingStatus === 'saving' ? 'bg-yellow-500/20 text-yellow-300' :
+                savingStatus === 'saved' ? 'bg-green-500/20 text-green-300' :
+                'bg-red-500/20 text-red-300'
+              }`}>
+                {savingStatus === 'saving' ? 'Saving...' :
+                  savingStatus === 'saved' ? 'Saved' : 'Error'}
+              </span>
+            </div>
+            <Button
+              onClick={() => router.push(`/portfolio/preview/${portfolio.id}`)}
+              variant="outline"
+              size="sm"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+            >
+              <Eye className="h-4 w-4 mr-1" />
+              Preview
+            </Button>
+            <Button
+              onClick={() => router.push(`/portfolio/${userProfile?.username}/${portfolio.slug}`)}
+              variant="outline"
+              size="sm"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+            >
+              <ExternalLink className="h-4 w-4 mr-1" />
+              Public
             </Button>
           </div>
-          <div className="flex items-center gap-2 mb-2">
-            <span
-              onClick={handleReset}
-              className="text-xs text-blue-400 underline cursor-pointer hover:text-blue-300"
-              style={{ padding: 0, background: 'none', border: 'none' }}
-              tabIndex={0}
-              role="button"
-            >
-              Reset
-            </span>
-            {savingStatus === 'saving' && <span className="text-xs text-gray-400 ml-2">Saving...</span>}
-            {savingStatus === 'saved' && <span className="text-xs text-green-400 ml-2">Saved</span>}
-          </div>
-          <div className="text-xs text-gray-400">
-            <p>✨ <strong>Magic Wand:</strong> Fill all editable fields with AI</p>
-          </div>
         </div>
-
-        <div className="space-y-2">
-          <button onClick={() => setColorThemeOpen(!colorThemeOpen)} className="w-full flex justify-between items-center font-semibold text-sm text-white">
-            Color Theme
-            <ChevronDown className={`w-4 h-4 transition-transform ${colorThemeOpen ? 'rotate-180' : ''}`} />
-          </button>
-          {colorThemeOpen && (
-            <div className="flex gap-1 flex-wrap">
-              {THEMES.map((theme) => (
-                <button
-                  key={theme.name}
-                  onClick={() => handleFieldChange("theme_name", theme.name)}
-                  className={`rounded-full transition-all focus:outline-none`}
-                  style={{
-                    width: 22,
-                    height: 22,
-                    background: theme.colors.primary,
-                    border: selectedTheme.name === theme.name ? '2px solid #fff' : '1px solid #444',
-                    margin: 1,
-                  }}
-                  aria-label={theme.name}
-                />
-              ))}
+        {/* Main Editor Content */}
+        <main className={`flex-1 p-6 overflow-y-auto ${selectedTheme.colors.background}`} style={{ minHeight: 0 }}>
+          <div className="max-w-5xl mx-auto space-y-6">
+            <div className="flex justify-end items-center gap-2">
+              <span className="text-sm text-gray-400">Manage Sections</span>
+              <Button onClick={expandAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Expand All</Button>
+              <Button onClick={collapseAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Collapse All</Button>
             </div>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <button onClick={() => setSectionsOpen(!sectionsOpen)} className="w-full flex justify-between items-center font-semibold text-sm text-white">
-            Sections
-            <ChevronDown className={`w-4 h-4 transition-transform ${sectionsOpen ? 'rotate-180' : ''}`} />
-          </button>
-          {sectionsOpen && (
-            <div className="space-y-2 pt-2">
-              <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
-                  <div>
-                    {sectionOrder.map((key) => (
-                      <SortableSectionItem
-                        key={key}
-                        id={key}
-                        name={SECTIONS_CONFIG[key]?.defaultName || key}
-                        enabled={(portfolio.sections_config as any)?.[key]?.enabled ?? false}
-                        onToggle={(e) => handleSectionConfigChange(key, 'enabled', e.target.checked)}
-                        dragHandleProps={{}}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </div>
-          )}
-        </div>
-
-        {/* Back to Dashboard - MOVED */}
-        <div className="mt-auto"></div>
-      </aside>
-
-      {/* --- Right Column (Editor & Preview) --- */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Navigation Bar (Hero Portfolio Theme) */}
-        <div className="bg-white/5 backdrop-blur-sm border-b border-white/10 p-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold text-white">Editing: {portfolio.name}</h1>
-              <span className={`text-xs font-medium px-3 py-1 rounded-full transition-colors ${
-                savingStatus === "saved" ? "bg-green-500/20 text-green-400 border border-green-500/30" :
-                savingStatus === "saving" ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 animate-pulse" :
-                "bg-red-500/20 text-red-400 border border-red-500/30"
-              }`}>
-                {savingStatus === 'saving' ? 'Saving...' : savingStatus === 'error' ? 'Error' : 'Saved'}
-              </span>
-              {!portfolio.is_published && (
-                <span className="text-xs font-medium px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
-                  ⚠️ Unpublished - Preview may not work
-                </span>
-              )}
-            </div>
-            <div className="flex items-center space-x-3">
-              <Switch
-                id="publish-switch"
-                isChecked={portfolio.is_published}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFieldChange('is_published', e.target.checked)}
-              />
-              <Label htmlFor="publish-switch" className="text-white font-medium">
-                {portfolio.is_published ? 'Published' : 'Unpublished'}
-              </Label>
+            {/* Section Editors */}
+            {sectionOrder.map(key => {
+              const sectionConfig = SECTIONS_CONFIG[key];
+              if (!sectionConfig) return null;
               
-              {/* Preview Button - Shows unpublished changes */}
-              <button
-                onClick={() => window.open(`/portfolio/preview/${portfolio.id}`, "_blank")} 
-                className="px-4 py-2 bg-blue-600/20 border border-blue-500/30 text-blue-300 rounded-lg hover:bg-blue-600/30 transition-all duration-300 text-sm font-medium flex items-center"
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                Preview
-              </button>
+              const isEnabled = (portfolio.sections_config as any)?.[key]?.enabled;
               
-              {/* View Public Button - Shows published version */}
-              <button
-                onClick={() => window.open(`/portfolio/${userProfile?.username || 'user'}/${portfolio.slug}`, "_blank")} 
-                className="px-4 py-2 bg-green-600/20 border border-green-500/30 text-green-300 rounded-lg hover:bg-green-600/30 transition-all duration-300 text-sm font-medium flex items-center"
-              >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                View Public
-              </button>
-            </div>
-          </div>
-        </div>
+              return (
+                <section key={key} id={key} className={`bg-white/5 rounded-xl border border-white/10 overflow-hidden transition-all duration-300 ${!isEnabled ? 'opacity-50' : ''}`}>
+                  <button 
+                    onClick={() => toggleSection(key)} 
+                    className={`w-full flex items-center justify-between p-4 ${selectedTheme.colors.card} hover:bg-opacity-80 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
+                        {sectionConfig.defaultName}
+                      </h2>
+                      {!isEnabled && (
+                        <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded-full">
+                          Disabled
+                        </span>
+                      )}
+                    </div>
+                    <ChevronDown className={`w-6 h-6 transform transition-transform text-white ${openSections[key] ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {openSections[key] && (
+                    <div className="p-6">
+                      {!isEnabled && (
+                        <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                          <p className="text-yellow-300 text-sm">
+                            This section is currently disabled. Enable it in the Sections panel to the left to start editing.
+                          </p>
+                        </div>
+                      )}
 
-        {/* --- Right Main Area (User's Theme) --- */}
-        <main className={`flex-1 overflow-y-auto ${selectedTheme.colors.background} ${selectedTheme.colors.text}`}>
-          {/* Content Area (User's Theme) */}
-          <div className="p-6">
-            <div className="max-w-5xl mx-auto space-y-6">
-              <div className="flex justify-end items-center gap-2">
-                  <span className="text-sm text-gray-400">Manage Sections</span>
-                  <Button onClick={expandAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Expand All</Button>
-                  <Button onClick={collapseAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Collapse All</Button>
-              </div>
-
-              {sortedEditorSections.map(key => {
-                const sectionConfig = SECTIONS_CONFIG[key];
-                if (!sectionConfig) return null;
-                
-                const isEnabled = (portfolio.sections_config as any)?.[key]?.enabled;
-                
-                return (
-                  <section key={key} id={key} className={`bg-white/5 rounded-xl border border-white/10 overflow-hidden transition-all duration-300 ${!isEnabled ? 'opacity-50' : ''}`}>
-                    <button 
-                      onClick={() => toggleSection(key)} 
-                      className={`w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
-                          {sectionConfig.defaultName}
-                        </h2>
-                        {!isEnabled && (
-                          <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded-full">
-                            Disabled
-                          </span>
-                        )}
-                      </div>
-                      <ChevronDown className={`w-6 h-6 transform transition-transform text-white ${openSections[key] ? 'rotate-180' : ''}`} />
-                    </button>
-                    
-                    {openSections[key] && (
-                      <div className="p-6">
-                        {!isEnabled && (
-                          <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                            <p className="text-yellow-300 text-sm">
-                              This section is currently disabled. Enable it in the Sections panel to the left to start editing.
-                            </p>
+                      {/* Section Title Editor */}
+                      {sectionConfig.hasCustomTitle && (
+                        <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                          <div className="flex items-center justify-between mb-3">
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                              Section Title
+                            </label>
                           </div>
-                        )}
-
-                        {/* Section Title Editor - Only show for sections that support custom titles */}
-                        {sectionConfig.hasCustomTitle && (
-                          <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
-                            <div className="flex items-center justify-between mb-3">
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
-                                Section Title
-                              </label>
-                            </div>
-                            <Input
-                              type="text"
-                              value={getSectionTitle(key)}
-                              onChange={(e) => handleSectionConfigChange(key as keyof typeof SECTIONS_CONFIG, 'title', e.target.value)}
-                              placeholder={`Enter title for ${sectionConfig.defaultName} section`}
-                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                            />
-                            <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
-                              This title will be displayed at the top of the {sectionConfig.defaultName} section on your portfolio. Use the AI Assistant to generate creative titles.
-                            </p>
-                          </div>
-                        )}
-                        
-                        {key === 'hero' && (
-                          <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                              {/* Left Column: Title & Subtitle */}
-                              <div className="space-y-4">
-                                <div>
-                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                    Hero Title
-                                  </label>
-                                  <Input
-                                    type="text"
-                                    value={portfolio.hero_title || ''}
-                                    onChange={(e) => handleFieldChange('hero_title', e.target.value)}
-                                    placeholder="Your main title"
-                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                  />
-                                </div>
-                                <div>
-                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                    Hero Subtitle
-                                  </label>
-                                  <Input
-                                    type="text"
-                                    value={portfolio.hero_subtitle || ''}
-                                    onChange={(e) => handleFieldChange('hero_subtitle', e.target.value)}
-                                    placeholder="Brief description or tagline"
-                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                  />
-                                </div>
-                              </div>
-
-                              {/* Right Column: Image Upload */}
-                              <div className="space-y-2">
+                          <Input
+                            type="text"
+                            value={getSectionTitle(key, portfolio)}
+                            onChange={(e) => handleSectionConfigChange(key as keyof typeof SECTIONS_CONFIG, 'title', e.target.value)}
+                            placeholder={`Enter title for ${sectionConfig.defaultName} section`}
+                            className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                          />
+                          <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
+                            This title will be displayed at the top of the {sectionConfig.defaultName} section on your portfolio. Use the AI Assistant to generate creative titles.
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Section-specific content would go here */}
+                      {/* This is where you'd add the individual section editors */}
+                      
+                      {key === 'hero' && (
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                            {/* Left Column: Title & Subtitle */}
+                            <div className="space-y-4">
+                              <div>
                                 <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                  Hero Background Image
+                                  Hero Title
                                 </label>
-                                {portfolio.hero_image_url ? (
-                                    <div className="relative group">
-                                        <img src={portfolio.hero_image_url} alt="Hero" className="w-full h-32 object-cover rounded-lg border border-white/10" />
-                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                            <button onClick={() => handleFieldChange('hero_image_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                      <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                      <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No image set</p>
-                                    </div>
-                                )}
-                                <div className="flex gap-2">
-                                  <Input
-                                    type="url"
-                                    value={portfolio.hero_image_url || ''}
-                                    onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
-                                    placeholder="Paste image URL"
-                                    className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                  />
-                                  <input
-                                    type="file" id="hero-upload" accept="image/*"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) uploadHeroImage(file);
-                                      e.target.value = '';
-                                    }}
-                                    className="hidden"
-                                  />
-                                  <Button
-                                    onClick={() => document.getElementById('hero-upload')?.click()}
-                                    variant="outline" size="sm" disabled={uploadingHero}
-                                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                                  >
-                                    {uploadingHero ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* CTA Buttons Section */}
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-between">
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
-                                  Call-to-Action Buttons
-                                </label>
-                                <Button
-                                  onClick={() => {
-                                    const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                    buttons.push({ text: '', link: '', style: 'primary', order: buttons.length + 1 });
-                                    handleFieldChange('hero_cta_buttons', buttons);
-                                  }}
-                                  variant="outline" size="sm"
-                                  className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
-                                >
-                                  <Plus className="h-4 w-4 mr-1" />
-                                  Add Button
-                                </Button>
-                              </div>
-                              
-                              <div className="space-y-3">
-                                {safeGetArray(portfolio.hero_cta_buttons).map((button: any, index: number) => (
-                                  <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                                    <Input
-                                      type="text"
-                                      value={button.text || ''}
-                                      onChange={(e) => {
-                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                        buttons[index] = { ...button, text: e.target.value };
-                                        handleFieldChange('hero_cta_buttons', buttons);
-                                      }}
-                                      placeholder="Button text"
-                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                    />
-                                    <Input
-                                      type="url"
-                                      value={button.link || ''}
-                                      onChange={(e) => {
-                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                        buttons[index] = { ...button, link: e.target.value };
-                                        handleFieldChange('hero_cta_buttons', buttons);
-                                      }}
-                                      placeholder="URL"
-                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                    />
-                                    <select
-                                      value={button.style || 'primary'}
-                                      onChange={(e) => {
-                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                        buttons[index] = { ...button, style: e.target.value };
-                                        handleFieldChange('hero_cta_buttons', buttons);
-                                      }}
-                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 rounded-md`}
-                                    >
-                                      <option value="primary">Primary</option>
-                                      <option value="secondary">Secondary</option>
-                                      <option value="outline">Outline</option>
-                                    </select>
-                                    <div className="flex gap-1">
-                                      <Button
-                                        onClick={() => {
-                                          const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                          if (index > 0) {
-                                            [buttons[index], buttons[index - 1]] = [buttons[index - 1], buttons[index]];
-                                            handleFieldChange('hero_cta_buttons', buttons);
-                                          }
-                                        }}
-                                        variant="outline" size="sm" disabled={index === 0}
-                                        className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
-                                      >
-                                        ↑
-                                      </Button>
-                                      <Button
-                                        onClick={() => {
-                                          const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                          if (index < buttons.length - 1) {
-                                            [buttons[index], buttons[index + 1]] = [buttons[index + 1], buttons[index]];
-                                            handleFieldChange('hero_cta_buttons', buttons);
-                                          }
-                                        }}
-                                        variant="outline" size="sm" disabled={index === safeGetArray(portfolio.hero_cta_buttons).length - 1}
-                                        className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
-                                      >
-                                        ↓
-                                      </Button>
-                                      <Button
-                                        onClick={() => {
-                                          const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                          buttons.splice(index, 1);
-                                          handleFieldChange('hero_cta_buttons', buttons);
-                                        }}
-                                        variant="outline" size="sm"
-                                        className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
-                                      >
-                                        <X className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ))}
-                                {safeGetArray(portfolio.hero_cta_buttons).length === 0 && (
-                                  <div className="text-center p-4 border-2 border-dashed border-white/20 rounded-lg">
-                                    <p className={`text-sm ${selectedTheme.colors.text} opacity-70`}>
-                                      No CTA buttons added yet. Click "Add Button" to get started.
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {key === 'about' && (
-                          <div className="space-y-6">
-                            {/* View Type Tabs */}
-                            <div className="flex gap-2 mb-4">
-                              <button
-                                className={`px-4 py-2 rounded-t-lg font-semibold transition-all border-b-2 ${aboutViewType === 'image-left' ? 'border-purple-500 bg-white/10 text-white' : 'border-transparent text-white/60 hover:bg-white/5'}`}
-                                onClick={() => setAboutViewType('image-left')}
-                              >
-                                Image Left
-                              </button>
-                              <button
-                                className={`px-4 py-2 rounded-t-lg font-semibold transition-all border-b-2 ${aboutViewType === 'image-right' ? 'border-purple-500 bg-white/10 text-white' : 'border-transparent text-white/60 hover:bg-white/5'}`}
-                                onClick={() => setAboutViewType('image-right')}
-                              >
-                                Image Right
-                              </button>
-                              <button
-                                className={`px-4 py-2 rounded-t-lg font-semibold transition-all border-b-2 ${aboutViewType === 'centered' ? 'border-purple-500 bg-white/10 text-white' : 'border-transparent text-white/60 hover:bg-white/5'}`}
-                                onClick={() => setAboutViewType('centered')}
-                              >
-                                Centered
-                              </button>
-                            </div>
-                            {/* About Me Section Layouts */}
-                            {aboutViewType === 'image-left' && (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                                {/* Left: Image */}
-                                <div className="space-y-2">
-                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
-                                  {portfolio.profile_photo_url ? (
-                                    <div className="relative group">
-                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-32 object-cover rounded-lg border border-white/10" />
-                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                        <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
-                                          <Trash2 className="h-4 w-4" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                      <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                      <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
-                                    </div>
-                                  )}
-                                  <div className="flex gap-2">
-                                    <Input
-                                      type="url"
-                                      value={portfolio.profile_photo_url || ''}
-                                      onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
-                                      placeholder="Paste image URL"
-                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                    />
-                                    <input
-                                      type="file" id="profile-upload" accept="image/*"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) uploadProfilePhoto(file);
-                                        e.target.value = '';
-                                      }}
-                                      className="hidden"
-                                    />
-                                    <Button
-                                      onClick={() => document.getElementById('profile-upload')?.click()}
-                                      variant="outline" size="sm" disabled={uploadingProfile}
-                                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                                    >
-                                      {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                    </Button>
-                                  </div>
-                                </div>
-                                {/* Right: About Text */}
-                                <div className="space-y-4">
-                                  <div>
-                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
-                                    <Textarea
-                                      value={portfolio.about_text || ''}
-                                      onChange={(e) => handleFieldChange('about_text', e.target.value)}
-                                      placeholder="Tell your story..."
-                                      rows={8}
-                                      className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            {aboutViewType === 'image-right' && (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                                {/* Left: About Text */}
-                                <div className="space-y-4">
-                                  <div>
-                                    <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
-                                    <Textarea
-                                      value={portfolio.about_text || ''}
-                                      onChange={(e) => handleFieldChange('about_text', e.target.value)}
-                                      placeholder="Tell your story..."
-                                      rows={8}
-                                      className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
-                                    />
-                                  </div>
-                                </div>
-                                {/* Right: Image */}
-                                <div className="space-y-2">
-                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
-                                  {portfolio.profile_photo_url ? (
-                                    <div className="relative group">
-                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-32 object-cover rounded-lg border border-white/10" />
-                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                        <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
-                                          <Trash2 className="h-4 w-4" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                      <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                      <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
-                                    </div>
-                                  )}
-                                  <div className="flex gap-2">
-                                    <Input
-                                      type="url"
-                                      value={portfolio.profile_photo_url || ''}
-                                      onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
-                                      placeholder="Paste image URL"
-                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                    />
-                                    <input
-                                      type="file" id="profile-upload" accept="image/*"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) uploadProfilePhoto(file);
-                                        e.target.value = '';
-                                      }}
-                                      className="hidden"
-                                    />
-                                    <Button
-                                      onClick={() => document.getElementById('profile-upload')?.click()}
-                                      variant="outline" size="sm" disabled={uploadingProfile}
-                                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                                    >
-                                      {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            {aboutViewType === 'centered' && (
-                              <div className="flex flex-col items-center gap-6">
-                                {/* Centered Image */}
-                                <div className="space-y-2 w-full max-w-xs">
-                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>Profile Photo</label>
-                                  {portfolio.profile_photo_url ? (
-                                    <div className="relative group">
-                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-32 object-cover rounded-lg border border-white/10" />
-                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                                        <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
-                                          <Trash2 className="h-4 w-4" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                      <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                      <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
-                                    </div>
-                                  )}
-                                  <div className="flex gap-2">
-                                    <Input
-                                      type="url"
-                                      value={portfolio.profile_photo_url || ''}
-                                      onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
-                                      placeholder="Paste image URL"
-                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                    />
-                                    <input
-                                      type="file" id="profile-upload" accept="image/*"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) uploadProfilePhoto(file);
-                                        e.target.value = '';
-                                      }}
-                                      className="hidden"
-                                    />
-                                    <Button
-                                      onClick={() => document.getElementById('profile-upload')?.click()}
-                                      variant="outline" size="sm" disabled={uploadingProfile}
-                                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                                    >
-                                      {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                    </Button>
-                                  </div>
-                                </div>
-                                {/* Centered About Text */}
-                                <div className="w-full max-w-2xl">
-                                  <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>About Text</label>
-                                  <Textarea
-                                    value={portfolio.about_text || ''}
-                                    onChange={(e) => handleFieldChange('about_text', e.target.value)}
-                                    placeholder="Tell your story..."
-                                    rows={8}
-                                    className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 resize-none`}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {key === 'tracks' && (
-                          (showAddTrackForm || !!editingTrack) ? (
-                            <PortfolioTrackForm
-                              portfolioId={portfolio.id}
-                              track={editingTrack}
-                              onCancel={() => {
-                                setEditingTrack(null);
-                                setShowAddTrackForm(false);
-                              }}
-                              onSuccess={fetchPortfolio}
-                            />
-                          ) : (
-                            <div className="space-y-4">
-                               <div className="flex justify-end items-center mb-4 gap-2">
-                                  <Button onClick={() => setTrackViewMode('list')} variant="ghost" size="icon" className={trackViewMode === 'list' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><List className="h-5 w-5" /></Button>
-                                  <Button onClick={() => setTrackViewMode('grid')} variant="ghost" size="icon" className={trackViewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><Grid className="h-5 w-5" /></Button>
-                                  <Button onClick={() => setShowAddTrackForm(true)} className="bg-white/10 border-white/20 text-white hover:bg-white/20"><PlusCircle className="mr-2 h-4 w-4" /> Add Item</Button>
-                                </div>
-                              <PortfolioTracksDisplay
-                                portfolioId={portfolio.id}
-                                onEdit={(track) => setEditingTrack(track)}
-                                onRefresh={fetchPortfolio}
-                                viewMode={trackViewMode}
-                              />
-                            </div>
-                          )
-                        )}
-
-                        {key === 'gallery' && (
-                          (showAddGalleryForm || !!editingGalleryItem) ? (
-                            <PortfolioGalleryForm
-                              portfolioId={portfolio.id}
-                              item={editingGalleryItem}
-                              onCancel={() => {
-                                setEditingGalleryItem(null);
-                                setShowAddGalleryForm(false);
-                              }}
-                              onSuccess={fetchPortfolio}
-                            />
-                          ) : (
-                            <div className="space-y-4">
-                              <div className="flex justify-end items-center mb-4 gap-2">
-                                <Button onClick={() => setGalleryViewMode('list')} variant="ghost" size="icon" className={galleryViewMode === 'list' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><List className="h-5 w-5" /></Button>
-                                <Button onClick={() => setGalleryViewMode('grid')} variant="ghost" size="icon" className={galleryViewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}><Grid className="h-5 w-5" /></Button>
-                                <Button onClick={() => setShowAddGalleryForm(true)} className="bg-white/10 border-white/20 text-white hover:bg-white/20"><PlusCircle className="mr-2 h-4 w-4" /> Add Item</Button>
-                              </div>
-                              <PortfolioGalleryDisplay
-                                portfolioId={portfolio.id}
-                                onEdit={(item) => setEditingGalleryItem(item)}
-                                onRefresh={fetchPortfolio}
-                                viewMode={galleryViewMode}
-                                filter={galleryFilter}
-                              />
-                            </div>
-                          )
-                        )}
-
-                        {key === 'hobbies' && (
-                          <div className="space-y-6">
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Hobbies Title
-                              </label>
-                              <Input
-                                type="text"
-                                value={portfolio.hobbies_title || ''}
-                                onChange={(e) => handleFieldChange('hobbies_title', e.target.value)}
-                                placeholder="My Hobbies & Interests"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Add Hobbies
-                              </label>
-                              <div className="flex gap-2 mb-4">
                                 <Input
                                   type="text"
-                                  value={hobbySearch}
-                                  onChange={(e) => setHobbySearch(e.target.value)}
-                                  placeholder="Search hobbies..."
-                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  value={portfolio.hero_title || ''}
+                                  onChange={(e) => handleFieldChange('hero_title', e.target.value)}
+                                  placeholder="Your main title"
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                 />
                               </div>
-                              
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-40 overflow-y-auto">
-                                {filteredHobbies.map((hobby) => (
-                                  <button
-                                    key={hobby.name}
-                                    onClick={() => handleAddHobby(hobby)}
-                                    className="flex flex-col items-center p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
-                                  >
-                                    <span className="text-2xl mb-1">{hobby.icon}</span>
-                                    <span className="text-xs text-center">{hobby.name}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Selected Hobbies
-                              </label>
-                              <div className="flex flex-wrap gap-2">
-                                {safeGetArray(portfolio.hobbies_json).map((hobby: any, index: number) => (
-                                  <div key={`hobby-${index}-${hobby.name}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
-                                    <span className="text-lg">{hobby.icon}</span>
-                                    <span className="text-sm">{hobby.name}</span>
-                                    <button
-                                      onClick={() => handleRemoveHobby(hobby.name)}
-                                      className="text-red-400 hover:text-red-300"
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {key === 'skills' && (
-                          <div className="space-y-6">
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Skills Title
-                              </label>
-                              <Input
-                                type="text"
-                                value={portfolio.skills_title || ''}
-                                onChange={(e) => handleFieldChange('skills_title', e.target.value)}
-                                placeholder="Skills & Tools"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Add Skills
-                              </label>
-                              <div className="flex gap-2 mb-4">
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  Hero Subtitle
+                                </label>
                                 <Input
                                   type="text"
-                                  value={skillSearch}
-                                  onChange={(e) => setSkillSearch(e.target.value)}
-                                  placeholder="Search skills..."
-                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  value={portfolio.hero_subtitle || ''}
+                                  onChange={(e) => handleFieldChange('hero_subtitle', e.target.value)}
+                                  placeholder="Brief description or tagline"
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                 />
                               </div>
-                              
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-40 overflow-y-auto">
-                                {filteredSkills.map((skill) => (
-                                  <button
-                                    key={skill.name}
-                                    onClick={() => handleAddSkill(skill)}
-                                    className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
-                                  >
-                                    <skill.icon className="h-5 w-5" style={{ color: skill.color }} />
-                                    <span className="text-sm">{skill.name}</span>
-                                  </button>
-                                ))}
-                              </div>
                             </div>
-                            
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Selected Skills
-                              </label>
-                              <div className="flex flex-wrap gap-2">
-                                {safeGetArray(portfolio.skills_json).map((skill: any, index: number) => (
-                                  <div key={`skill-${index}-${skill.name}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
-                                    <span className="text-sm">{skill.name}</span>
-                                    <button
-                                      onClick={() => handleRemoveSkill(skill.name)}
-                                      className="text-red-400 hover:text-red-300"
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
 
-                        {key === 'resume' && (
-                          <div className="space-y-6">
-                            <div>
+                            {/* Right Column: Image Upload */}
+                            <div className="space-y-2">
                               <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Resume Title
+                                Hero Background Image
                               </label>
-                              <Input
-                                type="text"
-                                value={portfolio.resume_title || ''}
-                                onChange={(e) => handleFieldChange('resume_title', e.target.value)}
-                                placeholder="Resume"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Resume File
-                              </label>
+                              {portfolio.hero_image_url ? (
+                                  <div className="relative group">
+                                      <img src={portfolio.hero_image_url} alt="Hero" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                          <button onClick={() => handleFieldChange('hero_image_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
+                                              <Trash2 className="h-4 w-4" />
+                                          </button>
+                                      </div>
+                                  </div>
+                              ) : (
+                                  <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                    <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                    <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No image set</p>
+                                  </div>
+                              )}
                               <div className="flex gap-2">
                                 <Input
                                   type="url"
-                                  value={portfolio.resume_url || ''}
-                                  onChange={(e) => handleFieldChange('resume_url', e.target.value)}
-                                  placeholder="Paste resume URL"
+                                  value={portfolio.hero_image_url || ''}
+                                  onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
+                                  placeholder="Paste image URL"
                                   className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                 />
                                 <input
-                                  type="file" id="resume-upload" accept=".pdf,.doc,.docx"
+                                  type="file" id="hero-upload" accept="image/*"
                                   onChange={(e) => {
                                     const file = e.target.files?.[0];
-                                    if (file) uploadResume(file);
+                                    if (file) uploadHeroImage(file);
                                     e.target.value = '';
                                   }}
                                   className="hidden"
                                 />
                                 <Button
-                                  onClick={() => document.getElementById('resume-upload')?.click()}
-                                  variant="outline" size="sm" disabled={uploadingResume}
+                                  onClick={() => document.getElementById('hero-upload')?.click()}
+                                  variant="outline" size="sm" disabled={uploadingHero}
                                   className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                                 >
-                                  {uploadingResume ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                  {uploadingHero ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                 </Button>
                               </div>
                             </div>
                           </div>
-                        )}
 
-                        {key === 'press' && (
-                          <PressMentionsForm portfolioId={portfolio.id} theme={selectedTheme} />
-                        )}
-
-                        {key === 'contact' && (
-                          <div className="space-y-6">
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Contact Title
+                          {/* CTA Buttons Section */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                Call-to-Action Buttons
                               </label>
-                              <Input
-                                type="text"
-                                value={portfolio.contact_title || ''}
-                                onChange={(e) => handleFieldChange('contact_title', e.target.value)}
-                                placeholder="Get in Touch"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
+                              <Button
+                                onClick={() => {
+                                  const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                  buttons.push({ text: '', link: '', style: 'primary', order: buttons.length + 1 });
+                                  handleFieldChange('hero_cta_buttons', buttons);
+                                }}
+                                variant="outline" size="sm"
+                                className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                              >
+                                <Plus className="h-4 w-4 mr-1" />
+                                Add Button
+                              </Button>
                             </div>
                             
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Contact Description
-                              </label>
-                              <Textarea
-                                value={portfolio.contact_description || ''}
-                                onChange={(e) => handleFieldChange('contact_description', e.target.value)}
-                                placeholder="Ready to work together? Let's talk!"
-                                rows={3}
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Contact Email
-                              </label>
-                              <Input
-                                type="email"
-                                value={portfolio.contact_email || ''}
-                                onChange={(e) => handleFieldChange('contact_email', e.target.value)}
-                                placeholder="your.email@example.com"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Contact Phone
-                              </label>
-                              <Input
-                                type="tel"
-                                value={portfolio.contact_phone || ''}
-                                onChange={(e) => handleFieldChange('contact_phone', e.target.value)}
-                                placeholder="e.g. +1 555-123-4567"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Location
-                              </label>
-                              <Input
-                                type="text"
-                                value={portfolio.contact_location || ''}
-                                onChange={(e) => handleFieldChange('contact_location', e.target.value)}
-                                placeholder="e.g. San Francisco, CA"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                              />
-                            </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                  Instagram URL
-                                </label>
-                                <Input
-                                  type="url"
-                                  value={portfolio.instagram_url || ''}
-                                  onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
-                                  placeholder="https://instagram.com/username"
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                />
-                              </div>
-                              <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                  Twitter URL
-                                </label>
-                                <Input
-                                  type="url"
-                                  value={portfolio.twitter_url || ''}
-                                  onChange={(e) => handleFieldChange('twitter_url', e.target.value)}
-                                  placeholder="https://twitter.com/username"
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                />
-                              </div>
-                              <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                  YouTube URL
-                                </label>
-                                <Input
-                                  type="url"
-                                  value={portfolio.youtube_url || ''}
-                                  onChange={(e) => handleFieldChange('youtube_url', e.target.value)}
-                                  placeholder="https://youtube.com/@username"
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                />
-                              </div>
-                              <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                  LinkedIn URL
-                                </label>
-                                <Input
-                                  type="url"
-                                  value={portfolio.linkedin_url || ''}
-                                  onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
-                                  placeholder="https://linkedin.com/in/username"
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                />
-                              </div>
-                              <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                  Website URL
-                                </label>
-                                <Input
-                                  type="url"
-                                  value={portfolio.website_url || ''}
-                                  onChange={(e) => handleFieldChange('website_url', e.target.value)}
-                                  placeholder="https://yourwebsite.com"
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                />
-                              </div>
-                              <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                  GitHub URL
-                                </label>
-                                <Input
-                                  type="url"
-                                  value={portfolio.github_url || ''}
-                                  onChange={(e) => handleFieldChange('github_url', e.target.value)}
-                                  placeholder="https://github.com/username"
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {key === 'footer' && (
-                          <div className="space-y-6">
-                            {/* About Summary */}
-                            <div>
-                              <div className="flex items-center justify-between mb-2">
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
-                                  About Summary
-                                </label>
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    id="footer_show_about_summary"
-                                    checked={portfolio.footer_show_about_summary !== false}
-                                    onChange={(e) => handleFieldChange('footer_show_about_summary', e.target.checked)}
-                                    className="rounded border-white/20 bg-white/10"
+                            <div className="space-y-3">
+                              {safeGetArray(portfolio.hero_cta_buttons).map((button: any, index: number) => (
+                                <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
+                                  <Input
+                                    type="text"
+                                    value={button.text || ''}
+                                    onChange={(e) => {
+                                      const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                      buttons[index] = { ...button, text: e.target.value };
+                                      handleFieldChange('hero_cta_buttons', buttons);
+                                    }}
+                                    placeholder="Button text"
+                                    className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                   />
-                                  <label htmlFor="footer_show_about_summary" className={`text-xs ${selectedTheme.colors.text}`}>
-                                    Show in footer
-                                  </label>
-                                </div>
-                              </div>
-                              <div className="flex gap-2 mb-2">
-                                <Textarea
-                                  value={portfolio.footer_about_summary || ''}
-                                  onChange={(e) => handleFieldChange('footer_about_summary', e.target.value)}
-                                  placeholder="A brief summary about yourself for the footer..."
-                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                  rows={3}
-                                />
-                                <Button
-                                  onClick={async () => {
-                                    if (!portfolio.about_text) {
-                                      alert('Please add some content to your About section first.');
-                                      return;
-                                    }
-                                    handleFieldChange('footer_about_summary', portfolio.about_text.substring(0, 200) + (portfolio.about_text.length > 200 ? '...' : ''));
-                                  }}
-                                  variant="outline" size="sm"
-                                  className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
-                                >
-                                  Auto-fill
-                                </Button>
-                              </div>
-                            </div>
-
-                            {/* Quick Links */}
-                            <div>
-                              <div className="flex items-center justify-between mb-2">
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
-                                  Quick Links
-                                </label>
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    id="footer_show_links"
-                                    checked={portfolio.footer_show_links !== false}
-                                    onChange={(e) => handleFieldChange('footer_show_links', e.target.checked)}
-                                    className="rounded border-white/20 bg-white/10"
+                                  <Input
+                                    type="url"
+                                    value={button.link || ''}
+                                    onChange={(e) => {
+                                      const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                      buttons[index] = { ...button, link: e.target.value };
+                                      handleFieldChange('hero_cta_buttons', buttons);
+                                    }}
+                                    placeholder="URL"
+                                    className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                                   />
-                                  <label htmlFor="footer_show_links" className={`text-xs ${selectedTheme.colors.text}`}>
-                                    Show in footer
-                                  </label>
-                                </div>
-                              </div>
-                              <div className="space-y-2">
-                                {safeGetArray(portfolio.footer_links_json).map((link: any, index: number) => (
-                                  <div key={index} className="flex gap-2">
-                                    <Input
-                                      type="text"
-                                      value={link.text || ''}
-                                      onChange={(e) => {
-                                        const links = safeGetArray(portfolio.footer_links_json);
-                                        links[index] = { ...link, text: e.target.value };
-                                        handleFieldChange('footer_links_json', links);
-                                      }}
-                                      placeholder="Link text"
-                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                    />
-                                    <Input
-                                      type="url"
-                                      value={link.url || ''}
-                                      onChange={(e) => {
-                                        const links = safeGetArray(portfolio.footer_links_json);
-                                        links[index] = { ...link, url: e.target.value };
-                                        handleFieldChange('footer_links_json', links);
-                                      }}
-                                      placeholder="URL"
-                                      className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                    />
+                                  <select
+                                    value={button.style || 'primary'}
+                                    onChange={(e) => {
+                                      const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                      buttons[index] = { ...button, style: e.target.value };
+                                      handleFieldChange('hero_cta_buttons', buttons);
+                                    }}
+                                    className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 rounded-md`}
+                                  >
+                                    <option value="primary">Primary</option>
+                                    <option value="secondary">Secondary</option>
+                                    <option value="outline">Outline</option>
+                                  </select>
+                                  <div className="flex gap-1">
                                     <Button
                                       onClick={() => {
-                                        const links = safeGetArray(portfolio.footer_links_json);
-                                        links.splice(index, 1);
-                                        handleFieldChange('footer_links_json', links);
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        if (index > 0) {
+                                          [buttons[index], buttons[index - 1]] = [buttons[index - 1], buttons[index]];
+                                          handleFieldChange('hero_cta_buttons', buttons);
+                                        }
+                                      }}
+                                      variant="outline" size="sm" disabled={index === 0}
+                                      className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
+                                    >
+                                      ↑
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        if (index < buttons.length - 1) {
+                                          [buttons[index], buttons[index + 1]] = [buttons[index + 1], buttons[index]];
+                                          handleFieldChange('hero_cta_buttons', buttons);
+                                        }
+                                      }}
+                                      variant="outline" size="sm" disabled={index === safeGetArray(portfolio.hero_cta_buttons).length - 1}
+                                      className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
+                                    >
+                                      ↓
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        buttons.splice(index, 1);
+                                        handleFieldChange('hero_cta_buttons', buttons);
                                       }}
                                       variant="outline" size="sm"
                                       className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
@@ -1790,73 +661,433 @@ const PortfolioEditorPage = () => {
                                       <X className="h-4 w-4" />
                                     </Button>
                                   </div>
-                                ))}
-                                <Button
-                                  onClick={() => {
-                                    const links = safeGetArray(portfolio.footer_links_json);
-                                    links.push({ text: '', url: '' });
-                                    handleFieldChange('footer_links_json', links);
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {key === 'about' && (
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                            {/* Left Column: Text Content */}
+                            <div className="space-y-4">
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                  About Text
+                                </label>
+                                <Textarea
+                                  value={portfolio.about_text || ''}
+                                  onChange={(e) => handleFieldChange('about_text', e.target.value)}
+                                  placeholder="Tell your story..."
+                                  rows={8}
+                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Right Column: Profile Photo */}
+                            <div className="space-y-2">
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Profile Photo
+                              </label>
+                              {portfolio.profile_photo_url ? (
+                                  <div className="relative group">
+                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-48 object-cover rounded-lg border border-white/10" />
+                                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                          <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
+                                              <Trash2 className="h-4 w-4" />
+                                          </button>
+                                      </div>
+                                  </div>
+                              ) : (
+                                  <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                    <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                    <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
+                                  </div>
+                              )}
+                              <div className="flex gap-2">
+                                <Input
+                                  type="url"
+                                  value={portfolio.profile_photo_url || ''}
+                                  onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
+                                  placeholder="Paste photo URL"
+                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                />
+                                <input
+                                  type="file" id="profile-upload" accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) uploadProfilePhoto(file);
+                                    e.target.value = '';
                                   }}
-                                  variant="outline" size="sm"
-                                  className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                                  className="hidden"
+                                />
+                                <Button
+                                  onClick={() => document.getElementById('profile-upload')?.click()}
+                                  variant="outline" size="sm" disabled={uploadingProfile}
+                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                                 >
-                                  <Plus className="h-4 w-4 mr-1" />
-                                  Add Link
+                                  {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                 </Button>
                               </div>
                             </div>
+                          </div>
+                        </div>
+                      )}
 
-                            {/* Social Links Toggle */}
-                            <div>
-                              <div className="flex items-center justify-between">
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
-                                  Social Links
-                                </label>
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    id="footer_show_social_links"
-                                    checked={portfolio.footer_show_social_links !== false}
-                                    onChange={(e) => handleFieldChange('footer_show_social_links', e.target.checked)}
-                                    className="rounded border-white/20 bg-white/10"
-                                  />
-                                  <label htmlFor="footer_show_social_links" className={`text-xs ${selectedTheme.colors.text}`}>
-                                    Show in footer
-                                  </label>
-                                </div>
-                              </div>
-                              <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
-                                Uses social links from Contact section
-                              </p>
-                            </div>
+                      {key === 'tracks' && (
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between">
+                            <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>Tracks</h3>
+                            <Button
+                              onClick={() => setShowAddTrackForm(true)}
+                              variant="outline"
+                              className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Track
+                            </Button>
+                          </div>
+                          
+                          <PortfolioTracksDisplay portfolioId={portfolio.id} viewMode={trackViewMode} />
+                          
+                          {showAddTrackForm && (
+                            <PortfolioTrackForm
+                              portfolioId={portfolio.id}
+                              onCancel={() => setShowAddTrackForm(false)}
+                              onSuccess={() => {
+                                setShowAddTrackForm(false);
+                                // Refresh tracks display
+                              }}
+                            />
+                          )}
+                        </div>
+                      )}
 
-                            {/* Copyright Text */}
-                            <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
-                                Copyright Text
-                              </label>
+                      {key === 'gallery' && (
+                        <div className="space-y-6">
+                          <div className="flex items-center justify-between">
+                            <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>Gallery</h3>
+                            <Button
+                              onClick={() => setShowAddGalleryForm(true)}
+                              variant="outline"
+                              className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Item
+                            </Button>
+                          </div>
+                          
+                          <PortfolioGalleryDisplay portfolioId={portfolio.id} viewMode={galleryViewMode} filter={galleryFilter} />
+                          
+                          {showAddGalleryForm && (
+                            <PortfolioGalleryForm
+                              portfolioId={portfolio.id}
+                              onCancel={() => setShowAddGalleryForm(false)}
+                              onSuccess={() => {
+                                setShowAddGalleryForm(false);
+                                // Refresh gallery display
+                              }}
+                            />
+                          )}
+                        </div>
+                      )}
+
+                      {key === 'hobbies' && (
+                        <div className="space-y-6">
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Add Hobbies
+                            </label>
+                            <div className="flex gap-2 mb-4">
                               <Input
                                 type="text"
-                                value={portfolio.footer_copyright_text || ''}
-                                onChange={(e) => handleFieldChange('footer_copyright_text', e.target.value)}
-                                placeholder={`© ${new Date().getFullYear()} ${portfolio?.artist_name || 'Hero Portfolio'}. All rights reserved.`}
-                                className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                value={hobbySearch}
+                                onChange={(e) => setHobbySearch(e.target.value)}
+                                placeholder="Search hobbies..."
+                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
                               />
-                              <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
-                                Leave empty to use default copyright text
-                              </p>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-40 overflow-y-auto">
+                              {filteredHobbies.map((hobby) => (
+                                <button
+                                  key={hobby.name}
+                                  onClick={() => handleAddHobby(hobby)}
+                                  className="flex flex-col items-center p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                                >
+                                  <span className="text-2xl mb-1">{hobby.icon}</span>
+                                  <span className="text-xs text-center">{hobby.name}</span>
+                                </button>
+                              ))}
                             </div>
                           </div>
-                        )}
-                      </div>
-                    )}
-                  </section>
-                );
-              })}
-            </div>
+                          
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Selected Hobbies
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                              {safeGetArray(portfolio.hobbies_json).map((hobby: any, index: number) => (
+                                <div key={`hobby-${index}-${hobby.name}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
+                                  <span className="text-lg">{hobby.icon}</span>
+                                  <span className="text-sm">{hobby.name}</span>
+                                  <button
+                                    onClick={() => handleRemoveHobby(hobby.name)}
+                                    className="text-red-400 hover:text-red-300"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {key === 'skills' && (
+                        <div className="space-y-6">
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Add Skills
+                            </label>
+                            <div className="flex gap-2 mb-4">
+                              <Input
+                                type="text"
+                                value={skillSearch}
+                                onChange={(e) => setSkillSearch(e.target.value)}
+                                placeholder="Search skills..."
+                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-40 overflow-y-auto">
+                              {filteredSkills.map((skill) => (
+                                <button
+                                  key={skill.name}
+                                  onClick={() => handleAddSkill(skill)}
+                                  className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                                >
+                                  <skill.icon className="h-5 w-5" style={{ color: skill.color }} />
+                                  <span className="text-sm">{skill.name}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Selected Skills
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                              {safeGetArray(portfolio.skills_json).map((skill: any, index: number) => (
+                                <div key={`skill-${index}-${skill.name}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
+                                  <span className="text-sm">{skill.name}</span>
+                                  <button
+                                    onClick={() => handleRemoveSkill(skill.name)}
+                                    className="text-red-400 hover:text-red-300"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {key === 'resume' && (
+                        <div className="space-y-6">
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Resume File
+                            </label>
+                            <div className="flex gap-2">
+                              <Input
+                                type="url"
+                                value={portfolio.resume_url || ''}
+                                onChange={(e) => handleFieldChange('resume_url', e.target.value)}
+                                placeholder="Paste resume URL"
+                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                              <input
+                                type="file" id="resume-upload" accept=".pdf,.doc,.docx"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) uploadResume(file);
+                                  e.target.value = '';
+                                }}
+                                className="hidden"
+                              />
+                              <Button
+                                onClick={() => document.getElementById('resume-upload')?.click()}
+                                variant="outline" size="sm" disabled={uploadingResume}
+                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                              >
+                                {uploadingResume ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {key === 'press' && (
+                        <PressMentionsForm portfolioId={portfolio.id} theme={selectedTheme} />
+                      )}
+
+                      {key === 'contact' && (
+                        <div className="space-y-6">
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Contact Description
+                            </label>
+                            <Textarea
+                              value={portfolio.contact_description || ''}
+                              onChange={(e) => handleFieldChange('contact_description', e.target.value)}
+                              placeholder="Ready to work together? Let's talk!"
+                              rows={3}
+                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Contact Email
+                            </label>
+                            <Input
+                              type="email"
+                              value={portfolio.contact_email || ''}
+                              onChange={(e) => handleFieldChange('contact_email', e.target.value)}
+                              placeholder="your.email@example.com"
+                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Contact Phone
+                            </label>
+                            <Input
+                              type="tel"
+                              value={portfolio.contact_phone || ''}
+                              onChange={(e) => handleFieldChange('contact_phone', e.target.value)}
+                              placeholder="e.g. +1 555-123-4567"
+                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Contact Location
+                            </label>
+                            <Input
+                              type="text"
+                              value={portfolio.contact_location || ''}
+                              onChange={(e) => handleFieldChange('contact_location', e.target.value)}
+                              placeholder="e.g. New York, NY"
+                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              Website URL
+                            </label>
+                            <Input
+                              type="url"
+                              value={portfolio.website_url || ''}
+                              onChange={(e) => handleFieldChange('website_url', e.target.value)}
+                              placeholder="https://yourwebsite.com"
+                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                LinkedIn URL
+                              </label>
+                              <Input
+                                type="url"
+                                value={portfolio.linkedin_url || ''}
+                                onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
+                                placeholder="https://linkedin.com/in/yourprofile"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Twitter URL
+                              </label>
+                              <Input
+                                type="url"
+                                value={portfolio.twitter_url || ''}
+                                onChange={(e) => handleFieldChange('twitter_url', e.target.value)}
+                                placeholder="https://twitter.com/yourhandle"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                Instagram URL
+                              </label>
+                              <Input
+                                type="url"
+                                value={portfolio.instagram_url || ''}
+                                onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
+                                placeholder="https://instagram.com/yourhandle"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                GitHub URL
+                              </label>
+                              <Input
+                                type="url"
+                                value={portfolio.github_url || ''}
+                                onChange={(e) => handleFieldChange('github_url', e.target.value)}
+                                placeholder="https://github.com/yourusername"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                YouTube URL
+                              </label>
+                              <Input
+                                type="url"
+                                value={portfolio.youtube_url || ''}
+                                onChange={(e) => handleFieldChange('youtube_url', e.target.value)}
+                                placeholder="https://youtube.com/@yourchannel"
+                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
           </div>
         </main>
       </div>
+
+      {/* Custom CSS for hiding scrollbar */}
+      <style jsx global>{`
+        .custom-scrollbar-hide::-webkit-scrollbar {
+          width: 0 !important;
+          background: transparent;
+        }
+        .custom-scrollbar-hide {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+      `}</style>
     </div>
   );
 };
