@@ -37,7 +37,7 @@ export default function PortfolioThemeSelector({
               style={{
                 width: 22,
                 height: 22,
-                background: themeOption.colors.primary,
+                background: themeOption.previewColor,
                 border: theme.name === themeOption.name ? '2px solid #fff' : '1px solid #444',
                 margin: 1,
               }}

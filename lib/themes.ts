@@ -10,11 +10,13 @@ export interface PortfolioTheme {
     heading: string;
     accent: string;
   };
+  previewColor: string;
 }
 
 export const THEMES = [
   {
     name: 'Music Maestro',
+    previewColor: '#a78bfa', // purple-400
     colors: {
       background: 'bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900',
       text: 'text-purple-100',
@@ -28,6 +30,7 @@ export const THEMES = [
   },
   {
     name: 'Photo Gallery',
+    previewColor: '#f87171', // red-400
     colors: {
       background: 'bg-gradient-to-br from-red-950 via-red-900 to-red-800',
       text: 'text-red-100',
@@ -41,6 +44,7 @@ export const THEMES = [
   },
   {
     name: 'Midnight Dusk',
+    previewColor: '#60a5fa', // blue-400
     colors: {
       background: 'bg-gray-900',
       text: 'text-gray-300',
@@ -54,6 +58,7 @@ export const THEMES = [
   },
   {
     name: 'Ocean Blue',
+    previewColor: '#38bdf8', // sky-400
     colors: {
       background: 'bg-slate-900',
       text: 'text-slate-300',
@@ -67,6 +72,7 @@ export const THEMES = [
   },
   {
     name: 'Sunset Rose',
+    previewColor: '#fb7185', // rose-400
     colors: {
       background: 'bg-rose-950',
       text: 'text-rose-100',
@@ -80,6 +86,7 @@ export const THEMES = [
   },
   {
     name: 'Royal Purple',
+    previewColor: '#a78bfa', // violet-400
     colors: {
       background: 'bg-violet-950',
       text: 'text-violet-100',
@@ -93,6 +100,7 @@ export const THEMES = [
   },
   {
     name: 'Golden Hour',
+    previewColor: '#fbbf24', // amber-400
     colors: {
       background: 'bg-amber-950',
       text: 'text-amber-100',
@@ -106,6 +114,7 @@ export const THEMES = [
   },
   {
     name: 'Emerald Forest',
+    previewColor: '#2dd4bf', // teal-400
     colors: {
       background: 'bg-teal-950',
       text: 'text-teal-100',
@@ -119,6 +128,7 @@ export const THEMES = [
   },
   {
     name: 'Lime Fresh',
+    previewColor: '#a3e635', // lime-400
     colors: {
       background: 'bg-lime-950',
       text: 'text-lime-100',
@@ -132,6 +142,7 @@ export const THEMES = [
   },
   {
     name: 'Classic Gray',
+    previewColor: '#f3f4f6', // gray-200
     colors: {
       background: 'bg-gray-800',
       text: 'text-gray-200',
@@ -145,6 +156,7 @@ export const THEMES = [
   },
   {
     name: 'Stone Elegance',
+    previewColor: '#d6d3d1', // stone-300
     colors: {
       background: 'bg-stone-900',
       text: 'text-stone-300',
