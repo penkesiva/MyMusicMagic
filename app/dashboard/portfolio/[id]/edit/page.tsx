@@ -315,86 +315,15 @@ const PortfolioEditorPage = () => {
     fetchPortfolio();
   }, [id, router, supabase]);
 
-  const saveChanges = useDebouncedCallback(async (updatedPortfolio: Partial<Portfolio>) => {
+  const saveChanges = useDebouncedCallback(async (fields: Partial<Portfolio>) => {
     if (!portfolio) return;
-
-    // Debug user context
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError) {
-      console.error('❌ User auth error:', userError);
-      return;
-    }
-    
-    console.log('👤 Current user:', user?.id);
-    console.log('📄 Portfolio user_id:', portfolio.user_id);
-    console.log('🔐 User matches portfolio owner:', user?.id === portfolio.user_id);
-
-    const validPortfolioKeys = [
-      'hero_title', 'hero_subtitle', 'hero_cta_buttons',
-      'about_title', 'about_text', 'profile_photo_url', 'instagram_url', 'twitter_url',
-      'youtube_url', 'linkedin_url', 'website_url', 'github_url',
-      'hobbies_title', 'hobbies_json', 'skills_title', 'skills_json',
-      'press_title', 'press_json', 'key_projects_title', 'key_projects_json',
-      'contact_title', 'contact_description', 'contact_email', 'contact_phone', 'contact_location', 'footer_text',
-      'footer_about_summary', 'footer_links_json', 'footer_social_links_json', 'footer_copyright_text',
-      'footer_show_social_links', 'footer_show_about_summary', 'footer_show_links',
-      'sections_config', 'theme_name', 'resume_url', 'resume_title', 'artist_name', 'bio',
-      'seo_title', 'seo_description'
-    ];
-
-    const portfolioToSave: Partial<Portfolio> = {};
-    for (const key of Object.keys(updatedPortfolio) as (keyof Portfolio)[]) {
-      if (validPortfolioKeys.includes(key)) {
-        let value = updatedPortfolio[key];
-        
-        // Handle JSON fields - if the database expects text, stringify them
-        if (key === 'hobbies_json' || key === 'skills_json' || key === 'sections_config' || 
-            key === 'press_json' || key === 'key_projects_json' || key === 'footer_links_json' || 
-            key === 'footer_social_links_json') {
-          if (value && typeof value === 'object') {
-            value = JSON.stringify(value);
-            console.log(`🔄 Stringified ${key}:`, value);
-          }
-        }
-        
-        (portfolioToSave as any)[key] = value;
-      } else {
-        console.warn('⚠️ Field not in validPortfolioKeys:', key, updatedPortfolio[key]);
-      }
-    }
-
-    if (Object.keys(portfolioToSave).length === 0) {
-      setSavingStatus("saved");
-      return;
-    }
-    
-    // Debug logging
-    console.log('💾 Saving portfolio data:', JSON.stringify(portfolioToSave, null, 2));
-    console.log('🔍 Fields being sent:', Object.keys(portfolioToSave));
-    console.log('🎯 Portfolio ID:', portfolio.id);
-    
+    const { id } = portfolio;
     const { error } = await supabase
-      .from("user_portfolios")
-      .update(portfolioToSave)
-      .eq("id", portfolio.id);
-
-    if (error) {
-      console.error("Error saving portfolio:", error);
-      console.error("Error details:", {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
-      });
-      console.error("Full error object:", JSON.stringify(error, null, 2));
-      setSavingStatus("error");
-    } else {
-      console.log('✅ Portfolio saved successfully');
-      setSavingStatus("saved");
-      // Optimistically update local state, no need to re-fetch immediately
-      setPortfolio(prev => ({...prev, ...updatedPortfolio}) as Portfolio);
-    }
-  }, 1500);
+      .from('user_portfolios')
+      .update(fields)
+      .eq('id', id);
+    setSavingStatus(error ? "error" : "saved");
+  }, 600);
 
   const handleFieldChange = (field: keyof Portfolio, value: any) => {
     // Set saving status immediately when changes start
@@ -938,7 +867,7 @@ const PortfolioEditorPage = () => {
                     >
                       <div className="flex items-center gap-3">
                         <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
-                          {getSectionTitle(key)}
+                          {sectionConfig.defaultName}
                         </h2>
                         {!isEnabled && (
                           <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded-full">
@@ -1483,8 +1412,8 @@ const PortfolioEditorPage = () => {
                                 Selected Hobbies
                               </label>
                               <div className="flex flex-wrap gap-2">
-                                {safeGetArray(portfolio.hobbies_json).map((hobby: any) => (
-                                  <div key={hobby.name} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
+                                {safeGetArray(portfolio.hobbies_json).map((hobby: any, index: number) => (
+                                  <div key={`hobby-${index}-${hobby.name}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
                                     <span className="text-lg">{hobby.icon}</span>
                                     <span className="text-sm">{hobby.name}</span>
                                     <button
@@ -1548,8 +1477,8 @@ const PortfolioEditorPage = () => {
                                 Selected Skills
                               </label>
                               <div className="flex flex-wrap gap-2">
-                                {safeGetArray(portfolio.skills_json).map((skill: any) => (
-                                  <div key={skill.name} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
+                                {safeGetArray(portfolio.skills_json).map((skill: any, index: number) => (
+                                  <div key={`skill-${index}-${skill.name}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
                                     <span className="text-sm">{skill.name}</span>
                                     <button
                                       onClick={() => handleRemoveSkill(skill.name)}

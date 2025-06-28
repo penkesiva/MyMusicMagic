@@ -601,7 +601,7 @@ export default function PortfolioPage({ params }: PageProps) {
   };
 
   const renderPress = (portfolio: Portfolio) => {
-    const sectionTitle = (portfolio.sections_config as any)?.press?.name || SECTIONS_CONFIG['press'].defaultName;
+    const sectionTitle = (portfolio.sections_config as any)?.press?.title || SECTIONS_CONFIG['press'].defaultName;
     
     return (
       <section id="press" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
@@ -614,7 +614,7 @@ export default function PortfolioPage({ params }: PageProps) {
   };
 
   const renderKeyProjects = (portfolio: Portfolio) => {
-    const sectionTitle = (portfolio.sections_config as any)?.key_projects?.name || SECTIONS_CONFIG['key_projects'].defaultName;
+    const sectionTitle = (portfolio.sections_config as any)?.key_projects?.title || SECTIONS_CONFIG['key_projects'].defaultName;
     
     return (
       <section id="key_projects" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
@@ -627,7 +627,7 @@ export default function PortfolioPage({ params }: PageProps) {
   };
 
   const renderResume = (portfolio: Portfolio) => {
-    const sectionTitle = (portfolio.sections_config as any)?.resume?.name || SECTIONS_CONFIG['resume'].defaultName;
+    const sectionTitle = (portfolio.sections_config as any)?.resume?.title || SECTIONS_CONFIG['resume'].defaultName;
     
     return (
       <section id="resume" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
@@ -651,7 +651,7 @@ export default function PortfolioPage({ params }: PageProps) {
   };
 
   const renderContact = (portfolio: Portfolio) => {
-    const sectionTitle = portfolio.contact_title || (portfolio.sections_config as any)?.contact?.name || SECTIONS_CONFIG['contact'].defaultName;
+    const sectionTitle = portfolio.contact_title || (portfolio.sections_config as any)?.contact?.title || SECTIONS_CONFIG['contact'].defaultName;
     
     return (
       <section id="contact" className={`${theme.colors.background} ${theme.colors.text} py-32 px-4 md:px-8 relative overflow-hidden`}>
@@ -837,7 +837,7 @@ export default function PortfolioPage({ params }: PageProps) {
   };
 
   const renderTestimonials = (portfolio: Portfolio) => {
-    const sectionTitle = (portfolio.sections_config as any)?.testimonials?.name || SECTIONS_CONFIG['testimonials'].defaultName;
+    const sectionTitle = (portfolio.sections_config as any)?.testimonials?.title || SECTIONS_CONFIG['testimonials'].defaultName;
     
     return (
       <section id="testimonials" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
@@ -850,7 +850,7 @@ export default function PortfolioPage({ params }: PageProps) {
   };
 
   const renderBlog = (portfolio: Portfolio) => {
-    const sectionTitle = (portfolio.sections_config as any)?.blog?.name || SECTIONS_CONFIG['blog'].defaultName;
+    const sectionTitle = (portfolio.sections_config as any)?.blog?.title || SECTIONS_CONFIG['blog'].defaultName;
     
     return (
       <section id="blog" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
@@ -863,7 +863,7 @@ export default function PortfolioPage({ params }: PageProps) {
   };
 
   const renderStatus = (portfolio: Portfolio) => {
-    const sectionTitle = (portfolio.sections_config as any)?.status?.name || SECTIONS_CONFIG['status'].defaultName;
+    const sectionTitle = (portfolio.sections_config as any)?.status?.title || SECTIONS_CONFIG['status'].defaultName;
     
     return (
       <section id="status" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
