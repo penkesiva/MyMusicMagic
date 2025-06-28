@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -64,6 +64,7 @@ const PortfolioEditorPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
   const fileUploader = useMemo(() => new PortfolioFileUploader(), []);
@@ -281,6 +282,32 @@ const PortfolioEditorPage = () => {
     !safeGetArray(portfolio?.skills_json).some(s => s.name === skill.name)
   );
 
+  // Explicit save function
+  const handleExplicitSave = async () => {
+    if (!portfolio) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('user_portfolios')
+        .update(portfolio)
+        .eq('id', portfolio.id);
+      
+      if (error) {
+        console.error('Save error:', error);
+        alert('Error saving portfolio. Please try again.');
+      } else {
+        setSavingStatus('saved');
+        alert('Portfolio saved successfully!');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      alert('Error saving portfolio. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900">
@@ -335,10 +362,22 @@ const PortfolioEditorPage = () => {
         {/* AI Assistant Component */}
         <PortfolioAIAssistant
           portfolio={portfolio}
-          onPortfolioUpdate={setPortfolio}
+          onPortfolioUpdate={(updatedPortfolio) => {
+            setPortfolio(updatedPortfolio);
+            // Update sectionOrder to include all enabled sections, sorted by order/defaultOrder
+            const enabledSections = Object.keys(updatedPortfolio.sections_config)
+              .filter(key => updatedPortfolio.sections_config[key]?.enabled);
+            const sortedSections = enabledSections.sort((a, b) => {
+              const orderA = updatedPortfolio.sections_config[a]?.order ?? SECTIONS_CONFIG[a]?.defaultOrder ?? 999;
+              const orderB = updatedPortfolio.sections_config[b]?.order ?? SECTIONS_CONFIG[b]?.defaultOrder ?? 999;
+              return orderA - orderB;
+            });
+            setSectionOrder(sortedSections);
+          }}
           isGenerating={isGenerating}
           setIsGenerating={setIsGenerating}
           theme={selectedTheme}
+          onSave={handleExplicitSave}
         />
 
         {/* Theme Selector Component */}
@@ -397,7 +436,26 @@ const PortfolioEditorPage = () => {
               </span>
             </div>
             <Button
-              onClick={() => router.push(`/portfolio/preview/${portfolio.id}`)}
+              onClick={handleExplicitSave}
+              variant="outline"
+              size="sm"
+              disabled={isSaving}
+              className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30 disabled:opacity-50"
+            >
+              {isSaving ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-1" />
+                  Save State
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={() => window.open(`/portfolio/preview/${portfolio.id}`, '_blank', 'noopener,noreferrer')}
               variant="outline"
               size="sm"
               className="bg-white/10 border-white/20 text-white hover:bg-white/20"
@@ -406,7 +464,7 @@ const PortfolioEditorPage = () => {
               Preview
             </Button>
             <Button
-              onClick={() => router.push(`/portfolio/${userProfile?.username}/${portfolio.slug}`)}
+              onClick={() => window.open(`/portfolio/${userProfile?.username}/${portfolio.slug}`, '_blank', 'noopener,noreferrer')}
               variant="outline"
               size="sm"
               className="bg-white/10 border-white/20 text-white hover:bg-white/20"

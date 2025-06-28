@@ -12,6 +12,7 @@ interface PortfolioAIAssistantProps {
   isGenerating: boolean;
   setIsGenerating: (generating: boolean) => void;
   theme: any;
+  onSave?: () => Promise<void>;
 }
 
 export default function PortfolioAIAssistant({
@@ -19,7 +20,8 @@ export default function PortfolioAIAssistant({
   onPortfolioUpdate,
   isGenerating,
   setIsGenerating,
-  theme
+  theme,
+  onSave
 }: PortfolioAIAssistantProps) {
   const [prompt, setPrompt] = useState("");
   const [isUserInteracting, setIsUserInteracting] = useState(false);
@@ -64,7 +66,9 @@ export default function PortfolioAIAssistant({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate content from AI.');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'Failed to generate content from AI.';
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -73,9 +77,19 @@ export default function PortfolioAIAssistant({
       const updatedPortfolio = { ...portfolio, ...data };
       onPortfolioUpdate(updatedPortfolio);
 
+      // Auto-save after successful AI generation
+      if (onSave) {
+        try {
+          await onSave();
+        } catch (error) {
+          console.error('Auto-save after AI generation failed:', error);
+        }
+      }
+
     } catch (error) {
       console.error("AI Generation Error:", error);
-      alert("There was an error generating the portfolio content. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "There was an error generating the portfolio content. Please try again.";
+      alert(errorMessage);
     } finally {
       setIsGenerating(false);
     }
