@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { THEMES } from "@/lib/themes";
 import { Portfolio } from "@/types/portfolio";
@@ -17,9 +17,25 @@ export default function PortfolioThemeSelector({
   theme
 }: PortfolioThemeSelectorProps) {
   const [colorThemeOpen, setColorThemeOpen] = useState(true);
+  const [clickedTheme, setClickedTheme] = useState<string | null>(null);
+
+  // Auto-hide theme name after 2 seconds
+  useEffect(() => {
+    if (clickedTheme) {
+      const timer = setTimeout(() => {
+        setClickedTheme(null);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [clickedTheme]);
+
+  const handleThemeClick = (themeName: string) => {
+    onFieldChange("theme_name", themeName);
+    setClickedTheme(themeName);
+  };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 relative">
       <button 
         onClick={() => setColorThemeOpen(!colorThemeOpen)} 
         className="w-full flex justify-between items-center font-semibold text-sm text-white"
@@ -32,7 +48,7 @@ export default function PortfolioThemeSelector({
           {THEMES.map((themeOption) => (
             <button
               key={themeOption.name}
-              onClick={() => onFieldChange("theme_name", themeOption.name)}
+              onClick={() => handleThemeClick(themeOption.name)}
               className={`rounded-full transition-all focus:outline-none`}
               style={{
                 width: 22,
@@ -44,6 +60,13 @@ export default function PortfolioThemeSelector({
               title={themeOption.name}
             />
           ))}
+        </div>
+      )}
+      
+      {/* Theme name display at bottom right of section */}
+      {clickedTheme && (
+        <div className="absolute bottom-0 right-0 bg-black/80 text-white px-2 py-1 rounded text-xs font-medium animate-in slide-in-from-bottom-2 duration-300">
+          {clickedTheme}
         </div>
       )}
     </div>
