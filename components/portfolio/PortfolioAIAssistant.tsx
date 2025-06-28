@@ -22,6 +22,7 @@ export default function PortfolioAIAssistant({
   theme
 }: PortfolioAIAssistantProps) {
   const [prompt, setPrompt] = useState("");
+  const [isUserInteracting, setIsUserInteracting] = useState(false);
 
   const placeholders = [
     "Build a portfolio for an upcoming cello artist...",
@@ -31,13 +32,26 @@ export default function PortfolioAIAssistant({
   ];
 
   useEffect(() => {
+    if (isUserInteracting) return; // Stop scrolling if user is interacting
+    
     let i = 0;
     const interval = setInterval(() => {
       setPrompt(placeholders[i]);
       i = (i + 1) % placeholders.length;
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isUserInteracting]);
+
+  const handleTextareaFocus = () => {
+    setIsUserInteracting(true);
+  };
+
+  const handleTextareaBlur = () => {
+    // Only resume scrolling if the textarea is empty
+    if (!prompt.trim()) {
+      setIsUserInteracting(false);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!prompt || !portfolio) return;
@@ -85,6 +99,8 @@ export default function PortfolioAIAssistant({
         placeholder="Describe what you want to generate…"
         value={prompt}
         onChange={e => setPrompt(e.target.value)}
+        onFocus={handleTextareaFocus}
+        onBlur={handleTextareaBlur}
         disabled={isGenerating}
         rows={3}
         style={{ minHeight: 60, maxHeight: 120 }}

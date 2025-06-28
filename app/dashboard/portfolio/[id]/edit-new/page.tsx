@@ -351,6 +351,22 @@ const PortfolioEditorPage = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 p-6 overflow-y-auto">
+        {/* AI Loading Animation */}
+        {isGenerating && (
+          <div className="mb-6">
+            <div className="bg-white/10 rounded-full h-2 overflow-hidden">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full animate-pulse" style={{ width: '100%' }}></div>
+            </div>
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-sm text-purple-300">AI is generating content...</span>
+              </div>
+              <span className="text-xs text-gray-500">Please wait</span>
+            </div>
+          </div>
+        )}
+        
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="flex justify-end items-center gap-2">
             <span className="text-sm text-gray-400">Manage Sections</span>
