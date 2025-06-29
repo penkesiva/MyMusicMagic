@@ -5,6 +5,7 @@ import { Play, Pause, Info } from "lucide-react"
 import Image from "next/image"
 import { PortfolioTheme } from "@/lib/themes"
 import { Database } from "@/types/database"
+import { useAudioStore, playTrack } from "@/lib/audioState"
 
 type Track = Database['public']['Tables']['tracks']['Row']
 
@@ -15,27 +16,43 @@ interface TrackCardProps {
   onPlay?: (track: Track) => void
   onInfo?: (track: Track) => void
   isPlaying?: boolean
+  audioPlayerMode?: 'bottom' | 'inline'
 }
 
-export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPlaying: externalIsPlaying }: TrackCardProps) {
-  const [isPlaying, setIsPlaying] = useState(false)
+export function TrackCard({ 
+  track, 
+  theme, 
+  variant = 'grid', 
+  onPlay, 
+  onInfo, 
+  isPlaying: externalIsPlaying,
+  audioPlayerMode = 'bottom'
+}: TrackCardProps) {
   const [progress, setProgress] = useState(0)
   const audioRef = useRef<HTMLAudioElement>(null)
   
-  // Use external isPlaying state if provided, otherwise use internal state
-  const isPlayingState = externalIsPlaying !== undefined ? externalIsPlaying : isPlaying
+  // Global audio state
+  const { currentTrack, isPlaying } = useAudioStore()
+  
+  // Determine if this track is currently playing
+  const isCurrentTrack = currentTrack?.id === track.id
+  const isTrackPlaying = isCurrentTrack && isPlaying
+  
+  // Use external isPlaying state if provided, otherwise use global state
+  const isPlayingState = externalIsPlaying !== undefined ? externalIsPlaying : isTrackPlaying
 
   const togglePlay = () => {
     if (onPlay) {
       onPlay(track)
+    } else if (audioPlayerMode === 'inline') {
+      // Inline mode - use global state
+      playTrack(track)
     } else {
-      if (!audioRef.current) return
-      if (isPlaying) {
-        audioRef.current.pause()
-      } else {
-        audioRef.current.play()
-      }
-      setIsPlaying(!isPlaying)
+      // Bottom player mode - dispatch custom event
+      const playEvent = new CustomEvent('playTrack', {
+        detail: { track, isPlaying: isCurrentTrack && isPlaying }
+      })
+      window.dispatchEvent(playEvent)
     }
   }
 
@@ -47,14 +64,13 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
 
   useEffect(() => {
     const audio = audioRef.current
-    if (!audio || onPlay) return // Don't set up internal audio if external control is used
+    if (!audio || onPlay || audioPlayerMode === 'bottom') return // Don't set up internal audio if external control is used
 
     const updateProgress = () => {
       setProgress((audio.currentTime / audio.duration) * 100)
     }
 
     const handleEnded = () => {
-      setIsPlaying(false)
       setProgress(0)
     }
 
@@ -65,7 +81,7 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
       audio.removeEventListener('timeupdate', updateProgress)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [onPlay])
+  }, [onPlay, audioPlayerMode])
 
   // Default theme if none provided
   const defaultTheme: PortfolioTheme = {
@@ -107,7 +123,11 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
             onClick={togglePlay}
             className={`p-2 rounded-full transition-colors duration-200 ${colors.primary.replace('text-','hover:bg-')} hover:bg-opacity-20 ${colors.primary}`}
           >
-            {isPlayingState ? <Pause size={16} /> : <Play size={16} />}
+            {isTrackPlaying ? (
+              <Pause size={16} />
+            ) : (
+              <Play size={16} />
+            )}
           </button>
           <button 
             onClick={handleInfo}
@@ -122,7 +142,7 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
 
   return (
     <div className={`rounded-xl shadow-lg overflow-hidden transition-all duration-300 ${colors.card} hover:shadow-2xl hover:-translate-y-1`}>
-      {!onPlay && <audio ref={audioRef} src={track.audio_url} preload="metadata"></audio>}
+      {!onPlay && audioPlayerMode === 'inline' && <audio ref={audioRef} src={track.audio_url} preload="metadata"></audio>}
       
       <div className="relative aspect-square">
         <Image 
@@ -138,7 +158,7 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
         <h3 className={`text-xl font-bold ${colors.heading}`}>{track.title}</h3>
         {track.description && <p className={`mt-1 text-sm ${colors.cardText}`}>{track.description}</p>}
 
-        {!onPlay && (
+        {!onPlay && audioPlayerMode === 'inline' && (
           <div className="mt-4">
             <div className="w-full h-1.5 bg-gray-600/50 rounded-full overflow-hidden">
               <div 
@@ -154,7 +174,11 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
             onClick={togglePlay}
             className={`p-3 rounded-full transition-colors duration-200 ${colors.primary.replace('text-','hover:bg-')} hover:bg-opacity-20 ${colors.primary}`}
           >
-            {isPlayingState ? <Pause size={20} /> : <Play size={20} />}
+            {isTrackPlaying ? (
+              <Pause size={20} />
+            ) : (
+              <Play size={20} />
+            )}
           </button>
           <button 
             onClick={handleInfo}

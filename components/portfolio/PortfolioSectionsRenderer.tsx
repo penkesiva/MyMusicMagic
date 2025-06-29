@@ -6,6 +6,8 @@ import { Portfolio } from '@/types/portfolio';
 import { TrackCard } from '@/app/components/tracks/TrackCard';
 import AudioPlayer from '@/app/components/AudioPlayer';
 import PortfolioGalleryDisplay from '@/components/portfolio/PortfolioGalleryDisplay';
+import PortfolioTracksDisplay from '@/components/portfolio/PortfolioTracksDisplay';
+import PortfolioBottomAudioPlayer from '@/components/portfolio/PortfolioBottomAudioPlayer';
 import PressMentionsDisplay from '@/components/portfolio/PressMentionsDisplay';
 import { HOBBIES_LIST } from '@/lib/hobbies';
 import { SKILLS_LIST } from '@/lib/skills';
@@ -29,6 +31,22 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
   theme,
   showPreviewBanner = false,
 }) => {
+  const [showBottomAudioPlayer, setShowBottomAudioPlayer] = React.useState(false);
+
+  // Add event listener for bottom audio player
+  React.useEffect(() => {
+    const handlePlayTrack = () => {
+      if (portfolio?.sections_config?.tracks?.audio_player_mode === 'bottom') {
+        setShowBottomAudioPlayer(true)
+      }
+    }
+
+    window.addEventListener('playTrack', handlePlayTrack)
+    return () => {
+      window.removeEventListener('playTrack', handlePlayTrack)
+    }
+  }, [portfolio?.sections_config?.tracks?.audio_player_mode])
+
   let sortedSections: string[] = [];
   if (portfolio.sections_config) {
     let sectionsArray: string[] = [];
@@ -159,11 +177,11 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
               <section id="tracks" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto">
                   <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('tracks')}</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {tracks.map((track: any) => (
-                      <TrackCard key={track.id} track={track} theme={theme} />
-                    ))}
-                  </div>
+                  <PortfolioTracksDisplay 
+                    portfolioId={portfolio.id} 
+                    viewMode="grid"
+                    audioPlayerMode={portfolio.sections_config?.tracks?.audio_player_mode || 'bottom'}
+                  />
                 </div>
               </section>
             )}
@@ -278,6 +296,13 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
           </footer>
         )}
       </main>
+
+      {/* Bottom Audio Player */}
+      <PortfolioBottomAudioPlayer
+        isVisible={showBottomAudioPlayer}
+        onClose={() => setShowBottomAudioPlayer(false)}
+        theme={theme}
+      />
     </div>
   );
 };

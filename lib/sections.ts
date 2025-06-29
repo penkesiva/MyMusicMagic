@@ -46,7 +46,8 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
         defaultEnabled: true,
         hasCustomTitle: true,
         fields: {
-            tracks_title: 'text'
+            tracks_title: 'text',
+            audio_player_mode: 'text'
         }
     },
     gallery: {

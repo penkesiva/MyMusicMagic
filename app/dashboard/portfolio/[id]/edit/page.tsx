@@ -29,6 +29,7 @@ import PortfolioThemeSelector from '@/components/portfolio/PortfolioThemeSelecto
 import PortfolioSectionManager from '@/components/portfolio/PortfolioSectionManager';
 import { PortfolioFileUploader } from '@/components/portfolio/PortfolioFileUploader';
 import { safeGetArray, getSectionTitle, getSortedEditorSections } from '@/lib/portfolioEditorUtils';
+import PortfolioBottomAudioPlayer from '@/components/portfolio/PortfolioBottomAudioPlayer'
 
 const NAVBAR_HEIGHT = 56;
 const SIDEBAR_MIN_WIDTH = 220;
@@ -67,6 +68,7 @@ const PortfolioEditorPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [tracksRefreshKey, setTracksRefreshKey] = useState(0);
   const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
+  const [showBottomAudioPlayer, setShowBottomAudioPlayer] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
   const fileUploader = useMemo(() => new PortfolioFileUploader(), []);
@@ -145,7 +147,7 @@ const PortfolioEditorPage = () => {
   // Handle section config changes
   const handleSectionConfigChange = (
     sectionKey: keyof typeof SECTIONS_CONFIG,
-    configKey: "enabled" | "name" | "title",
+    configKey: "enabled" | "name" | "title" | "audio_player_mode",
     value: boolean | string
   ) => {
     if (!portfolio || !portfolio.sections_config) return;
@@ -318,6 +320,20 @@ const PortfolioEditorPage = () => {
       setIsSaving(false);
     }
   };
+
+  // Add event listener for bottom audio player
+  useEffect(() => {
+    const handlePlayTrack = () => {
+      if (portfolio?.sections_config?.tracks?.audio_player_mode === 'bottom') {
+        setShowBottomAudioPlayer(true)
+      }
+    }
+
+    window.addEventListener('playTrack', handlePlayTrack)
+    return () => {
+      window.removeEventListener('playTrack', handlePlayTrack)
+    }
+  }, [portfolio?.sections_config?.tracks?.audio_player_mode])
 
   if (loading) {
     return (
@@ -856,12 +872,48 @@ const PortfolioEditorPage = () => {
                               </Button>
                             </div>
                           </div>
+
+                          {/* Audio Player Mode Preference */}
+                          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
+                                  Show Audio Player
+                                </label>
+                                <p className={`text-xs ${selectedTheme.colors.text} opacity-70`}>
+                                  {((portfolio.sections_config?.tracks?.audio_player_mode || 'bottom') === 'bottom') 
+                                    ? 'Audio player will appear at the bottom of the page when a track is played.'
+                                    : 'Audio controls will appear inline with each track for direct playback.'
+                                  }
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => handleSectionConfigChange('tracks', 'audio_player_mode', 
+                                  (portfolio.sections_config?.tracks?.audio_player_mode || 'bottom') === 'bottom' ? 'inline' : 'bottom'
+                                )}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  (portfolio.sections_config?.tracks?.audio_player_mode || 'bottom') === 'bottom'
+                                    ? 'bg-blue-600'
+                                    : 'bg-gray-600'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    (portfolio.sections_config?.tracks?.audio_player_mode || 'bottom') === 'bottom'
+                                      ? 'translate-x-6'
+                                      : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          </div>
                           
                           <PortfolioTracksDisplay 
                             portfolioId={portfolio.id} 
                             viewMode={trackViewMode} 
                             onRefresh={refreshTracks}
                             refreshKey={tracksRefreshKey}
+                            audioPlayerMode={portfolio.sections_config?.tracks?.audio_player_mode || 'bottom'}
                           />
                           
                           {showAddTrackForm && (
@@ -1225,7 +1277,56 @@ const PortfolioEditorPage = () => {
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
+        
+        /* Custom range input styling for audio player */
+        input[type="range"] {
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-track {
+          background: rgba(255, 255, 255, 0.2);
+          height: 4px;
+          border-radius: 2px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          background: white;
+          height: 12px;
+          width: 12px;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="range"]::-moz-range-track {
+          background: rgba(255, 255, 255, 0.2);
+          height: 4px;
+          border-radius: 2px;
+          border: none;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+          background: white;
+          height: 12px;
+          width: 12px;
+          border-radius: 50%;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
       `}</style>
+
+      {/* Bottom Audio Player */}
+      <PortfolioBottomAudioPlayer
+        isVisible={showBottomAudioPlayer}
+        onClose={() => setShowBottomAudioPlayer(false)}
+        theme={selectedTheme}
+      />
     </div>
   );
 };
