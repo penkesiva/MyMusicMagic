@@ -47,7 +47,6 @@ const PortfolioEditorPage = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [savingStatus, setSavingStatus] = useState("saved");
-  const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
   const [isMac, setIsMac] = useState(false);
@@ -176,10 +175,8 @@ const PortfolioEditorPage = () => {
     setSavingStatus("unsaved");
     setPortfolio(prev => ({ ...prev!, [field]: value }));
     
-    // Only auto-save if enabled
-    if (autoSaveEnabled) {
-      saveChanges({ [field]: value });
-    }
+    // Always auto-save
+    saveChanges({ [field]: value });
   };
 
   // Handle section config changes
@@ -217,10 +214,8 @@ const PortfolioEditorPage = () => {
     (newConfig[sectionKey] as any)[configKey] = value;
     setPortfolio(prev => prev ? { ...prev, sections_config: newConfig } : null);
     
-    // Only auto-save if enabled
-    if (autoSaveEnabled) {
-      saveChanges({ sections_config: newConfig });
-    }
+    // Always auto-save
+    saveChanges({ sections_config: newConfig });
   };
 
   // Handle drag end for section reordering
@@ -241,10 +236,8 @@ const PortfolioEditorPage = () => {
         });
         setPortfolio({ ...portfolio, sections_config: updatedConfig });
         
-        // Only auto-save if enabled
-        if (autoSaveEnabled) {
-          saveChanges({ sections_config: updatedConfig });
-        }
+        // Always auto-save
+        saveChanges({ sections_config: updatedConfig });
       }
     }
   };
@@ -380,6 +373,7 @@ const PortfolioEditorPage = () => {
     setSaveError(null);
     
     try {
+      // Save the complete current portfolio state
       const { error } = await supabase
         .from('user_portfolios')
         .update(portfolio)
@@ -392,6 +386,7 @@ const PortfolioEditorPage = () => {
       } else {
         setSavingStatus("saved");
         setHasUnpublishedChanges(true);
+        console.log('Manual save successful:', portfolio);
       }
     } catch (error: any) {
       setSavingStatus("error");
@@ -423,26 +418,6 @@ const PortfolioEditorPage = () => {
       console.error('Publish error:', error);
     }
   };
-
-  // Add keyboard shortcut for manual save
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Ctrl+S (Windows) or Cmd+S (Mac)
-      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-        event.preventDefault();
-        
-        // Only save if auto-save is disabled and there are unsaved changes
-        if (!autoSaveEnabled && savingStatus === 'unsaved') {
-          handleManualSave();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [autoSaveEnabled, savingStatus]);
 
   // Add event listener for bottom audio player
   useEffect(() => {
@@ -586,20 +561,6 @@ const PortfolioEditorPage = () => {
           <div className="flex items-center gap-4">
             {/* Save Controls Group */}
             <div className="flex items-center gap-4 bg-white/5 rounded-lg px-4 py-2 border border-white/10">
-              {/* Auto-save Toggle */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">Auto-save:</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={autoSaveEnabled}
-                    onChange={(e) => setAutoSaveEnabled(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600 border-0"></div>
-                </label>
-              </div>
-
               {/* Save Status */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-400">Status:</span>
@@ -614,13 +575,6 @@ const PortfolioEditorPage = () => {
                     savingStatus === 'unsaved' ? 'Unsaved' : 'Error'}
                 </span>
               </div>
-
-              {/* Manual Save Instructions */}
-              {!autoSaveEnabled && (
-                <div className="text-xs text-gray-400 hidden md:block">
-                  Press {isMac ? 'Cmd+S' : 'Ctrl+S'} to save
-                </div>
-              )}
             </div>
 
             {/* Preview Button */}
