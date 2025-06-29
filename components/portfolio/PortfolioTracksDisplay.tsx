@@ -156,7 +156,7 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
           {tracks.map((track) => (
             <div key={track.id} className="bg-white/5 rounded-lg overflow-hidden border border-white/10 group">
               <div className="relative aspect-square">
-                <img src={track.thumbnail_url || '/default-track-thumbnail.jpg'} alt={track.title} className="w-full h-full object-cover"/>
+                <img src={track.thumbnail_url} alt={track.title} className="w-full h-full object-cover"/>
                  <button onClick={() => handlePlayPause(track)} className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   {playingTrack === track.id ? (<PauseIcon className="h-8 w-8 text-white" />) : (<PlayIcon className="h-8 w-8 text-white ml-1" />)}
                 </button>
@@ -179,7 +179,7 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
           {tracks.map((track) => (
             <div key={track.id} className="flex items-center p-3 bg-white/5 rounded-lg border border-white/10">
               <div className="relative w-16 h-16 flex-shrink-0">
-                <img src={track.thumbnail_url || '/default-track-thumbnail.jpg'} alt={track.title} className="w-full h-full object-cover rounded-md"/>
+                <img src={track.thumbnail_url} alt={track.title} className="w-full h-full object-cover rounded-md"/>
                 <button onClick={() => handlePlayPause(track)} className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center hover:bg-black/60 transition-colors">
                   {playingTrack === track.id ? (<PauseIcon className="h-6 w-6 text-white" />) : (<PlayIcon className="h-6 w-6 text-white ml-1" />)}
                 </button>

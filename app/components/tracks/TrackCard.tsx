@@ -79,7 +79,8 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
       cardText: 'text-gray-300',
       heading: 'text-white',
       accent: 'text-blue-500'
-    }
+    },
+    previewColor: 'bg-gray-900'
   }
 
   const colors = theme?.colors || defaultTheme.colors;
@@ -89,7 +90,7 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
       <div className={`flex items-center space-x-4 p-4 rounded-lg ${colors.card} transition-all duration-300 hover:shadow-lg`}>
         <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
           <Image 
-            src={track.thumbnail_url || '/default-track-thumbnail.jpg'} 
+            src={track.thumbnail_url} 
             alt={track.title}
             fill
             className="object-cover"
@@ -125,7 +126,7 @@ export function TrackCard({ track, theme, variant = 'grid', onPlay, onInfo, isPl
       
       <div className="relative aspect-square">
         <Image 
-          src={track.thumbnail_url || '/default-track-thumbnail.jpg'} 
+          src={track.thumbnail_url} 
           alt={track.title}
           fill
           className="object-cover"

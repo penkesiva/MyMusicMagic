@@ -136,4 +136,27 @@ export const generateEnhancedAITitle = async (
     console.error('Error generating enhanced AI title:', error);
     return await generateAISectionTitle(sectionKey, portfolioData, portfolioData?.artist_name);
   }
-}; 
+};
+
+/**
+ * Get a random default track thumbnail URL
+ * @returns A random default track thumbnail URL
+ */
+export function getRandomDefaultTrackThumbnail(): string {
+  const defaultThumbnails = [
+    '/default-track-thumbnail-1.jpg',
+    '/default-track-thumbnail-2.jpg', 
+    '/default-track-thumbnail-3.jpg',
+    '/default-track-thumbnail-4.jpg',
+    '/default-track-thumbnail-5.jpg',
+    '/default-track-thumbnail-6.jpg',
+    '/default-track-thumbnail-7.jpg',
+    '/default-track-thumbnail-8.jpg',
+    '/default-track-thumbnail-9.jpg',
+    '/default-track-thumbnail-10.jpg'
+  ]
+  
+  // Randomly select one of the default thumbnails
+  const randomIndex = Math.floor(Math.random() * defaultThumbnails.length)
+  return defaultThumbnails[randomIndex]
+} 

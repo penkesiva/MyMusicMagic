@@ -432,7 +432,7 @@ export default function PortfolioPage({ params }: PageProps) {
                     {/* Track Image */}
                     <div className="relative aspect-square overflow-hidden">
                       <Image
-                        src={track.thumbnail_url || '/default-track-thumbnail.jpg'}
+                        src={track.thumbnail_url}
                         alt={track.title || 'Track thumbnail'}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"

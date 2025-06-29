@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
 import { XMarkIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import { getRandomDefaultTrackThumbnail } from '@/lib/utils'
 
 type Track = Database['public']['Tables']['tracks']['Row']
 type TrackInsert = Database['public']['Tables']['tracks']['Insert']
@@ -81,7 +82,7 @@ export function PortfolioTrackForm({ portfolioId, track: trackToEdit, onSuccess,
         audio_url = supabase.storage.from('tracks').getPublicUrl(filePath).data.publicUrl
       }
 
-      let thumbnail_url = track.thumbnail_url || ''
+      let thumbnail_url = track.thumbnail_url || getRandomDefaultTrackThumbnail()
       if (thumbnailFile) {
         const thumbnailPath = `portfolios/${portfolioId}/track-thumbnails/${Date.now()}-${thumbnailFile.name}`
         const { error: thumbnailError } = await supabase.storage.from('track-thumbnails').upload(thumbnailPath, thumbnailFile)
