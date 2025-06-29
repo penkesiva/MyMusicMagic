@@ -13,6 +13,8 @@ import { HOBBIES_LIST } from '@/lib/hobbies';
 import { SKILLS_LIST } from '@/lib/skills';
 import { FaTwitter, FaGithub, FaLinkedin, FaInstagram, FaFacebook, FaYoutube, FaSoundcloud, FaSpotify, FaApple } from 'react-icons/fa';
 import { Globe } from 'lucide-react';
+import PortfolioKeyProjectsDisplay from './PortfolioKeyProjectsDisplay';
+import PortfolioTestimonialsDisplay from './PortfolioTestimonialsDisplay';
 
 // Add other imports as needed (skills, hobbies, etc.)
 
@@ -244,8 +246,12 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
             {key === 'key_projects' && (
               <section id="key_projects" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto">
-                  <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('key_projects')}</h2>
-                  {/* Add key projects content here */}
+                  <PortfolioKeyProjectsDisplay 
+                    portfolioId={portfolio.id}
+                    title={getSectionTitle('key_projects')}
+                    projects={safeGetArray(portfolio.key_projects_json)}
+                    theme={theme}
+                  />
                 </div>
               </section>
             )}
@@ -253,7 +259,10 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
               <section id="testimonials" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto">
                   <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('testimonials')}</h2>
-                  {/* Add testimonials content here */}
+                  <PortfolioTestimonialsDisplay 
+                    portfolioId={portfolio.id}
+                    theme={theme}
+                  />
                 </div>
               </section>
             )}

@@ -19,6 +19,8 @@ import PortfolioGalleryForm from "@/components/portfolio/PortfolioGalleryForm";
 import { THEMES } from "@/lib/themes";
 import PortfolioTracksDisplay from "@/components/portfolio/PortfolioTracksDisplay";
 import PortfolioGalleryDisplay from "@/components/portfolio/PortfolioGalleryDisplay";
+import PortfolioKeyProjectsEditor from "@/components/portfolio/PortfolioKeyProjectsEditor";
+import PortfolioTestimonialsEditor from "@/components/portfolio/PortfolioTestimonialsEditor";
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -955,6 +957,36 @@ const PortfolioEditorPage = () => {
                               }}
                             />
                           )}
+                        </div>
+                      )}
+
+                      {key === 'key_projects' && (
+                        <div className="space-y-6">
+                          <PortfolioKeyProjectsEditor 
+                            portfolioId={portfolio.id}
+                            title={getSectionTitle(key, portfolio)}
+                            projects={safeGetArray(portfolio.key_projects_json)}
+                            theme={selectedTheme}
+                            onRefresh={() => {
+                              // Refresh the portfolio data
+                              fetchPortfolio();
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {key === 'testimonials' && (
+                        <div className="space-y-6">
+                          <PortfolioTestimonialsEditor 
+                            portfolioId={portfolio.id}
+                            title={getSectionTitle(key, portfolio)}
+                            testimonials={safeGetArray(portfolio.testimonials_json)}
+                            theme={selectedTheme}
+                            onRefresh={() => {
+                              // Refresh the portfolio data
+                              fetchPortfolio();
+                            }}
+                          />
                         </div>
                       )}
 

@@ -43,6 +43,10 @@ export type Portfolio = {
   key_projects_title: string | null;
   key_projects_json: any; // json
 
+  // Testimonials
+  testimonials_title: string | null;
+  testimonials_json: any; // json
+
   // Resume
   resume_title: string | null;
   resume_url: string | null;

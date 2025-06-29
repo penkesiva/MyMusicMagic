@@ -20,6 +20,8 @@ import AudioPlayer from '@/app/components/AudioPlayer';
 import PortfolioGalleryDisplay from '@/components/portfolio/PortfolioGalleryDisplay';
 import PressMentionsDisplay from '@/components/portfolio/PressMentionsDisplay';
 import PortfolioSectionsRenderer from '@/components/portfolio/PortfolioSectionsRenderer';
+import PortfolioKeyProjectsDisplay from '@/components/portfolio/PortfolioKeyProjectsDisplay';
+import PortfolioTestimonialsDisplay from '@/components/portfolio/PortfolioTestimonialsDisplay';
 
 // Force dynamic rendering to prevent caching
 export const dynamic = 'force-dynamic';
@@ -431,8 +433,12 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
     return (
       <section id="key_projects" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
-          <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <p className={`${colors.text} text-lg max-w-2xl mx-auto`}>Coming Soon</p>
+          <PortfolioKeyProjectsDisplay 
+            portfolioId={portfolio.id}
+            title={sectionTitle}
+            projects={safeGetArray(portfolio.key_projects_json)}
+            theme={theme}
+          />
         </div>
       </section>
     );
@@ -497,8 +503,12 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
     return (
       <section id="testimonials" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
         <div className="container mx-auto">
-          <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{sectionTitle}</h2>
-          <p className={`${colors.text} text-lg max-w-2xl mx-auto text-center`}>Coming Soon</p>
+          <PortfolioTestimonialsDisplay 
+            portfolioId={portfolio.id}
+            title={sectionTitle}
+            testimonials={safeGetArray(portfolio.testimonials_json)}
+            theme={theme}
+          />
         </div>
       </section>
     );
