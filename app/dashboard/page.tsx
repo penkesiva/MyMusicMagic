@@ -15,9 +15,8 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { TemplatePreview } from '@/components/ui/template-preview'
-import { Sparkles, Layout } from 'lucide-react'
+import { Sparkles, Layout, Edit, ExternalLink, Trash2, FileText, Star, Music, Image, Video, MessageSquare, Briefcase, Award, Heart, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Edit, Settings, ExternalLink } from 'lucide-react'
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 type UserSubscription = Database['public']['Tables']['user_subscriptions']['Row']
@@ -721,15 +720,6 @@ export default function DashboardPage() {
                         >
                           <Edit className="h-3 w-3 mr-1" />
                           Edit
-                        </Button>
-                        <Button
-                          onClick={() => router.push(`/dashboard/portfolio/${p.id}/settings`)}
-                          variant="outline"
-                          size="sm"
-                          className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                        >
-                          <Settings className="h-3 w-3 mr-1" />
-                          Settings
                         </Button>
                         <Button
                           onClick={() => window.open(`/portfolio/${profile?.username || 'user'}/${p.slug}`, '_blank', 'noopener,noreferrer')}

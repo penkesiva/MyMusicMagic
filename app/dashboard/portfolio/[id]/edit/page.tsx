@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Settings
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -47,6 +47,11 @@ const PortfolioEditorPage = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [savingStatus, setSavingStatus] = useState("saved");
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isPublished, setIsPublished] = useState(false);
+  const [isMac, setIsMac] = useState(false);
+  const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(false);
   
   const [editingTrack, setEditingTrack] = useState<any | null>(null);
   const [showAddTrackForm, setShowAddTrackForm] = useState(false);
@@ -89,12 +94,30 @@ const PortfolioEditorPage = () => {
   // Save changes to database
   const saveChanges = useDebouncedCallback(async (fields: Partial<Portfolio>) => {
     if (!portfolio) return;
-    const { id } = portfolio;
-    const { error } = await supabase
-      .from('user_portfolios')
-      .update(fields)
-      .eq('id', id);
-    setSavingStatus(error ? "error" : "saved");
+    
+    setSavingStatus("saving");
+    setSaveError(null);
+    
+    try {
+      const { id } = portfolio;
+      const { error } = await supabase
+        .from('user_portfolios')
+        .update(fields)
+        .eq('id', id);
+      
+      if (error) {
+        setSavingStatus("error");
+        setSaveError(error.message);
+        console.error('Save error:', error);
+      } else {
+        setSavingStatus("saved");
+        setHasUnpublishedChanges(true);
+      }
+    } catch (error: any) {
+      setSavingStatus("error");
+      setSaveError(error.message || 'Unknown error occurred');
+      console.error('Save error:', error);
+    }
   }, 600);
 
   // Fetch portfolio data
@@ -118,6 +141,7 @@ const PortfolioEditorPage = () => {
 
       setPortfolio(portfolioData);
       setSectionOrder(getSortedEditorSections(portfolioData));
+      setIsPublished(portfolioData.is_published || false);
 
       // Get user profile
       const { data: userData, error: userError } = await supabase
@@ -141,11 +165,21 @@ const PortfolioEditorPage = () => {
     fetchPortfolio();
   }, [id, router, supabase]);
 
+  // Detect operating system for keyboard shortcuts
+  useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    setIsMac(userAgent.includes('mac'));
+  }, []);
+
   // Handle field changes
   const handleFieldChange = (field: keyof Portfolio, value: any) => {
-    setSavingStatus("saving");
+    setSavingStatus("unsaved");
     setPortfolio(prev => ({ ...prev!, [field]: value }));
-    saveChanges({ [field]: value });
+    
+    // Only auto-save if enabled
+    if (autoSaveEnabled) {
+      saveChanges({ [field]: value });
+    }
   };
 
   // Handle section config changes
@@ -155,6 +189,9 @@ const PortfolioEditorPage = () => {
     value: boolean | string
   ) => {
     if (!portfolio || !portfolio.sections_config) return;
+    
+    setSavingStatus("unsaved");
+    
     const newConfig = { ...(portfolio.sections_config as Record<string, any>) };
     
     if (!newConfig[sectionKey]) {
@@ -178,7 +215,12 @@ const PortfolioEditorPage = () => {
     }
     
     (newConfig[sectionKey] as any)[configKey] = value;
-    handleFieldChange("sections_config", newConfig);
+    setPortfolio(prev => prev ? { ...prev, sections_config: newConfig } : null);
+    
+    // Only auto-save if enabled
+    if (autoSaveEnabled) {
+      saveChanges({ sections_config: newConfig });
+    }
   };
 
   // Handle drag end for section reordering
@@ -192,12 +234,17 @@ const PortfolioEditorPage = () => {
       setSectionOrder(newOrder);
       
       if (portfolio) {
+        setSavingStatus("unsaved");
         const updatedConfig = { ...portfolio.sections_config };
         newOrder.forEach((key: string, idx: number) => {
           if (updatedConfig[key]) updatedConfig[key].order = idx + 1;
         });
         setPortfolio({ ...portfolio, sections_config: updatedConfig });
-        saveChanges({ sections_config: updatedConfig });
+        
+        // Only auto-save if enabled
+        if (autoSaveEnabled) {
+          saveChanges({ sections_config: updatedConfig });
+        }
       }
     }
   };
@@ -324,6 +371,78 @@ const PortfolioEditorPage = () => {
       setIsSaving(false);
     }
   };
+
+  // Manual save function
+  const handleManualSave = async () => {
+    if (!portfolio) return;
+    
+    setSavingStatus("saving");
+    setSaveError(null);
+    
+    try {
+      const { error } = await supabase
+        .from('user_portfolios')
+        .update(portfolio)
+        .eq('id', portfolio.id);
+      
+      if (error) {
+        setSavingStatus("error");
+        setSaveError(error.message);
+        console.error('Manual save error:', error);
+      } else {
+        setSavingStatus("saved");
+        setHasUnpublishedChanges(true);
+      }
+    } catch (error: any) {
+      setSavingStatus("error");
+      setSaveError(error.message || 'Unknown error occurred');
+      console.error('Manual save error:', error);
+    }
+  };
+
+  // Publish portfolio to make it publicly visible
+  const handlePublish = async () => {
+    if (!portfolio) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_portfolios')
+        .update({ is_published: true })
+        .eq('id', portfolio.id);
+      
+      if (error) {
+        setSaveError(error.message);
+        console.error('Publish error:', error);
+      } else {
+        setIsPublished(true);
+        setHasUnpublishedChanges(false);
+        setPortfolio(prev => prev ? { ...prev, is_published: true } : null);
+      }
+    } catch (error: any) {
+      setSaveError(error.message || 'Failed to publish portfolio');
+      console.error('Publish error:', error);
+    }
+  };
+
+  // Add keyboard shortcut for manual save
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ctrl+S (Windows) or Cmd+S (Mac)
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault();
+        
+        // Only save if auto-save is disabled and there are unsaved changes
+        if (!autoSaveEnabled && savingStatus === 'unsaved') {
+          handleManualSave();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [autoSaveEnabled, savingStatus]);
 
   // Add event listener for bottom audio player
   useEffect(() => {
@@ -465,63 +584,118 @@ const PortfolioEditorPage = () => {
             <span className="text-xl font-bold text-white">{portfolio.name || 'Untitled Portfolio'}</span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400">Status:</span>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                savingStatus === 'saving' ? 'bg-yellow-500/20 text-yellow-300' :
-                savingStatus === 'saved' ? 'bg-green-500/20 text-green-300' :
-                'bg-red-500/20 text-red-300'
-              }`}>
-                {savingStatus === 'saving' ? 'Saving...' :
-                  savingStatus === 'saved' ? 'Saved' : 'Error'}
-              </span>
-            </div>
-            <Button
-              onClick={handleExplicitSave}
-              variant="outline"
-              size="sm"
-              disabled={isSaving}
-              className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30 disabled:opacity-50"
-            >
-              {isSaving ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-1" />
-                  Save State
-                </>
+            {/* Save Controls Group */}
+            <div className="flex items-center gap-4 bg-white/5 rounded-lg px-4 py-2 border border-white/10">
+              {/* Auto-save Toggle */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400">Auto-save:</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={autoSaveEnabled}
+                    onChange={(e) => setAutoSaveEnabled(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600 border-0"></div>
+                </label>
+              </div>
+
+              {/* Save Status */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400">Status:</span>
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  savingStatus === 'saving' ? 'bg-yellow-500/20 text-yellow-300' :
+                  savingStatus === 'saved' ? 'bg-green-500/20 text-green-300' :
+                  savingStatus === 'unsaved' ? 'bg-orange-500/20 text-orange-300' :
+                  'bg-red-500/20 text-red-300'
+                }`}>
+                  {savingStatus === 'saving' ? 'Saving...' :
+                    savingStatus === 'saved' ? 'Saved' :
+                    savingStatus === 'unsaved' ? 'Unsaved' : 'Error'}
+                </span>
+              </div>
+
+              {/* Manual Save Instructions */}
+              {!autoSaveEnabled && (
+                <div className="text-xs text-gray-400 hidden md:block">
+                  Press {isMac ? 'Cmd+S' : 'Ctrl+S'} to save
+                </div>
               )}
-            </Button>
+            </div>
+
+            {/* Preview Button */}
             <Button
               onClick={() => window.open(`/portfolio/preview/${portfolio.id}`, '_blank', 'noopener,noreferrer')}
               variant="outline"
               size="sm"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
             >
               <Eye className="h-4 w-4 mr-1" />
               Preview
             </Button>
+
+            {/* Publish Button */}
             <Button
-              onClick={() => router.push(`/dashboard/portfolio/${portfolio.id}/settings`)}
+              onClick={handlePublish}
               variant="outline"
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              size="sm"
+              disabled={!hasUnpublishedChanges && isPublished}
+              className={`${
+                hasUnpublishedChanges 
+                  ? 'bg-orange-600/20 border-orange-500/30 text-orange-300 hover:bg-orange-600/30' 
+                  : isPublished
+                  ? 'bg-green-600/20 border-green-500/30 text-green-300'
+                  : 'bg-gray-600/20 border-gray-500/30 text-gray-400'
+              }`}
             >
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
+              {hasUnpublishedChanges ? (
+                <>
+                  <Upload className="h-4 w-4 mr-1" />
+                  Publish Changes
+                </>
+              ) : isPublished ? (
+                <>
+                  <Check className="h-4 w-4 mr-1" />
+                  Published
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-1" />
+                  Publish
+                </>
+              )}
             </Button>
+
+            {/* Public Button */}
             <Button
-              onClick={() => router.push(`/dashboard/portfolio/${portfolio.id}/preview`)}
+              onClick={() => window.open(`/portfolio/${userProfile?.username}/${portfolio.slug}`, '_blank', 'noopener,noreferrer')}
               variant="outline"
-              className="border-gray-600 text-gray-300 hover:bg-gray-700"
+              size="sm"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
             >
-              <Eye className="h-4 w-4 mr-2" />
-              Preview
+              <ExternalLink className="h-4 w-4 mr-1" />
+              Public
             </Button>
           </div>
         </div>
+        {/* Error Popup */}
+        {saveError && (
+          <div className="fixed top-20 right-6 z-50 bg-red-900/90 border border-red-500/50 rounded-lg p-4 max-w-sm shadow-lg">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <h3 className="text-red-200 font-medium mb-1">Save Error</h3>
+                <p className="text-red-300 text-sm">{saveError}</p>
+              </div>
+              <button
+                onClick={() => setSaveError(null)}
+                className="text-red-300 hover:text-red-100 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Main Editor Content */}
         <main className={`flex-1 p-6 overflow-y-auto ${selectedTheme.colors.background}`} style={{ minHeight: 0 }}>
           {/* AI Loading Animation */}
@@ -1416,4 +1590,4 @@ const PortfolioEditorPage = () => {
   );
 };
 
-export default PortfolioEditorPage; 
+export default PortfolioEditorPage;
