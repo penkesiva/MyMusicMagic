@@ -229,6 +229,23 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
   }
 
+  // Scrolling text component
+  const ScrollingText = ({ text, maxLength = 10, className = '' }: { text: string, maxLength?: number, className?: string }) => {
+    const shouldScroll = text.length > maxLength
+    
+    if (!shouldScroll) {
+      return <span className={className}>{text}</span>
+    }
+
+    return (
+      <div className="overflow-hidden">
+        <div className={`${className} animate-scroll-text whitespace-nowrap`}>
+          {text}
+        </div>
+      </div>
+    )
+  }
+
   if (!isVisible || !currentTrack) {
     console.log('PortfolioBottomAudioPlayer hidden:', { isVisible, hasTrack: !!currentTrack })
     return null
@@ -256,14 +273,18 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
               {/* Main controls row */}
               <div className="flex items-center justify-between flex-1">
                 {/* Track Info */}
-                <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="flex items-center gap-3 flex-1 min-w-0 px-2">
                   <img
                     src={currentTrack.thumbnail_url}
                     alt={currentTrack.title}
                     className="w-10 h-10 rounded-lg object-cover flex-shrink-0 shadow-md"
                   />
-                  <div className="min-w-0">
-                    <h3 className={`${colors.text} font-medium truncate text-sm`}>{currentTrack.title}</h3>
+                  <div className="min-w-0 py-1">
+                    <ScrollingText 
+                      text={currentTrack.title} 
+                      maxLength={10} 
+                      className={`${colors.text} font-medium text-sm`}
+                    />
                     {currentTrack.description && (
                       <p className={`${colors.text} opacity-70 text-xs truncate`}>{currentTrack.description}</p>
                     )}
@@ -271,7 +292,7 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
                 </div>
 
                 {/* Playback Controls */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-2">
                   <button
                     onClick={togglePlay}
                     className={`p-2 rounded-full transition-colors ${
@@ -307,7 +328,7 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
                       step="0.1"
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-12 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer hidden md:block"
+                      className="w-12 h-1 bg-black/60 rounded-lg appearance-none cursor-pointer hidden md:block"
                     />
                   </div>
 
@@ -353,7 +374,11 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
                     className="w-14 h-14 rounded-lg object-cover flex-shrink-0 shadow-md"
                   />
                   <div className="min-w-0">
-                    <h3 className={`${colors.text} font-semibold truncate`}>{currentTrack.title}</h3>
+                    <ScrollingText 
+                      text={currentTrack.title} 
+                      maxLength={10} 
+                      className={`${colors.text} font-semibold`}
+                    />
                     {currentTrack.description && (
                       <p className={`${colors.text} opacity-70 text-sm truncate`}>{currentTrack.description}</p>
                     )}
@@ -376,7 +401,7 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
                       step="0.1"
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-20 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
+                      className="w-20 h-1 bg-black/60 rounded-lg appearance-none cursor-pointer"
                     />
                   </div>
 
@@ -435,6 +460,80 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
           )}
         </div>
       </div>
+
+      {/* Custom CSS for hiding scrollbar */}
+      <style jsx global>{`
+        .custom-scrollbar-hide::-webkit-scrollbar {
+          width: 0 !important;
+          background: transparent;
+        }
+        .custom-scrollbar-hide {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        
+        /* Custom range input styling for audio player */
+        input[type="range"] {
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-track {
+          background: rgba(0, 0, 0, 0.8);
+          height: 4px;
+          border-radius: 2px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          background: white;
+          height: 12px;
+          width: 12px;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="range"]::-moz-range-track {
+          background: rgba(0, 0, 0, 0.8);
+          height: 4px;
+          border-radius: 2px;
+          border: none;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+          background: white;
+          height: 12px;
+          width: 12px;
+          border-radius: 50%;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Scrolling text animation */
+        @keyframes scroll-text {
+          0%, 25% {
+            transform: translateX(0);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+          }
+          50% {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+          }
+          75%, 100% {
+            transform: translateX(-100%);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+          }
+        }
+        
+        .animate-scroll-text {
+          animation: scroll-text 8s ease-in-out infinite;
+          animation-delay: 1s;
+        }
+      `}</style>
     </div>
   )
-} 
+}

@@ -51,6 +51,8 @@ const PortfolioEditorPage = () => {
   
   const [editingGalleryItem, setEditingGalleryItem] = useState<any | null>(null);
   const [showAddGalleryForm, setShowAddGalleryForm] = useState(false);
+  const [showEditTrackForm, setShowEditTrackForm] = useState(false);
+  const [showEditGalleryForm, setShowEditGalleryForm] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
   const [uploadingProfile, setUploadingProfile] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
@@ -74,9 +76,9 @@ const PortfolioEditorPage = () => {
   const fileUploader = useMemo(() => new PortfolioFileUploader(), []);
 
   // Refresh functions for tracks and gallery
-  const refreshTracks = useCallback(() => {
-    setTracksRefreshKey(prev => prev + 1);
-  }, []);
+  const refreshTracks = () => {
+    setTracksRefreshKey(prev => prev + 1)
+  }
 
   const refreshGallery = useCallback(() => {
     setGalleryRefreshKey(prev => prev + 1);
@@ -334,6 +336,16 @@ const PortfolioEditorPage = () => {
       window.removeEventListener('playTrack', handlePlayTrack)
     }
   }, [portfolio?.sections_config?.tracks?.audio_player_mode])
+
+  const handleEditTrack = (track: any) => {
+    setEditingTrack(track)
+    setShowEditTrackForm(true)
+  }
+
+  const handleEditGalleryItem = (item: any) => {
+    setEditingGalleryItem(item)
+    setShowEditGalleryForm(true)
+  }
 
   if (loading) {
     return (
@@ -912,6 +924,7 @@ const PortfolioEditorPage = () => {
                             portfolioId={portfolio.id} 
                             viewMode={trackViewMode} 
                             onRefresh={refreshTracks}
+                            onEdit={handleEditTrack}
                             refreshKey={tracksRefreshKey}
                             audioPlayerMode={portfolio.sections_config?.tracks?.audio_player_mode || 'bottom'}
                           />
@@ -922,6 +935,22 @@ const PortfolioEditorPage = () => {
                               onCancel={() => setShowAddTrackForm(false)}
                               onSuccess={() => {
                                 setShowAddTrackForm(false);
+                                refreshTracks();
+                              }}
+                            />
+                          )}
+
+                          {showEditTrackForm && editingTrack && (
+                            <PortfolioTrackForm
+                              portfolioId={portfolio.id}
+                              track={editingTrack}
+                              onCancel={() => {
+                                setShowEditTrackForm(false);
+                                setEditingTrack(null);
+                              }}
+                              onSuccess={() => {
+                                setShowEditTrackForm(false);
+                                setEditingTrack(null);
                                 refreshTracks();
                               }}
                             />
@@ -969,6 +998,7 @@ const PortfolioEditorPage = () => {
                             viewMode={galleryViewMode} 
                             filter={galleryFilter}
                             onRefresh={refreshGallery}
+                            onEdit={handleEditGalleryItem}
                             refreshKey={galleryRefreshKey}
                           />
                           
@@ -978,6 +1008,22 @@ const PortfolioEditorPage = () => {
                               onCancel={() => setShowAddGalleryForm(false)}
                               onSuccess={() => {
                                 setShowAddGalleryForm(false);
+                                refreshGallery();
+                              }}
+                            />
+                          )}
+
+                          {showEditGalleryForm && editingGalleryItem && (
+                            <PortfolioGalleryForm
+                              portfolioId={portfolio.id}
+                              item={editingGalleryItem}
+                              onCancel={() => {
+                                setShowEditGalleryForm(false);
+                                setEditingGalleryItem(null);
+                              }}
+                              onSuccess={() => {
+                                setShowEditGalleryForm(false);
+                                setEditingGalleryItem(null);
                                 refreshGallery();
                               }}
                             />
