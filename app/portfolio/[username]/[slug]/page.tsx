@@ -357,7 +357,7 @@ export default function PortfolioPage({ params }: PageProps) {
                     alt={portfolio.artist_name || 'Artist profile photo'}
                     width={500}
                     height={600}
-                    className="relative rounded-2xl aspect-[5/6] object-cover shadow-2xl transform group-hover:scale-105 transition-transform duration-500"
+                    className="relative rounded-2xl aspect-square object-cover shadow-2xl transform group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>

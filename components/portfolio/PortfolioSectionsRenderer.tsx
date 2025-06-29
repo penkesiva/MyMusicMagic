@@ -162,7 +162,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
               <section id="about" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto flex flex-col md:flex-row items-center gap-12">
                   {portfolio.profile_photo_url && (
-                    <div className="flex-shrink-0 w-48 h-48 relative rounded-full overflow-hidden border-4 border-white/20 shadow-lg">
+                    <div className="flex-shrink-0 w-48 h-48 relative rounded-2xl overflow-hidden border-4 border-white/20 shadow-lg">
                       <Image src={portfolio.profile_photo_url} alt="Profile" fill className="object-cover" />
                     </div>
                   )}
