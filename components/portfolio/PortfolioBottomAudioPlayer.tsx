@@ -235,9 +235,9 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
   }
 
   return (
-    <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 min-w-[400px] max-w-[600px] ${
       isExpanded ? 'h-32' : 'h-20'
-    }`}>
+    }">
       {/* Audio element - always present when track is available */}
       <audio 
         ref={audioRef} 
@@ -245,11 +245,11 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
       />
       
       {/* Main Player Bar */}
-      <div className={`${colors.background} bg-opacity-95 backdrop-blur-sm border-t border-white/20 shadow-lg h-full relative`}>
+      <div className={`${colors.background} bg-opacity-95 backdrop-blur-sm border border-white/20 shadow-lg h-full rounded-t-lg relative`}>
         {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none rounded-t-lg"></div>
         
-        <div className="max-w-4xl mx-auto px-4 h-full relative z-10">
+        <div className="px-4 h-full relative z-10">
           {/* Compact Mode */}
           {!isExpanded && (
             <div className="flex flex-col h-full">
