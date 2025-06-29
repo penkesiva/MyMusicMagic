@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Settings
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -505,22 +505,20 @@ const PortfolioEditorPage = () => {
               Preview
             </Button>
             <Button
-              onClick={() => router.push(`/dashboard/portfolio/${portfolio.id}/layout`)}
+              onClick={() => router.push(`/dashboard/portfolio/${portfolio.id}/settings`)}
               variant="outline"
-              size="sm"
-              className="bg-purple-600/20 border-purple-500/30 text-purple-300 hover:bg-purple-600/30"
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
             >
-              <Layout className="h-4 w-4 mr-1" />
-              Layout
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
             </Button>
             <Button
-              onClick={() => window.open(`/portfolio/${userProfile?.username}/${portfolio.slug}`, '_blank', 'noopener,noreferrer')}
+              onClick={() => router.push(`/dashboard/portfolio/${portfolio.id}/preview`)}
               variant="outline"
-              size="sm"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
             >
-              <ExternalLink className="h-4 w-4 mr-1" />
-              Public
+              <Eye className="h-4 w-4 mr-2" />
+              Preview
             </Button>
           </div>
         </div>

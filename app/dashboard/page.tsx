@@ -16,6 +16,8 @@ import {
 import Link from 'next/link'
 import { TemplatePreview } from '@/components/ui/template-preview'
 import { Sparkles, Layout } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Edit, Settings, ExternalLink } from 'lucide-react'
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 type UserSubscription = Database['public']['Tables']['user_subscriptions']['Row']
@@ -711,51 +713,33 @@ export default function DashboardPage() {
                       <p className="text-gray-400 text-sm truncate">
                         {p.subtitle || 'No description provided'}
                       </p>
-                      <div className="mt-4 flex flex-col sm:flex-row gap-2">
-                        <Link
-                          href={`/dashboard/portfolio/${p.id}/edit`}
-                          className="w-full sm:w-auto px-4 py-2 text-center rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold hover:opacity-90 transition-opacity"
+                      <div className="mt-4 flex gap-2">
+                        <Button
+                          onClick={() => router.push(`/dashboard/portfolio/${p.id}/edit`)}
+                          size="sm"
+                          className="bg-purple-600 hover:bg-purple-700 text-white"
                         >
+                          <Edit className="h-3 w-3 mr-1" />
                           Edit
-                        </Link>
-                        <Link
-                          href={`/dashboard/portfolio/${p.id}/layout`}
-                          className="w-full sm:w-auto px-4 py-2 text-center rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/30 font-semibold hover:bg-purple-500/20 transition-colors flex items-center justify-center gap-2"
+                        </Button>
+                        <Button
+                          onClick={() => router.push(`/dashboard/portfolio/${p.id}/settings`)}
+                          variant="outline"
+                          size="sm"
+                          className="border-gray-600 text-gray-300 hover:bg-gray-700"
                         >
-                          <Layout className="w-4 h-4" />
-                          <span>Layout</span>
-                        </Link>
-                        <button
-                          onClick={() => handleTogglePublish(p.id, p.is_published)}
-                          className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                            p.is_published
-                              ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20'
-                              : 'bg-gray-500/10 text-gray-400 hover:bg-gray-500/20'
-                          }`}
+                          <Settings className="h-3 w-3 mr-1" />
+                          Settings
+                        </Button>
+                        <Button
+                          onClick={() => window.open(`/portfolio/${profile?.username || 'user'}/${p.slug}`, '_blank', 'noopener,noreferrer')}
+                          variant="outline"
+                          size="sm"
+                          className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                         >
-                          {p.is_published ? <EyeIcon className="w-5 h-5" /> : <EyeSlashIcon className="w-5 h-5" />}
-                          <span>{p.is_published ? 'Published' : 'Draft'}</span>
-                        </button>
-                        <Link
-                          href={`/portfolio/${profile?.username || 'user'}/${p.slug}`}
-                          className={`w-full sm:w-auto px-4 py-2 text-center rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
-                            p.is_published
-                              ? 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'
-                              : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                          }`}
-                          onClick={(e) => !p.is_published && e.preventDefault()}
-                          title={p.is_published ? 'View live portfolio' : 'Publish to view'}
-                        >
-                          <EyeIcon className="w-5 h-5" />
-                          <span>View</span>
-                        </Link>
-                        <button
-                          onClick={() => handleDeletePortfolio(p.id)}
-                          className="w-full sm:w-auto px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 font-semibold transition-colors flex items-center justify-center gap-2"
-                        >
-                          <TrashIcon className="w-5 h-5" />
-                          <span>Delete</span>
-                        </button>
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
                       </div>
                       {p.slug && (
                         <div className="mt-4 pt-4 border-t border-white/10">
