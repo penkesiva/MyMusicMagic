@@ -201,6 +201,13 @@ export default function PortfolioPage({ params }: PageProps) {
     return [];
   };
 
+  const formatDuration = (seconds: number) => {
+    const totalSeconds = Math.round(seconds) // Round to nearest second
+    const mins = Math.floor(totalSeconds / 60)
+    const secs = totalSeconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  };
+
   const renderHobbies = (portfolio: Portfolio) => {
     if (!portfolio.hobbies_title || !portfolio.hobbies_json || safeGetArray(portfolio.hobbies_json).length === 0) return null;
     
@@ -441,7 +448,7 @@ export default function PortfolioPage({ params }: PageProps) {
                       
                       {/* Track duration badge */}
                       <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 text-sm text-white">
-                        {track.duration || '3:45'}
+                        {formatDuration(track.duration || 0)}
                       </div>
                     </div>
                     

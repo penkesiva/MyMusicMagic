@@ -13,9 +13,10 @@ interface PortfolioGalleryDisplayProps {
   onRefresh?: () => void
   viewMode?: 'list' | 'grid'
   filter?: 'all' | 'photo' | 'video'
+  refreshKey?: number
 }
 
-export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'grid', filter: initialFilter = 'all' }: PortfolioGalleryDisplayProps) {
+export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'grid', filter: initialFilter = 'all', refreshKey = 0 }: PortfolioGalleryDisplayProps) {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -26,7 +27,7 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
 
   useEffect(() => {
     fetchGalleryItems()
-  }, [portfolioId])
+  }, [portfolioId, refreshKey])
 
   const fetchGalleryItems = async () => {
     try {

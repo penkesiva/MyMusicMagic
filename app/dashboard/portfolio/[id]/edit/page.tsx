@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useDebouncedCallback } from "use-debounce";
@@ -65,9 +65,20 @@ const PortfolioEditorPage = () => {
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [tracksRefreshKey, setTracksRefreshKey] = useState(0);
+  const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
 
   const supabase = useMemo(() => createClient(), []);
   const fileUploader = useMemo(() => new PortfolioFileUploader(), []);
+
+  // Refresh functions for tracks and gallery
+  const refreshTracks = useCallback(() => {
+    setTracksRefreshKey(prev => prev + 1);
+  }, []);
+
+  const refreshGallery = useCallback(() => {
+    setGalleryRefreshKey(prev => prev + 1);
+  }, []);
 
   // Save changes to database
   const saveChanges = useDebouncedCallback(async (fields: Partial<Portfolio>) => {
@@ -815,17 +826,43 @@ const PortfolioEditorPage = () => {
                         <div className="space-y-6">
                           <div className="flex items-center justify-between">
                             <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>Tracks</h3>
-                            <Button
-                              onClick={() => setShowAddTrackForm(true)}
-                              variant="outline"
-                              className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Add Track
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              {/* View Mode Toggle Buttons */}
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  size="sm"
+                                  variant={trackViewMode === 'list' ? 'default' : 'outline'}
+                                  onClick={() => setTrackViewMode('list')}
+                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                >
+                                  <List className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant={trackViewMode === 'grid' ? 'default' : 'outline'}
+                                  onClick={() => setTrackViewMode('grid')}
+                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                >
+                                  <Grid className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <Button
+                                onClick={() => setShowAddTrackForm(true)}
+                                variant="outline"
+                                className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Add Track
+                              </Button>
+                            </div>
                           </div>
                           
-                          <PortfolioTracksDisplay portfolioId={portfolio.id} viewMode={trackViewMode} />
+                          <PortfolioTracksDisplay 
+                            portfolioId={portfolio.id} 
+                            viewMode={trackViewMode} 
+                            onRefresh={refreshTracks}
+                            refreshKey={tracksRefreshKey}
+                          />
                           
                           {showAddTrackForm && (
                             <PortfolioTrackForm
@@ -833,7 +870,7 @@ const PortfolioEditorPage = () => {
                               onCancel={() => setShowAddTrackForm(false)}
                               onSuccess={() => {
                                 setShowAddTrackForm(false);
-                                // Refresh tracks display
+                                refreshTracks();
                               }}
                             />
                           )}
@@ -844,17 +881,44 @@ const PortfolioEditorPage = () => {
                         <div className="space-y-6">
                           <div className="flex items-center justify-between">
                             <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>Gallery</h3>
-                            <Button
-                              onClick={() => setShowAddGalleryForm(true)}
-                              variant="outline"
-                              className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Add Item
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              {/* View Mode Toggle Buttons */}
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  size="sm"
+                                  variant={galleryViewMode === 'list' ? 'default' : 'outline'}
+                                  onClick={() => setGalleryViewMode('list')}
+                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                >
+                                  <List className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant={galleryViewMode === 'grid' ? 'default' : 'outline'}
+                                  onClick={() => setGalleryViewMode('grid')}
+                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                >
+                                  <Grid className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <Button
+                                onClick={() => setShowAddGalleryForm(true)}
+                                variant="outline"
+                                className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Add Item
+                              </Button>
+                            </div>
                           </div>
                           
-                          <PortfolioGalleryDisplay portfolioId={portfolio.id} viewMode={galleryViewMode} filter={galleryFilter} />
+                          <PortfolioGalleryDisplay 
+                            portfolioId={portfolio.id} 
+                            viewMode={galleryViewMode} 
+                            filter={galleryFilter}
+                            onRefresh={refreshGallery}
+                            refreshKey={galleryRefreshKey}
+                          />
                           
                           {showAddGalleryForm && (
                             <PortfolioGalleryForm
@@ -862,7 +926,7 @@ const PortfolioEditorPage = () => {
                               onCancel={() => setShowAddGalleryForm(false)}
                               onSuccess={() => {
                                 setShowAddGalleryForm(false);
-                                // Refresh gallery display
+                                refreshGallery();
                               }}
                             />
                           )}

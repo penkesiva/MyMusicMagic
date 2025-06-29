@@ -12,9 +12,10 @@ interface PortfolioTracksDisplayProps {
   onEdit?: (track: Track) => void
   onRefresh?: () => void
   viewMode?: 'list' | 'grid'
+  refreshKey?: number
 }
 
-export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'list' }: PortfolioTracksDisplayProps) {
+export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'list', refreshKey = 0 }: PortfolioTracksDisplayProps) {
   const [tracks, setTracks] = useState<Track[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -26,7 +27,7 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
 
   useEffect(() => {
     fetchTracks()
-  }, [portfolioId])
+  }, [portfolioId, refreshKey])
 
   useEffect(() => {
     return () => {
@@ -113,8 +114,9 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
   }
 
   const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
+    const totalSeconds = Math.round(seconds) // Round to nearest second
+    const mins = Math.floor(totalSeconds / 60)
+    const secs = totalSeconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
