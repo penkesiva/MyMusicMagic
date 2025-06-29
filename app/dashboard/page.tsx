@@ -15,7 +15,7 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { TemplatePreview } from '@/components/ui/template-preview'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Layout } from 'lucide-react'
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 type UserSubscription = Database['public']['Tables']['user_subscriptions']['Row']
@@ -717,6 +717,13 @@ export default function DashboardPage() {
                           className="w-full sm:w-auto px-4 py-2 text-center rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold hover:opacity-90 transition-opacity"
                         >
                           Edit
+                        </Link>
+                        <Link
+                          href={`/dashboard/portfolio/${p.id}/layout`}
+                          className="w-full sm:w-auto px-4 py-2 text-center rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/30 font-semibold hover:bg-purple-500/20 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Layout className="w-4 h-4" />
+                          <span>Layout</span>
                         </Link>
                         <button
                           onClick={() => handleTogglePublish(p.id, p.is_published)}

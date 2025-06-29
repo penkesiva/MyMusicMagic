@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -503,6 +503,15 @@ const PortfolioEditorPage = () => {
             >
               <Eye className="h-4 w-4 mr-1" />
               Preview
+            </Button>
+            <Button
+              onClick={() => router.push(`/dashboard/portfolio/${portfolio.id}/layout`)}
+              variant="outline"
+              size="sm"
+              className="bg-purple-600/20 border-purple-500/30 text-purple-300 hover:bg-purple-600/30"
+            >
+              <Layout className="h-4 w-4 mr-1" />
+              Layout
             </Button>
             <Button
               onClick={() => window.open(`/portfolio/${userProfile?.username}/${portfolio.slug}`, '_blank', 'noopener,noreferrer')}

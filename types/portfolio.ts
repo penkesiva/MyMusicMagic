@@ -17,6 +17,7 @@ export type Portfolio = {
   
   // Page Content
   sections_config: any; // json
+  layout_config: any; // json - layout editor configuration
   
   // Hero Section
   hero_title: string | null;
@@ -86,4 +87,8 @@ export type Portfolio = {
   footer_show_social_links: boolean | null;
   footer_show_about_summary: boolean | null;
   footer_show_links: boolean | null;
+  
+  // Layout editor data (added dynamically)
+  tracks?: any[]; // Track data for layout calculations
+  gallery?: any[]; // Gallery data for layout calculations
 }; 
