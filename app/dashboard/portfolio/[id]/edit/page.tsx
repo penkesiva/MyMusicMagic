@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check, Home, User, Music, ImageIcon, Briefcase, MessageSquare, Newspaper, Contact, Settings, Heart, Code, GraduationCap, Camera, Video, Mic, Headphones, Palette, Globe, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Github, Youtube, ExternalLink as ExternalLinkIcon
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -32,11 +32,36 @@ import PortfolioSectionManager from '@/components/portfolio/PortfolioSectionMana
 import { PortfolioFileUploader } from '@/components/portfolio/PortfolioFileUploader';
 import { safeGetArray, getSectionTitle, getSortedEditorSections } from '@/lib/portfolioEditorUtils';
 import PortfolioBottomAudioPlayer from '@/components/portfolio/PortfolioBottomAudioPlayer'
+import { Switch } from '@/components/ui/switch';
 
 const NAVBAR_HEIGHT = 56;
 const SIDEBAR_MIN_WIDTH = 220;
 const SIDEBAR_DEFAULT_WIDTH = 240;
 const SIDEBAR_MAX_WIDTH = 320;
+
+// Section icons mapping
+const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
+  hero: Home,
+  about: User,
+  tracks: Music,
+  gallery: ImageIcon,
+  key_projects: Briefcase,
+  testimonials: MessageSquare,
+  press: Newspaper,
+  resume: FileText,
+  contact: Contact,
+  skills: Code,
+  hobbies: Heart,
+  blog: FileText,
+  status: Star,
+  footer: Settings
+};
+
+// Helper function to get section icon
+const getSectionIcon = (sectionKey: string) => {
+  const IconComponent = SECTION_ICONS[sectionKey];
+  return IconComponent ? <IconComponent className="w-5 h-5" /> : <Settings className="w-5 h-5" />;
+};
 
 const PortfolioEditorPage = () => {
   const router = useRouter();
@@ -80,6 +105,33 @@ const PortfolioEditorPage = () => {
 
   const supabase = useMemo(() => createClient(), []);
   const fileUploader = useMemo(() => new PortfolioFileUploader(), []);
+
+  // Helper function to scroll to section (moved inside component to access state)
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      // Expand the section if it's collapsed
+      if (!openSections[sectionId]) {
+        setOpenSections(prev => ({ ...prev, [sectionId]: true }));
+      }
+      
+      // Add a subtle highlight effect
+      element.style.transition = 'box-shadow 0.3s ease';
+      element.style.boxShadow = '0 0 0 2px rgba(168, 85, 247, 0.3)';
+      
+      // Scroll to the element
+      element.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start',
+        inline: 'nearest'
+      });
+      
+      // Remove the highlight after a delay
+      setTimeout(() => {
+        element.style.boxShadow = '';
+      }, 2000);
+    }
+  };
 
   // Refresh functions for tracks and gallery
   const refreshTracks = () => {
@@ -529,6 +581,7 @@ const PortfolioEditorPage = () => {
           onDragEnd={handleDragEnd}
           sectionOrder={sectionOrder}
           theme={selectedTheme}
+          onSectionClick={scrollToSection}
         />
       </aside>
       {/* Main Area: Nav-Bar + Editor */}
@@ -689,16 +742,19 @@ const PortfolioEditorPage = () => {
                     className={`w-full flex items-center justify-between p-4 ${selectedTheme.colors.card} hover:bg-opacity-80 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
                   >
                     <div className="flex items-center gap-3">
-                      <h2 className={`text-xl font-bold ${selectedTheme.colors.heading}`}>
-                        {sectionConfig.defaultName}
-                      </h2>
+                      <div className="flex items-center gap-2 text-purple-400">
+                        {getSectionIcon(key)}
+                        <h2 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
+                          {sectionConfig.defaultName}
+                        </h2>
+                      </div>
                       {!isEnabled && (
                         <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded-full">
                           Disabled
                         </span>
                       )}
                     </div>
-                    <ChevronDown className={`w-6 h-6 transform transition-transform text-white ${openSections[key] ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 transform transition-transform text-white ${openSections[key] ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {openSections[key] && (

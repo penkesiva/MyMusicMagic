@@ -2,12 +2,36 @@
 
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { List, ChevronDown } from "lucide-react";
+import { List, ChevronDown, Home, User, Music, Image as ImageIcon, Briefcase, MessageSquare, Newspaper, FileText, Contact, Settings, Heart, Code, Star } from "lucide-react";
 import { SECTIONS_CONFIG } from "@/lib/sections";
 import { Portfolio } from "@/types/portfolio";
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+
+// Section icons mapping for sidebar
+const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
+  hero: Home,
+  about: User,
+  tracks: Music,
+  gallery: ImageIcon,
+  key_projects: Briefcase,
+  testimonials: MessageSquare,
+  press: Newspaper,
+  resume: FileText,
+  contact: Contact,
+  skills: Code,
+  hobbies: Heart,
+  blog: FileText,
+  status: Star,
+  footer: Settings
+};
+
+// Helper function to get section icon
+const getSectionIcon = (sectionKey: string) => {
+  const IconComponent = SECTION_ICONS[sectionKey];
+  return IconComponent ? <IconComponent size={14} /> : <Settings size={14} />;
+};
 
 interface PortfolioSectionManagerProps {
   portfolio: Portfolio | null;
@@ -19,6 +43,7 @@ interface PortfolioSectionManagerProps {
   onDragEnd: (event: DragEndEvent) => void;
   sectionOrder: string[];
   theme: any;
+  onSectionClick?: (sectionId: string) => void;
 }
 
 // Sortable Section Item component
@@ -29,9 +54,10 @@ type SortableSectionItemProps = {
   onToggle: (e: React.ChangeEvent<HTMLInputElement>) => void;
   dragHandleProps: React.HTMLAttributes<HTMLSpanElement>;
   onNameEdit?: () => void;
+  onSectionClick?: (sectionId: string) => void;
 };
 
-function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onNameEdit }: SortableSectionItemProps) {
+function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onNameEdit, onSectionClick }: SortableSectionItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -47,12 +73,51 @@ function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onN
     minHeight: 32,
     cursor: 'grab',
   };
+
+  const handleSectionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onSectionClick) {
+      onSectionClick(id);
+    }
+  };
+
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
       <span {...listeners} {...dragHandleProps} style={{ marginRight: 8, cursor: 'grab', color: '#aaa' }}>
         <List size={16} />
       </span>
-      <span style={{ flex: 1, fontWeight: enabled ? 500 : 400, color: enabled ? '#fff' : '#888' }}>{name}</span>
+      <div 
+        style={{ 
+          flex: 1, 
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          cursor: 'pointer',
+          transition: 'color 0.2s ease'
+        }}
+        onClick={handleSectionClick}
+        onMouseEnter={(e) => {
+          if (enabled) {
+            e.currentTarget.style.color = '#a855f7';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (enabled) {
+            e.currentTarget.style.color = '#fff';
+          }
+        }}
+        title={`Click to scroll to ${name} section`}
+      >
+        <span style={{ color: enabled ? '#a855f7' : '#666' }}>
+          {getSectionIcon(id)}
+        </span>
+        <span style={{ 
+          fontWeight: enabled ? 500 : 400, 
+          color: enabled ? '#fff' : '#888'
+        }}>
+          {name}
+        </span>
+      </div>
       <Switch
         id={`enable-${id}`}
         isChecked={enabled}
@@ -68,7 +133,8 @@ export default function PortfolioSectionManager({
   onSectionConfigChange,
   onDragEnd,
   sectionOrder,
-  theme
+  theme,
+  onSectionClick
 }: PortfolioSectionManagerProps) {
   const [sectionsOpen, setSectionsOpen] = useState(true);
 
@@ -105,6 +171,7 @@ export default function PortfolioSectionManager({
                       e.target.checked
                     )}
                     dragHandleProps={{}}
+                    onSectionClick={onSectionClick}
                   />
                 );
               })}
