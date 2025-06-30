@@ -5,6 +5,7 @@ export type Portfolio = {
   user_id: string;
   name: string;
   slug: string;
+  subtitle: string | null;
   template_id: string | null;
   is_published: boolean;
   is_default: boolean;
