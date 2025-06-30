@@ -730,6 +730,15 @@ export default function DashboardPage() {
                           <ExternalLink className="h-3 w-3 mr-1" />
                           View
                         </Button>
+                        <Button
+                          onClick={() => handleDeletePortfolio(p.id)}
+                          variant="outline"
+                          size="sm"
+                          className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Delete
+                        </Button>
                       </div>
                       {p.slug && (
                         <div className="mt-4 pt-4 border-t border-white/10">
