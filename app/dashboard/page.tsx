@@ -484,31 +484,95 @@ export default function DashboardPage() {
               {/* Subscription Section */}
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
                 <h2 className="text-xl font-semibold text-white mb-4">Subscription</h2>
-                <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg p-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-lg font-medium text-white capitalize">{subscription?.plan_type || 'Free'} Plan</h3>
-                      <p className="text-gray-300">Status: <span className="text-green-400">{subscription?.status || 'Active'}</span></p>
+                <div className="space-y-4">
+                  {/* Current Plan */}
+                  <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg p-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="text-lg font-medium text-white capitalize">{subscription?.plan_type || 'Free'} Plan</h3>
+                        <p className="text-gray-300">Status: <span className="text-green-400">{subscription?.status || 'Active'}</span></p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-white">
+                          {subscription?.plan_type === 'free' ? 'Free' : '$9.99'}
+                        </p>
+                        <p className="text-sm text-gray-400">per month</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-white">
-                        {subscription?.plan_type === 'free' ? 'Free' : '$9.99'}
-                      </p>
-                      <p className="text-sm text-gray-400">per month</p>
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-300 mb-2">Features:</h4>
+                      <ul className="space-y-1">
+                        {getPlanFeatures(subscription?.plan_type || 'free').map((feature, index) => (
+                          <li key={index} className="text-sm text-gray-300 flex items-center">
+                            <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-300 mb-2">Features:</h4>
-                    <ul className="space-y-1">
-                      {getPlanFeatures(subscription?.plan_type || 'free').map((feature, index) => (
-                        <li key={index} className="text-sm text-gray-300 flex items-center">
-                          <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+
+                  {/* Upgrade Plan */}
+                  <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-500/30 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <h3 className="text-lg font-medium text-white">Pro Plan</h3>
+                        <p className="text-blue-300 text-sm">Unlock your full potential</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-white">Coming Soon</p>
+                        <p className="text-sm text-blue-400">Pricing TBA</p>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-300 mb-2">Pro Features:</h4>
+                      <ul className="space-y-1">
+                        <li className="text-sm text-gray-300 flex items-center">
+                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
-                          {feature}
+                          Unlimited portfolios
                         </li>
-                      ))}
-                    </ul>
+                        <li className="text-sm text-gray-300 flex items-center">
+                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Premium templates & themes
+                        </li>
+                        <li className="text-sm text-gray-300 flex items-center">
+                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Advanced analytics & insights
+                        </li>
+                        <li className="text-sm text-gray-300 flex items-center">
+                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Custom domain support
+                        </li>
+                        <li className="text-sm text-gray-300 flex items-center">
+                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Priority support
+                        </li>
+                        <li className="text-sm text-gray-300 flex items-center">
+                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Advanced SEO tools
+                        </li>
+                      </ul>
+                    </div>
+                    <button
+                      className="w-full px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled
+                    >
+                      Coming Soon
+                    </button>
                   </div>
                 </div>
               </div>
