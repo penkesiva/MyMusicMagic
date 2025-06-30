@@ -39,10 +39,7 @@ export default function DashboardPage() {
   
   // Profile editing state
   const [editingProfile, setEditingProfile] = useState({
-    full_name: '',
-    username: '',
-    bio: '',
-    website_url: ''
+    username: ''
   })
   
   const router = useRouter()
@@ -51,8 +48,6 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user }, error: userError } = await supabase.auth.getUser()
-      
-      console.log('User auth check:', { user, userError })
       
       if (!user) {
         router.push('/auth/signin')
@@ -75,10 +70,7 @@ export default function DashboardPage() {
       if (profileData) {
         setProfile(profileData)
         setEditingProfile({
-          username: profileData.username || '',
-          full_name: profileData.full_name || '',
-          bio: profileData.bio || '',
-          website_url: profileData.website_url || ''
+          username: profileData.username || ''
         })
       }
 
@@ -156,12 +148,12 @@ export default function DashboardPage() {
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update(editingProfile)
+        .update({ username: editingProfile.username })
         .eq('id', profile.id)
 
       if (error) throw error
 
-      setProfile({ ...profile, ...editingProfile })
+      setProfile({ ...profile, username: editingProfile.username })
       setIsEditingProfile(false)
       setSuccess('Profile updated successfully!')
       setTimeout(() => setSuccess(null), 3000)
@@ -460,34 +452,6 @@ export default function DashboardPage() {
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                      <input
-                        type="text"
-                        value={editingProfile.full_name}
-                        onChange={(e) => setEditingProfile({ ...editingProfile, full_name: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
-                      <textarea
-                        value={editingProfile.bio}
-                        onChange={(e) => setEditingProfile({ ...editingProfile, bio: e.target.value })}
-                        rows={3}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Website URL</label>
-                      <input
-                        type="url"
-                        value={editingProfile.website_url}
-                        onChange={(e) => setEditingProfile({ ...editingProfile, website_url: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                        placeholder="https://example.com"
-                      />
-                    </div>
                     <div className="flex space-x-2">
                       <button
                         onClick={handleSaveProfile}
@@ -510,24 +474,8 @@ export default function DashboardPage() {
                       <p className="text-white">{profile?.username || 'Not set'}</p>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-400 mb-1">Full Name</h3>
-                      <p className="text-white">{profile?.full_name || 'Not set'}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-400 mb-1">Bio</h3>
-                      <p className="text-white">{profile?.bio || 'No bio added yet'}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-400 mb-1">Website</h3>
-                      <p className="text-white">
-                        {profile?.website_url ? (
-                          <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 transition-colors">
-                            {profile.website_url}
-                          </a>
-                        ) : (
-                          'Not set'
-                        )}
-                      </p>
+                      <h3 className="text-sm font-medium text-gray-400 mb-1">Email</h3>
+                      <p className="text-white">{profile?.email || 'Not set'}</p>
                     </div>
                   </div>
                 )}
