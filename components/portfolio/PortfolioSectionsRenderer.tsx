@@ -15,6 +15,7 @@ import { FaTwitter, FaGithub, FaLinkedin, FaInstagram, FaFacebook, FaYoutube, Fa
 import { Globe } from 'lucide-react';
 import PortfolioKeyProjectsDisplay from './PortfolioKeyProjectsDisplay';
 import PortfolioTestimonialsDisplay from './PortfolioTestimonialsDisplay';
+import SponsorsDisplay from './SponsorsDisplay';
 
 // Add other imports as needed (skills, hobbies, etc.)
 
@@ -157,6 +158,13 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                 <div className="container mx-auto">
                   <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading}`}>{getSectionTitle('press')}</h2>
                   <PressMentionsDisplay portfolioId={portfolio.id} theme={theme} layout="featured" />
+                </div>
+              </section>
+            )}
+            {key === 'sponsors' && (
+              <section id="sponsors" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <SponsorsDisplay portfolio={portfolio} theme={theme} />
                 </div>
               </section>
             )}

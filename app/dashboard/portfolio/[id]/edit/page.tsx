@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check, Home, User, Music, ImageIcon, Briefcase, MessageSquare, Newspaper, Contact, Settings, Heart, Code, GraduationCap, Camera, Video, Mic, Headphones, Palette, Globe, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Github, Youtube, ExternalLink as ExternalLinkIcon
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check, Home, User, Music, ImageIcon, Briefcase, MessageSquare, Newspaper, Contact, Settings, Heart, Code, GraduationCap, Camera, Video, Mic, Headphones, Palette, Globe, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Github, Youtube, ExternalLink as ExternalLinkIcon, Award
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -33,6 +33,7 @@ import { PortfolioFileUploader } from '@/components/portfolio/PortfolioFileUploa
 import { safeGetArray, getSectionTitle, getSortedEditorSections } from '@/lib/portfolioEditorUtils';
 import PortfolioBottomAudioPlayer from '@/components/portfolio/PortfolioBottomAudioPlayer'
 import { Switch } from '@/components/ui/switch';
+import SponsorsForm from '@/components/portfolio/SponsorsForm';
 
 const NAVBAR_HEIGHT = 56;
 const SIDEBAR_MIN_WIDTH = 220;
@@ -54,6 +55,7 @@ const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
   hobbies: Heart,
   blog: FileText,
   status: Star,
+  sponsors: Award,
   footer: Settings
 };
 
@@ -1394,6 +1396,10 @@ const PortfolioEditorPage = () => {
 
                       {key === 'press' && (
                         <PressMentionsForm portfolioId={portfolio.id} theme={selectedTheme} />
+                      )}
+
+                      {key === 'sponsors' && (
+                        <SponsorsForm portfolio={portfolio} onFieldChange={handleFieldChange} theme={selectedTheme} />
                       )}
 
                       {key === 'contact' && (

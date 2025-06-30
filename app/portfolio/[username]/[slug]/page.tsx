@@ -21,6 +21,7 @@ import PressMentionsDisplay from '@/components/portfolio/PressMentionsDisplay';
 import PortfolioSectionsRenderer from '@/components/portfolio/PortfolioSectionsRenderer';
 import PortfolioKeyProjectsDisplay from '@/components/portfolio/PortfolioKeyProjectsDisplay';
 import PortfolioTestimonialsDisplay from '@/components/portfolio/PortfolioTestimonialsDisplay';
+import SponsorsDisplay from '@/components/portfolio/SponsorsDisplay';
 
 type PageProps = {
   params: { username: string; slug: string };

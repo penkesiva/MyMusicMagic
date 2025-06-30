@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { List, ChevronDown, Home, User, Music, Image as ImageIcon, Briefcase, MessageSquare, Newspaper, FileText, Contact, Settings, Heart, Code, Star } from "lucide-react";
+import { List, ChevronDown, Home, User, Music, Image as ImageIcon, Briefcase, MessageSquare, Newspaper, FileText, Contact, Settings, Heart, Code, Star, Award } from "lucide-react";
 import { SECTIONS_CONFIG } from "@/lib/sections";
 import { Portfolio } from "@/types/portfolio";
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
@@ -24,6 +24,7 @@ const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
   hobbies: Heart,
   blog: FileText,
   status: Star,
+  sponsors: Award,
   footer: Settings
 };
 

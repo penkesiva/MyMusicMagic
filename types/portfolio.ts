@@ -52,6 +52,10 @@ export type Portfolio = {
   resume_title: string | null;
   resume_url: string | null;
 
+  // Sponsors
+  sponsors_title: string | null;
+  sponsors_json: any;
+
   // Contact Section
   contact_title: string | null;
   contact_description: string | null;

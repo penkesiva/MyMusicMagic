@@ -173,6 +173,18 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
             youtube_url: 'url'
         }
     },
+    sponsors: {
+        key: 'sponsors',
+        defaultName: 'Sponsors & Partners',
+        defaultOrder: 8,
+        enabled: false,
+        defaultEnabled: false,
+        hasCustomTitle: true,
+        fields: {
+            sponsors_title: 'text',
+            sponsors_json: 'json'
+        }
+    },
     footer: {
         key: 'footer',
         defaultName: 'Footer',
