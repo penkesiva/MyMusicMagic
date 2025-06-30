@@ -60,8 +60,7 @@ export default function PortfolioKeyProjectsEditor({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className={`text-lg font-semibold ${colors.heading}`}>Key Projects</h3>
+      <div className="flex justify-end mb-2">
         <Button
           onClick={() => setShowForm(true)}
           variant="outline"

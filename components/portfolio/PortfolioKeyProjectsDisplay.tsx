@@ -32,16 +32,12 @@ export default function PortfolioKeyProjectsDisplay({
 
   const content = (
     <>
-      {!noContainer && (
-        <div className="mb-6">
-          <h3 className={`text-xl font-semibold ${colors.heading} mb-4`}>{title}</h3>
-          {description && (
-            <p className={`text-sm ${colors.text} opacity-80 leading-relaxed`}>
-              {description}
-            </p>
-          )}
-        </div>
-      )}
+      <div className="mb-8">
+        <h2 className={`text-4xl font-bold mb-4 text-center ${colors.heading}`}>{title}</h2>
+        {description && (
+          <p className={`text-sm ${colors.text} opacity-80 leading-relaxed text-center`}>{description}</p>
+        )}
+      </div>
 
       {projects.length === 0 ? (
         <div className={`text-center py-12 border-2 border-dashed border-white/20 rounded-lg ${colors.text} opacity-60`}>
@@ -71,9 +67,5 @@ export default function PortfolioKeyProjectsDisplay({
     return content
   }
 
-  return (
-    <div className={`${colors.background} p-6 rounded-lg border border-white/10`}>
-      {content}
-    </div>
-  )
+  return content;
 } 
