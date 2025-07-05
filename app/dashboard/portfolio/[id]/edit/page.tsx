@@ -228,7 +228,6 @@ const PortfolioEditorPage = () => {
   const handleFieldChange = (field: keyof Portfolio, value: any) => {
     setSavingStatus("unsaved");
     setPortfolio(prev => ({ ...prev!, [field]: value }));
-    
     // Always auto-save
     saveChanges({ [field]: value });
   };
