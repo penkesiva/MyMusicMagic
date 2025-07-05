@@ -34,6 +34,7 @@ import { safeGetArray, getSectionTitle, getSortedEditorSections } from '@/lib/po
 import PortfolioBottomAudioPlayer from '@/components/portfolio/PortfolioBottomAudioPlayer'
 import { Switch } from '@/components/ui/switch';
 import SponsorsForm from '@/components/portfolio/SponsorsForm';
+import SubscribeForm from '@/components/portfolio/SubscribeForm';
 
 const NAVBAR_HEIGHT = 56;
 const SIDEBAR_MIN_WIDTH = 220;
@@ -56,6 +57,7 @@ const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
   blog: FileText,
   status: Star,
   sponsors: Award,
+  subscribe: Mail,
   footer: Settings
 };
 
@@ -1399,6 +1401,10 @@ const PortfolioEditorPage = () => {
 
                       {key === 'sponsors' && (
                         <SponsorsForm portfolio={portfolio} onFieldChange={handleFieldChange} theme={selectedTheme} />
+                      )}
+
+                      {key === 'subscribe' && (
+                        <SubscribeForm portfolio={portfolio} onFieldChange={handleFieldChange} />
                       )}
 
                       {key === 'contact' && (

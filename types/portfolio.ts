@@ -57,6 +57,10 @@ export type Portfolio = {
   sponsors_title: string | null;
   sponsors_json: any;
 
+  // Subscribe Section
+  subscribe_description: string | null;
+  subscribe_button_text: string | null;
+
   // Contact Section
   contact_title: string | null;
   contact_description: string | null;

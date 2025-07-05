@@ -185,6 +185,18 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
             sponsors_json: 'json'
         }
     },
+    subscribe: {
+        key: 'subscribe',
+        defaultName: 'Subscribe',
+        defaultOrder: 10,
+        enabled: false,
+        defaultEnabled: false,
+        hasCustomTitle: true,
+        fields: {
+            subscribe_description: 'textarea',
+            subscribe_button_text: 'text'
+        }
+    },
     footer: {
         key: 'footer',
         defaultName: 'Footer',

@@ -16,6 +16,7 @@ import { Globe } from 'lucide-react';
 import PortfolioKeyProjectsDisplay from './PortfolioKeyProjectsDisplay';
 import PortfolioTestimonialsDisplay from './PortfolioTestimonialsDisplay';
 import SponsorsDisplay from './SponsorsDisplay';
+import SubscribeDisplay from './SubscribeDisplay';
 
 // Add other imports as needed (skills, hobbies, etc.)
 
@@ -249,6 +250,9 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                   </div>
                 </div>
               </section>
+            )}
+            {key === 'subscribe' && (
+              <SubscribeDisplay portfolio={portfolio} theme={theme} />
             )}
             {/* Add other sections with custom titles */}
             {key === 'key_projects' && (
