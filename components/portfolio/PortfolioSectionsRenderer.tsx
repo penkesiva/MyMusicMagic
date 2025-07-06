@@ -140,14 +140,14 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                     className="object-cover brightness-50"
                   />
                 )}
-                <div className="relative z-10 text-white max-w-4xl mx-auto">
+                <div className={`relative z-10 max-w-4xl mx-auto ${theme.colors.text}`}>
                   {portfolio.hero_title && (
-                    <h1 className={`text-6xl md:text-8xl font-extrabold mb-6 leading-tight ${fontClasses.heading}`} style={{ color: theme.colors.heading }}>
+                    <h1 className={`text-6xl md:text-8xl font-extrabold mb-6 leading-tight ${fontClasses.heading} ${theme.colors.heading}`}>
                       {portfolio.hero_title}
                     </h1>
                   )}
                   {portfolio.hero_subtitle && (
-                    <p className="text-xl md:text-2xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed" style={{ color: theme.colors.text }}>
+                    <p className={`text-xl md:text-2xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed ${theme.colors.text}`}>
                       {portfolio.hero_subtitle}
                     </p>
                   )}
@@ -166,6 +166,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                     filter="all"
                     cardShadows={cardShadows}
                     imageFrames={imageFrames}
+                    theme={theme}
                   />
                 </div>
               </section>
@@ -189,7 +190,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
               <section id="about" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
                 <div className="container mx-auto flex flex-col md:flex-row items-center gap-12">
                   {portfolio.profile_photo_url && (
-                    <div className="flex-shrink-0 w-48 h-48 relative rounded-2xl overflow-hidden border-4 border-white/20 shadow-lg">
+                    <div className={`flex-shrink-0 w-48 h-48 relative rounded-2xl overflow-hidden border-4 shadow-lg ${imageFrames ? 'border-white/20' : 'border-gray-300/20'}`}>
                       <Image src={portfolio.profile_photo_url} alt="Profile" fill className="object-cover" />
                     </div>
                   )}
@@ -208,6 +209,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                     portfolioId={portfolio.id} 
                     viewMode="grid"
                     audioPlayerMode={portfolio.sections_config?.tracks?.audio_player_mode || 'bottom'}
+                    theme={theme}
                   />
                 </div>
               </section>
@@ -218,9 +220,9 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                   <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading} ${fontClasses.heading}`}>{getSectionTitle('hobbies')}</h2>
                   <div className="flex flex-wrap justify-center gap-6">
                     {safeGetArray(portfolio.hobbies_json)?.map((hobby: any) => (
-                      <div key={hobby.name} className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-lg w-32">
+                      <div key={hobby.name} className={`flex flex-col items-center gap-2 p-4 rounded-lg w-32 ${cardShadows ? 'shadow-lg' : ''} ${imageFrames ? 'bg-white/10' : 'bg-gray-100/10'}`}>
                         <span className="text-4xl">{hobby.icon}</span>
-                        <span className="text-sm font-medium text-center">{hobby.name}</span>
+                        <span className={`text-sm font-medium text-center ${theme.colors.text}`}>{hobby.name}</span>
                       </div>
                     ))}
                   </div>
@@ -236,9 +238,9 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                       const skillDef = SKILLS_LIST.find(s => s.name === skill.name);
                       const Icon = skillDef?.icon;
                       return (
-                        <div key={skill.name} className="flex flex-col items-center gap-2 p-4 bg-white/10 rounded-lg w-32">
+                        <div key={skill.name} className={`flex flex-col items-center gap-2 p-4 rounded-lg w-32 ${cardShadows ? 'shadow-lg' : ''} ${imageFrames ? 'bg-white/10' : 'bg-gray-100/10'}`}>
                           {Icon && <span className="text-4xl"><Icon className="h-8 w-8" style={{ color: skill.color }} /></span>}
-                          <span className="text-sm font-medium text-center">{skill.name}</span>
+                          <span className={`text-sm font-medium text-center ${theme.colors.text}`}>{skill.name}</span>
                         </div>
                       );
                     })}
@@ -252,16 +254,16 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                   <h2 className={`text-4xl font-bold mb-8 text-center ${theme.colors.heading} ${fontClasses.heading}`}>{getSectionTitle('contact')}</h2>
                   <p className="text-lg mb-8 text-center">{portfolio.contact_description}</p>
                   <div className="flex flex-col gap-4 items-center">
-                    {portfolio.contact_email && <a href={`mailto:${portfolio.contact_email}`} className="text-blue-400 hover:underline">{portfolio.contact_email}</a>}
-                    {portfolio.contact_phone && <span>{portfolio.contact_phone}</span>}
-                    {portfolio.contact_location && <span>{portfolio.contact_location}</span>}
+                    {portfolio.contact_email && <a href={`mailto:${portfolio.contact_email}`} className={`${theme.colors.accent} hover:underline`}>{portfolio.contact_email}</a>}
+                    {portfolio.contact_phone && <span className={theme.colors.text}>{portfolio.contact_phone}</span>}
+                    {portfolio.contact_location && <span className={theme.colors.text}>{portfolio.contact_location}</span>}
                     <div className="flex gap-4 mt-4">
-                      {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className="text-blue-400"><FaTwitter className="w-6 h-6" /></a>}
-                      {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className="text-pink-400"><FaInstagram className="w-6 h-6" /></a>}
-                      {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-blue-700"><FaLinkedin className="w-6 h-6" /></a>}
-                      {portfolio.github_url && <a href={portfolio.github_url} target="_blank" rel="noopener noreferrer" className="text-gray-400"><FaGithub className="w-6 h-6" /></a>}
-                      {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className="text-red-500"><FaYoutube className="w-6 h-6" /></a>}
-                      {portfolio.website_url && <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className="text-green-400"><Globe className="w-6 h-6" /></a>}
+                      {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaTwitter className="w-6 h-6" /></a>}
+                      {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaInstagram className="w-6 h-6" /></a>}
+                      {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaLinkedin className="w-6 h-6" /></a>}
+                      {portfolio.github_url && <a href={portfolio.github_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaGithub className="w-6 h-6" /></a>}
+                      {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaYoutube className="w-6 h-6" /></a>}
+                      {portfolio.website_url && <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><Globe className="w-6 h-6" /></a>}
                     </div>
                   </div>
                 </div>
@@ -326,10 +328,10 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
         ))}
         {/* Footer */}
         {sortedSections.includes('footer') && (
-          <footer className={`${theme.colors.background} ${theme.colors.text} py-16 px-4 md:px-8 border-t border-white/10`}>
+          <footer className={`${theme.colors.background} ${theme.colors.text} py-16 px-4 md:px-8 border-t ${imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
             <div className="container mx-auto text-center">
               {/* Footer content here */}
-              <div className="mt-12 pt-8 border-t border-white/10">
+              <div className={`mt-12 pt-8 border-t ${imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
                 <p className={`${theme.colors.text} opacity-60`}>© 2024 {portfolio.artist_name}. All rights reserved.</p>
               </div>
             </div>

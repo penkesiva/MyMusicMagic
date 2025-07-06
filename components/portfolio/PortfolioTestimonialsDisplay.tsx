@@ -35,7 +35,9 @@ export default function PortfolioTestimonialsDisplay({
     background: 'bg-gray-900',
     text: 'text-white',
     primary: 'text-blue-400',
-    primaryStrong: 'text-blue-300'
+    primaryStrong: 'text-blue-300',
+    heading: 'text-white',
+    accent: 'text-blue-400'
   }
 
   // Auto-play carousel
@@ -86,7 +88,7 @@ export default function PortfolioTestimonialsDisplay({
       )}
 
       {testimonials.length === 0 ? (
-        <div className={`text-center py-12 border-2 border-dashed border-white/20 rounded-lg ${colors.text} opacity-60`}>
+        <div className={`text-center py-12 border-2 border-dashed rounded-lg ${colors.text} opacity-60 ${theme?.imageFrames ? 'border-white/20' : 'border-gray-300/20'}`}>
           <p className="text-lg mb-2">No testimonials added yet</p>
           <p className="text-sm">Share what others say about your work</p>
         </div>
@@ -100,18 +102,18 @@ export default function PortfolioTestimonialsDisplay({
                   key={testimonial.id} 
                   className="flex-shrink-0 w-full md:w-1/3"
                 >
-                  <div className={`p-6 rounded-xl border border-white/10 ${colors.background} h-full`}>
+                  <div className={`p-6 rounded-xl border ${colors.background} h-full ${theme?.imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
                     {/* Profile Image */}
                     <div className="text-center mb-4">
                       {testimonial.image_url ? (
                         <img
                           src={testimonial.image_url}
                           alt={testimonial.name}
-                          className="w-16 h-16 rounded-full mx-auto mb-3 object-cover border-2 border-white/20"
+                          className={`w-16 h-16 rounded-full mx-auto mb-3 object-cover border-2 ${theme?.imageFrames ? 'border-white/20' : 'border-gray-300/20'}`}
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-full mx-auto mb-3 bg-white/10 flex items-center justify-center">
-                          <span className="text-2xl text-white/60">👤</span>
+                        <div className={`w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center ${theme?.imageFrames ? 'bg-white/10' : 'bg-gray-100/10'}`}>
+                          <span className={`text-2xl ${theme?.imageFrames ? 'text-white/60' : 'text-gray-400/60'}`}>👤</span>
                         </div>
                       )}
                     </div>
@@ -159,15 +161,15 @@ export default function PortfolioTestimonialsDisplay({
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 p-2 rounded-full transition-colors ${theme?.imageFrames ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-100/10 hover:bg-gray-200/20'}`}
               >
-                <ChevronLeft className="w-5 h-5 text-white" />
+                <ChevronLeft className={`w-5 h-5 ${theme?.imageFrames ? 'text-white' : 'text-gray-600'}`} />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 p-2 rounded-full transition-colors ${theme?.imageFrames ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-100/10 hover:bg-gray-200/20'}`}
               >
-                <ChevronRight className="w-5 h-5 text-white" />
+                                  <ChevronRight className={`w-5 h-5 ${theme?.imageFrames ? 'text-white' : 'text-gray-600'}`} />
               </button>
             </>
           )}
@@ -181,8 +183,8 @@ export default function PortfolioTestimonialsDisplay({
                   onClick={() => goToSlide(i * 3)}
                   className={`w-2 h-2 rounded-full transition-colors ${
                     Math.floor(currentSlide / 3) === i 
-                      ? 'bg-white' 
-                      : 'bg-white/30'
+                      ? (theme?.imageFrames ? 'bg-white' : 'bg-gray-600')
+                      : (theme?.imageFrames ? 'bg-white/30' : 'bg-gray-300/30')
                   }`}
                 />
               ))}
@@ -210,7 +212,7 @@ export default function PortfolioTestimonialsDisplay({
   }
 
   return (
-    <div className={`${colors.background} p-6 rounded-lg border border-white/10`}>
+    <div className={`${colors.background} p-6 rounded-lg border ${theme?.imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
       {content}
     </div>
   )

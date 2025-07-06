@@ -18,7 +18,7 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
   return (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="post_me_subtitle" className="text-sm font-medium text-white">
+        <Label htmlFor="post_me_subtitle" className={`text-sm font-medium ${theme.colors.text}`}>
           Subtitle
         </Label>
         <Input
@@ -27,12 +27,12 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_subtitle || ''}
           onChange={e => onFieldChange('post_me_subtitle', e.target.value)}
           placeholder="Share your musical thoughts"
-          className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
         />
         <p className="mt-1 text-xs text-gray-400">Short description under the title</p>
       </div>
       <div>
-        <Label htmlFor="post_me_email_placeholder" className="text-sm font-medium text-white">
+        <Label htmlFor="post_me_email_placeholder" className={`text-sm font-medium ${theme.colors.text}`}>
           Email Placeholder
         </Label>
         <Input
@@ -41,12 +41,12 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_email_placeholder || ''}
           onChange={e => onFieldChange('post_me_email_placeholder', e.target.value)}
           placeholder="your@email.com"
-          className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
         />
         <p className="mt-1 text-xs text-gray-400">Placeholder for the email input</p>
       </div>
       <div>
-        <Label htmlFor="post_me_message_placeholder" className="text-sm font-medium text-white">
+        <Label htmlFor="post_me_message_placeholder" className={`text-sm font-medium ${theme.colors.text}`}>
           Message Placeholder
         </Label>
         <Input
@@ -55,12 +55,12 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_message_placeholder || ''}
           onChange={e => onFieldChange('post_me_message_placeholder', e.target.value)}
           placeholder="Your message here..."
-          className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
         />
         <p className="mt-1 text-xs text-gray-400">Placeholder for the message textarea</p>
       </div>
       <div>
-        <Label htmlFor="post_me_button_text" className="text-sm font-medium text-white">
+        <Label htmlFor="post_me_button_text" className={`text-sm font-medium ${theme.colors.text}`}>
           Button Text
         </Label>
         <Input
@@ -69,12 +69,12 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_button_text || ''}
           onChange={e => onFieldChange('post_me_button_text', e.target.value)}
           placeholder="Send Message"
-          className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
         />
         <p className="mt-1 text-xs text-gray-400">Text displayed on the submit button</p>
       </div>
       <div>
-        <Label htmlFor="post_me_success_message" className="text-sm font-medium text-white">
+        <Label htmlFor="post_me_success_message" className={`text-sm font-medium ${theme.colors.text}`}>
           Success Message
         </Label>
         <Input
@@ -83,12 +83,12 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_success_message || ''}
           onChange={e => onFieldChange('post_me_success_message', e.target.value)}
           placeholder="Message sent! Thank you for reaching out."
-          className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
         />
         <p className="mt-1 text-xs text-gray-400">Message shown after successful submission</p>
       </div>
       <div>
-        <Label htmlFor="post_me_error_message" className="text-sm font-medium text-white">
+        <Label htmlFor="post_me_error_message" className={`text-sm font-medium ${theme.colors.text}`}>
           Error Message
         </Label>
         <Input
@@ -97,12 +97,12 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_error_message || ''}
           onChange={e => onFieldChange('post_me_error_message', e.target.value)}
           placeholder="Something went wrong. Please try again."
-          className="mt-1 bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
         />
         <p className="mt-1 text-xs text-gray-400">Message shown if submission fails</p>
       </div>
-      <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-        <h4 className="text-sm font-medium text-white mb-2">Live Preview</h4>
+      <div className={`p-4 ${theme.colors.background} rounded-lg border border-gray-700`}>
+        <h4 className={`text-sm font-medium ${theme.colors.text} mb-2`}>Live Preview</h4>
         <PostMeDisplay portfolio={portfolio} theme={theme} previewOnly />
       </div>
     </div>

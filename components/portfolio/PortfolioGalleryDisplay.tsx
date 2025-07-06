@@ -16,9 +16,10 @@ interface PortfolioGalleryDisplayProps {
   refreshKey?: number
   cardShadows?: boolean
   imageFrames?: boolean
+  theme?: any
 }
 
-export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'grid', filter: initialFilter = 'all', refreshKey = 0, cardShadows = true, imageFrames = true }: PortfolioGalleryDisplayProps) {
+export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'grid', filter: initialFilter = 'all', refreshKey = 0, cardShadows = true, imageFrames = true, theme }: PortfolioGalleryDisplayProps) {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -26,6 +27,16 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
   const [tab, setTab] = useState<'all' | 'photo' | 'video'>('all')
 
   const supabase = createClient()
+
+  // Default theme colors if no theme is provided
+  const colors = theme?.colors || {
+    background: 'bg-gray-900',
+    text: 'text-white',
+    primary: 'text-blue-400',
+    primaryStrong: 'text-blue-300',
+    heading: 'text-white',
+    accent: 'text-blue-400'
+  }
 
   useEffect(() => {
     fetchGalleryItems()
@@ -112,19 +123,19 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
       {/* Tabs for All, Photos, Videos */}
       <div className="flex justify-center gap-4 mb-6">
         <button
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'all' ? 'bg-purple-600 text-white shadow' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'all' ? `${colors.accent} shadow` : `${imageFrames ? 'bg-white/10 text-white/60 hover:bg-white/20' : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
           onClick={() => setTab('all')}
         >
           All
         </button>
         <button
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'photo' ? 'bg-purple-600 text-white shadow' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'photo' ? `${colors.accent} shadow` : `${imageFrames ? 'bg-white/10 text-white/60 hover:bg-white/20' : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
           onClick={() => setTab('photo')}
         >
           Photos
         </button>
         <button
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'video' ? 'bg-purple-600 text-white shadow' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'video' ? `${colors.accent} shadow` : `${imageFrames ? 'bg-white/10 text-white/60 hover:bg-white/20' : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
           onClick={() => setTab('video')}
         >
           Videos
@@ -133,16 +144,16 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
 
       {/* List or Grid display */}
       {filteredItems.length === 0 ? (
-        <div className="text-center p-8 border-2 border-dashed border-white/20 rounded-lg">
-          <h3 className="text-lg font-semibold text-white/80">No {tab === 'photo' ? 'Photos' : tab === 'video' ? 'Videos' : 'Items'} Found</h3>
-          <p className="text-sm text-white/50 mt-2">
+        <div className={`text-center p-8 border-2 border-dashed rounded-lg ${imageFrames ? 'border-white/20' : 'border-gray-300/20'}`}>
+          <h3 className={`text-lg font-semibold ${colors.text} opacity-80`}>No {tab === 'photo' ? 'Photos' : tab === 'video' ? 'Videos' : 'Items'} Found</h3>
+          <p className={`text-sm ${colors.text} opacity-50 mt-2`}>
             {tab === 'photo' ? 'Add your first photo to get started.' : tab === 'video' ? 'No videos found. Try uploading a video.' : 'No items found. Try adding a new item.'}
           </p>
         </div>
       ) : viewMode === 'list' ? (
         <div className="space-y-3">
           {filteredItems.map((item) => (
-            <div key={item.id} className="flex items-center p-3 bg-white/5 rounded-lg border border-white/10">
+            <div key={item.id} className={`flex items-center p-3 rounded-lg border ${imageFrames ? 'bg-white/5 border-white/10' : 'bg-gray-100/5 border-gray-300/10'}`}>
               <div className="relative w-20 h-20 flex-shrink-0">
                 <img src={item.image_url} alt={item.title} className="w-full h-full object-cover rounded-md" />
                 {item.media_type === 'video' && (
@@ -157,7 +168,7 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
                 ) : null}
               </div>
               <div className="flex-1 min-w-0 mx-4">
-                <h4 className="font-medium text-sm text-white truncate">{item.title}</h4>
+                <h4 className={`font-medium text-sm ${colors.text} truncate`}>{item.title}</h4>
                 <p className="text-gray-400 text-xs truncate">{item.description}</p>
                 <p className="text-gray-500 text-xs mt-1">{formatDate(item.created_at)}</p>
               </div>
@@ -176,7 +187,7 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {filteredItems.map((item) => (
-            <div key={item.id} className={`bg-white/5 overflow-hidden border border-white/10 group flex flex-col ${cardShadows ? 'shadow-lg hover:shadow-xl' : ''} ${imageFrames ? 'rounded-xl' : 'rounded-none'}`}>
+            <div key={item.id} className={`overflow-hidden border group flex flex-col ${cardShadows ? 'shadow-lg hover:shadow-xl' : ''} ${imageFrames ? 'rounded-xl bg-white/5 border-white/10' : 'rounded-none bg-gray-100/5 border-gray-300/10'}`}>
               {/* Image/Video Preview */}
               <div className="relative aspect-square w-full min-h-[220px] max-h-[320px]">
                 <img src={item.image_url} alt={item.title} className={`w-full h-full object-cover ${imageFrames ? 'rounded-t-xl' : ''}`}/>
@@ -201,7 +212,7 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
 
               {/* Content */}
               <div className="p-3 flex-1 flex flex-col justify-between">
-                <h4 className="font-medium text-sm mb-1 line-clamp-1 text-white">{item.title}</h4>
+                <h4 className={`font-medium text-sm mb-1 line-clamp-1 ${colors.text}`}>{item.title}</h4>
                 <p className="text-gray-400 text-xs mb-2 line-clamp-2">{item.description}</p>
                 <div className="flex justify-between items-center mt-auto">
                   <p className="text-gray-500 text-xs">{formatDate(item.created_at)}</p>

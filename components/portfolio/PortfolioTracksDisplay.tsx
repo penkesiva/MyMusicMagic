@@ -15,9 +15,10 @@ interface PortfolioTracksDisplayProps {
   viewMode?: 'list' | 'grid'
   refreshKey?: number
   audioPlayerMode?: 'bottom' | 'inline'
+  theme?: any
 }
 
-export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'list', refreshKey = 0, audioPlayerMode = 'bottom' }: PortfolioTracksDisplayProps) {
+export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'list', refreshKey = 0, audioPlayerMode = 'bottom', theme }: PortfolioTracksDisplayProps) {
   const [tracks, setTracks] = useState<Track[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,6 +26,16 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
 
   // Global audio state
   const { currentTrack, isPlaying } = useAudioStore()
+
+  // Default theme colors if no theme is provided
+  const colors = theme?.colors || {
+    background: 'bg-gray-900',
+    text: 'text-white',
+    primary: 'text-blue-400',
+    primaryStrong: 'text-blue-300',
+    heading: 'text-white',
+    accent: 'text-blue-400'
+  }
 
   // Debug logging
   useEffect(() => {
@@ -138,7 +149,7 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tracks.map((track) => (
-          <div key={track.id} className="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-white/20 transition-colors">
+          <div key={track.id} className={`rounded-lg p-4 border transition-colors ${theme?.imageFrames ? 'bg-white/5 border-white/10 hover:border-white/20' : 'bg-gray-100/5 border-gray-300/10 hover:border-gray-400/20'}`}>
             <div className="relative mb-4">
               <img
                 src={track.thumbnail_url}
@@ -158,7 +169,7 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
             </div>
             
             <div className="space-y-2">
-              <h3 className="font-semibold text-white truncate">{track.title}</h3>
+              <h3 className={`font-semibold ${colors.text} truncate`}>{track.title}</h3>
               {track.description && (
                 <p className="text-gray-400 text-sm line-clamp-2">{track.description}</p>
               )}

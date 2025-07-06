@@ -27,7 +27,9 @@ export default function PortfolioKeyProjectsDisplay({
     background: 'bg-gray-900',
     text: 'text-white',
     primary: 'text-blue-400',
-    primaryStrong: 'text-blue-300'
+    primaryStrong: 'text-blue-300',
+    heading: 'text-white',
+    accent: 'text-blue-400'
   }
 
   const content = (
@@ -40,14 +42,14 @@ export default function PortfolioKeyProjectsDisplay({
       </div>
 
       {projects.length === 0 ? (
-        <div className={`text-center py-12 border-2 border-dashed border-white/20 rounded-lg ${colors.text} opacity-60`}>
+        <div className={`text-center py-12 border-2 border-dashed rounded-lg ${colors.text} opacity-60 ${theme?.imageFrames ? 'border-white/20' : 'border-gray-300/20'}`}>
           <p className="text-lg mb-2">No projects added yet</p>
           <p className="text-sm">Showcase your key projects and achievements</p>
         </div>
       ) : (
         <div className="space-y-6">
           {projects.map((project, index) => (
-            <div key={project.id} className={`p-4 border border-white/10 rounded-lg ${colors.background}`}>
+            <div key={project.id} className={`p-4 border rounded-lg ${colors.background} ${theme?.imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
               <div className="mb-3">
                 <h4 className={`text-lg font-semibold ${colors.heading} mb-2`}>{project.title}</h4>
                 {project.description && (

@@ -37,7 +37,9 @@ export default function PortfolioKeyProjectsEditor({
     background: 'bg-gray-900',
     text: 'text-white',
     primary: 'text-blue-400',
-    primaryStrong: 'text-blue-300'
+    primaryStrong: 'text-blue-300',
+    heading: 'text-white',
+    accent: 'text-blue-400'
   }
 
   const handleSuccess = () => {
@@ -73,13 +75,13 @@ export default function PortfolioKeyProjectsEditor({
       </div>
 
       {projects.length === 0 ? (
-        <div className={`text-center py-12 border-2 border-dashed border-white/20 rounded-lg ${colors.text} opacity-60`}>
+        <div className={`text-center py-12 border-2 border-dashed rounded-lg ${colors.text} opacity-60 ${theme?.imageFrames ? 'border-white/20' : 'border-gray-300/20'}`}>
           <p className="text-lg mb-2">No projects added yet</p>
           <p className="text-sm mb-4">Showcase your key projects and achievements</p>
           <Button
             onClick={() => setShowForm(true)}
             variant="outline"
-            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+            className={`${theme?.imageFrames ? 'bg-white/10 border-white/20 text-white hover:bg-white/20' : 'bg-gray-100/10 border-gray-300/20 text-gray-700 hover:bg-gray-200/20'}`}
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Your First Project
