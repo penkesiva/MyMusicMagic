@@ -86,6 +86,7 @@ export type Portfolio = {
   
   // Theme
   theme_name: string | null;
+  font_pair: string | null;
   
   // Footer
   footer_text: string | null;

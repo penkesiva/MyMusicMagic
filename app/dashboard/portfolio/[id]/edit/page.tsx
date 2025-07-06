@@ -28,6 +28,7 @@ import PressMentionsForm from '@/components/portfolio/PressMentionsForm';
 import { generateEnhancedAITitle } from '@/lib/utils';
 import PortfolioAIAssistant from '@/components/portfolio/PortfolioAIAssistant';
 import PortfolioThemeSelector from '@/components/portfolio/PortfolioThemeSelector';
+import PortfolioFontSelector from '@/components/portfolio/PortfolioFontSelector';
 import PortfolioSectionManager from '@/components/portfolio/PortfolioSectionManager';
 import { PortfolioFileUploader } from '@/components/portfolio/PortfolioFileUploader';
 import { safeGetArray, getSectionTitle, getSortedEditorSections } from '@/lib/portfolioEditorUtils';
@@ -576,6 +577,12 @@ const PortfolioEditorPage = () => {
           portfolio={portfolio}
           onFieldChange={handleFieldChange}
           theme={selectedTheme}
+        />
+
+        {/* Font Selector Component */}
+        <PortfolioFontSelector
+          selectedFontPair={portfolio.font_pair || 'sf-pro'}
+          onFontPairChange={(fontPair) => handleFieldChange('font_pair', fontPair)}
         />
 
         {/* Section Manager Component */}
