@@ -28,6 +28,7 @@ interface PortfolioSectionsRendererProps {
   galleryItems: any[];
   theme: any;
   showPreviewBanner?: boolean;
+  isEditMode?: boolean;
 }
 
 const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
@@ -36,6 +37,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
   galleryItems,
   theme,
   showPreviewBanner = false,
+  isEditMode = false,
 }) => {
   const [showBottomAudioPlayer, setShowBottomAudioPlayer] = React.useState(false);
   
@@ -167,6 +169,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                     cardShadows={cardShadows}
                     imageFrames={imageFrames}
                     theme={theme}
+                    isEditMode={isEditMode}
                   />
                 </div>
               </section>
@@ -210,6 +213,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                     viewMode="grid"
                     audioPlayerMode={portfolio.sections_config?.tracks?.audio_player_mode || 'bottom'}
                     theme={theme}
+                    isEditMode={isEditMode}
                   />
                 </div>
               </section>

@@ -1140,6 +1140,7 @@ const PortfolioEditorPage = () => {
                             onEdit={handleEditTrack}
                             refreshKey={tracksRefreshKey}
                             audioPlayerMode={portfolio.sections_config?.tracks?.audio_player_mode || 'bottom'}
+                            isEditMode={true}
                           />
                           
                           {showAddTrackForm && (
@@ -1243,6 +1244,7 @@ const PortfolioEditorPage = () => {
                             onRefresh={refreshGallery}
                             onEdit={handleEditGalleryItem}
                             refreshKey={galleryRefreshKey}
+                            isEditMode={true}
                           />
                           
                           {showAddGalleryForm && (

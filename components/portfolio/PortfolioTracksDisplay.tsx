@@ -16,9 +16,10 @@ interface PortfolioTracksDisplayProps {
   refreshKey?: number
   audioPlayerMode?: 'bottom' | 'inline'
   theme?: any
+  isEditMode?: boolean
 }
 
-export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'list', refreshKey = 0, audioPlayerMode = 'bottom', theme }: PortfolioTracksDisplayProps) {
+export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'list', refreshKey = 0, audioPlayerMode = 'bottom', theme, isEditMode = false }: PortfolioTracksDisplayProps) {
   const [tracks, setTracks] = useState<Track[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -175,22 +176,24 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
               )}
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <span>{formatDuration(track.duration || 0)}</span>
-                <div className="flex items-center gap-2">
-                  {onEdit && (
+                {isEditMode && (
+                  <div className="flex items-center gap-2">
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(track)}
+                        className="p-1 hover:bg-white/10 rounded transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
                     <button
-                      onClick={() => onEdit(track)}
-                      className="p-1 hover:bg-white/10 rounded transition-colors"
+                      onClick={() => setShowDeleteConfirm(track.id)}
+                      className="p-1 hover:bg-white/10 rounded transition-colors text-red-400 hover:text-red-300"
                     >
-                      <Edit className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
-                  )}
-                  <button
-                    onClick={() => setShowDeleteConfirm(track.id)}
-                    className="p-1 hover:bg-white/10 rounded transition-colors text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -565,6 +565,7 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
       galleryItems={galleryItems}
       theme={theme}
       showPreviewBanner={true}
+      isEditMode={false}
     />
   );
 }

@@ -17,9 +17,10 @@ interface PortfolioGalleryDisplayProps {
   cardShadows?: boolean
   imageFrames?: boolean
   theme?: any
+  isEditMode?: boolean
 }
 
-export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'grid', filter: initialFilter = 'all', refreshKey = 0, cardShadows = true, imageFrames = true, theme }: PortfolioGalleryDisplayProps) {
+export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'grid', filter: initialFilter = 'all', refreshKey = 0, cardShadows = true, imageFrames = true, theme, isEditMode = false }: PortfolioGalleryDisplayProps) {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -175,12 +176,14 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
               <span className={`px-2 py-1 text-xs font-semibold rounded-full mx-4 ${
                 item.media_type === 'video' ? 'bg-blue-900/20 text-blue-300 border border-blue-500/20' : 'bg-green-900/20 text-green-300 border border-green-500/20'
               }`}>{item.media_type === 'video' ? 'Video' : 'Image'}</span>
-              <div className="flex items-center gap-2">
-                {onEdit && (
-                  <button onClick={() => onEdit(item)} className="p-2 text-blue-400 hover:text-blue-300 transition-colors" title="Edit"><PencilIcon className="h-4 w-4" /></button>
-                )}
-                <button onClick={() => handleDelete(item.id)} disabled={deletingItem === item.id} className="p-2 text-red-400 hover:text-red-300 transition-colors" title="Delete"><TrashIcon className="h-4 w-4" /></button>
-              </div>
+              {isEditMode && (
+                <div className="flex items-center gap-2">
+                  {onEdit && (
+                    <button onClick={() => onEdit(item)} className="p-2 text-blue-400 hover:text-blue-300 transition-colors" title="Edit"><PencilIcon className="h-4 w-4" /></button>
+                  )}
+                  <button onClick={() => handleDelete(item.id)} disabled={deletingItem === item.id} className="p-2 text-red-400 hover:text-red-300 transition-colors" title="Delete"><TrashIcon className="h-4 w-4" /></button>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -202,12 +205,14 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
                 {Boolean((item as any)['is_featured']) ? (
                   <span className="absolute top-3 left-3 bg-gradient-to-r from-purple-500 to-pink-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow">Featured</span>
                 ) : null}
-                <div className="absolute top-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {onEdit && (
-                    <button onClick={() => onEdit(item)} className="p-2 bg-blue-500/80 text-white rounded-full hover:bg-blue-500" title="Edit"><PencilIcon className="h-4 w-4" /></button>
-                  )}
-                  <button onClick={() => handleDelete(item.id)} disabled={deletingItem === item.id} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500" title="Delete"><TrashIcon className="h-4 w-4" /></button>
-                </div>
+                {isEditMode && (
+                  <div className="absolute top-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {onEdit && (
+                      <button onClick={() => onEdit(item)} className="p-2 bg-blue-500/80 text-white rounded-full hover:bg-blue-500" title="Edit"><PencilIcon className="h-4 w-4" /></button>
+                    )}
+                    <button onClick={() => handleDelete(item.id)} disabled={deletingItem === item.id} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500" title="Delete"><TrashIcon className="h-4 w-4" /></button>
+                  </div>
+                )}
               </div>
 
               {/* Content */}

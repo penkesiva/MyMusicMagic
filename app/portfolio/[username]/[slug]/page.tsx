@@ -927,6 +927,7 @@ export default function PortfolioPage({ params }: PageProps) {
       tracks={tracks}
       galleryItems={galleryItems}
       theme={theme}
+      isEditMode={false}
     />
   );
 }
