@@ -14,9 +14,11 @@ interface PortfolioGalleryDisplayProps {
   viewMode?: 'list' | 'grid'
   filter?: 'all' | 'photo' | 'video'
   refreshKey?: number
+  cardShadows?: boolean
+  imageFrames?: boolean
 }
 
-export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'grid', filter: initialFilter = 'all', refreshKey = 0 }: PortfolioGalleryDisplayProps) {
+export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh, viewMode = 'grid', filter: initialFilter = 'all', refreshKey = 0, cardShadows = true, imageFrames = true }: PortfolioGalleryDisplayProps) {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -174,10 +176,10 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {filteredItems.map((item) => (
-            <div key={item.id} className="bg-white/5 rounded-xl overflow-hidden border border-white/10 group flex flex-col">
+            <div key={item.id} className={`bg-white/5 overflow-hidden border border-white/10 group flex flex-col ${cardShadows ? 'shadow-lg hover:shadow-xl' : ''} ${imageFrames ? 'rounded-xl' : 'rounded-none'}`}>
               {/* Image/Video Preview */}
               <div className="relative aspect-square w-full min-h-[220px] max-h-[320px]">
-                <img src={item.image_url} alt={item.title} className="w-full h-full object-cover"/>
+                <img src={item.image_url} alt={item.title} className={`w-full h-full object-cover ${imageFrames ? 'rounded-t-xl' : ''}`}/>
                 {item.media_type === 'video' && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                     <div className="w-14 h-14 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">

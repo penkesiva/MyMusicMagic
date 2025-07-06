@@ -41,6 +41,11 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
   
   // Get font classes based on portfolio font pair
   const fontClasses = getFontClasses(portfolio.font_pair);
+  
+  // Get styling options with defaults
+  const cardShadows = portfolio.card_shadows ?? true;
+  const imageFrames = portfolio.image_frames ?? true;
+  const animations = portfolio.animations ?? true;
 
   // Add event listener for bottom audio player
   React.useEffect(() => {
@@ -115,7 +120,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
   };
 
   return (
-    <div className={`min-h-screen ${theme.colors.background} ${fontClasses.body} overflow-x-hidden`}>
+    <div className={`min-h-screen ${theme.colors.background} ${fontClasses.body} overflow-x-hidden ${animations ? 'animate-fade-in' : ''}`}>
       {showPreviewBanner && (
         <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-medium">
           🎯 PREVIEW MODE - This is how your portfolio will look when published
@@ -152,10 +157,16 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
             )}
             {/* Add other section renderings here, e.g. about, tracks, gallery, press, etc. */}
             {key === 'gallery' && (
-              <section id="gallery" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8`}>
+              <section id="gallery" className={`${theme.colors.background} ${theme.colors.text} py-20 px-4 md:px-8 ${animations ? 'animate-slide-in-up' : ''}`}>
                 <div className="container mx-auto">
                   <h2 className={`text-4xl font-bold mb-12 text-center ${theme.colors.heading} ${fontClasses.heading}`}>{getSectionTitle('gallery')}</h2>
-                  <PortfolioGalleryDisplay portfolioId={portfolio.id} viewMode="grid" filter="all" />
+                  <PortfolioGalleryDisplay 
+                    portfolioId={portfolio.id} 
+                    viewMode="grid" 
+                    filter="all"
+                    cardShadows={cardShadows}
+                    imageFrames={imageFrames}
+                  />
                 </div>
               </section>
             )}

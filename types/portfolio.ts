@@ -88,6 +88,11 @@ export type Portfolio = {
   theme_name: string | null;
   font_pair: string | null;
   
+  // Styling
+  card_shadows: boolean | null;
+  image_frames: boolean | null;
+  animations: boolean | null;
+  
   // Footer
   footer_text: string | null;
   footer_about_summary: string | null;

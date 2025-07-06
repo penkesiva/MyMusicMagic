@@ -29,6 +29,7 @@ import { generateEnhancedAITitle } from '@/lib/utils';
 import PortfolioAIAssistant from '@/components/portfolio/PortfolioAIAssistant';
 import PortfolioThemeSelector from '@/components/portfolio/PortfolioThemeSelector';
 import PortfolioFontSelector from '@/components/portfolio/PortfolioFontSelector';
+import PortfolioStylingSelector from '@/components/portfolio/PortfolioStylingSelector';
 import PortfolioSectionManager from '@/components/portfolio/PortfolioSectionManager';
 import { PortfolioFileUploader } from '@/components/portfolio/PortfolioFileUploader';
 import { safeGetArray, getSectionTitle, getSortedEditorSections } from '@/lib/portfolioEditorUtils';
@@ -583,6 +584,14 @@ const PortfolioEditorPage = () => {
         <PortfolioFontSelector
           selectedFontPair={portfolio.font_pair || 'sf-pro'}
           onFontPairChange={(fontPair) => handleFieldChange('font_pair', fontPair)}
+        />
+
+        {/* Styling Selector Component */}
+        <PortfolioStylingSelector
+          cardShadows={portfolio.card_shadows ?? true}
+          imageFrames={portfolio.image_frames ?? true}
+          animations={portfolio.animations ?? true}
+          onStylingChange={(setting, value) => handleFieldChange(setting === 'cardShadows' ? 'card_shadows' : setting === 'imageFrames' ? 'image_frames' : 'animations', value)}
         />
 
         {/* Section Manager Component */}
