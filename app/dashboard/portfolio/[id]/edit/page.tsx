@@ -35,6 +35,7 @@ import PortfolioBottomAudioPlayer from '@/components/portfolio/PortfolioBottomAu
 import { Switch } from '@/components/ui/switch';
 import SponsorsForm from '@/components/portfolio/SponsorsForm';
 import SubscribeForm from '@/components/portfolio/SubscribeForm';
+import PostMeForm from '@/components/portfolio/PostMeForm';
 
 const NAVBAR_HEIGHT = 56;
 const SIDEBAR_MIN_WIDTH = 220;
@@ -1405,6 +1406,10 @@ const PortfolioEditorPage = () => {
 
                       {key === 'subscribe' && (
                         <SubscribeForm portfolio={portfolio} onFieldChange={handleFieldChange} />
+                      )}
+
+                      {key === 'post_me' && (
+                        <PostMeForm portfolio={portfolio} onFieldChange={handleFieldChange} theme={selectedTheme} />
                       )}
 
                       {key === 'contact' && (

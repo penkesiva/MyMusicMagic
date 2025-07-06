@@ -17,6 +17,7 @@ import PortfolioKeyProjectsDisplay from './PortfolioKeyProjectsDisplay';
 import PortfolioTestimonialsDisplay from './PortfolioTestimonialsDisplay';
 import SponsorsDisplay from './SponsorsDisplay';
 import SubscribeDisplay from './SubscribeDisplay';
+import PostMeDisplay from './PostMeDisplay';
 
 // Add other imports as needed (skills, hobbies, etc.)
 
@@ -253,6 +254,9 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
             )}
             {key === 'subscribe' && (
               <SubscribeDisplay portfolio={portfolio} theme={theme} />
+            )}
+            {key === 'post_me' && (
+              <PostMeDisplay portfolio={portfolio} theme={theme} />
             )}
             {/* Add other sections with custom titles */}
             {key === 'key_projects' && (

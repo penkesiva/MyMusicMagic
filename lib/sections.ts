@@ -197,6 +197,25 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
             subscribe_button_text: 'text'
         }
     },
+    post_me: {
+        key: 'post_me',
+        defaultName: 'Post Me',
+        defaultOrder: 11,
+        enabled: false,
+        defaultEnabled: false,
+        hasCustomTitle: true,
+        fields: {
+            post_me_title: 'text',
+            post_me_subtitle: 'text',
+            post_me_email_placeholder: 'text',
+            post_me_message_placeholder: 'text',
+            post_me_button_text: 'text',
+            post_me_success_message: 'text',
+            post_me_error_message: 'text',
+            post_me_email: 'text',
+            post_me_message: 'textarea'
+        }
+    },
     footer: {
         key: 'footer',
         defaultName: 'Footer',

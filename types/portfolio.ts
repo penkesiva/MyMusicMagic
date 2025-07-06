@@ -100,4 +100,15 @@ export type Portfolio = {
   // Layout editor data (added dynamically)
   tracks?: any[]; // Track data for layout calculations
   gallery?: any[]; // Gallery data for layout calculations
+
+  // Post Me Section
+  post_me_title: string | null;
+  post_me_subtitle: string | null;
+  post_me_email_placeholder: string | null;
+  post_me_message_placeholder: string | null;
+  post_me_button_text: string | null;
+  post_me_success_message: string | null;
+  post_me_error_message: string | null;
+  post_me_email: string | null;
+  post_me_message: string | null;
 }; 
