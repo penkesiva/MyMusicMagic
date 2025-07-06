@@ -11,12 +11,16 @@ export interface PortfolioTheme {
     accent: string;
   };
   previewColor: string;
+  isGradient?: boolean;
+  gradientColors?: [string, string]; // [startColor, endColor]
 }
 
 export const THEMES = [
   {
     name: 'Music Maestro',
     previewColor: '#a78bfa', // purple-400
+    isGradient: true,
+    gradientColors: ['#581c87', '#7c3aed'], // purple-950 to purple-600
     colors: {
       background: 'bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900',
       text: 'text-purple-100',
@@ -31,6 +35,8 @@ export const THEMES = [
   {
     name: 'Photo Gallery',
     previewColor: '#f87171', // red-400
+    isGradient: true,
+    gradientColors: ['#7f1d1d', '#dc2626'], // red-950 to red-600
     colors: {
       background: 'bg-gradient-to-br from-red-950 via-red-900 to-red-800',
       text: 'text-red-100',
@@ -43,8 +49,25 @@ export const THEMES = [
     }
   },
   {
+    name: 'Ocean Blue',
+    previewColor: '#1e40af', // blue-800
+    isGradient: true,
+    gradientColors: ['#1e3a8a', '#3b82f6'], // blue-950 to blue-500
+    colors: {
+      background: 'bg-gradient-to-br from-blue-950 via-indigo-950 to-blue-900',
+      text: 'text-blue-100',
+      primary: 'text-blue-400',
+      primaryStrong: 'text-blue-300',
+      card: 'bg-blue-900/50 backdrop-blur-sm border border-blue-800/50',
+      cardText: 'text-blue-200',
+      heading: 'text-white',
+      accent: 'text-blue-500'
+    }
+  },
+  {
     name: 'Midnight Dusk',
     previewColor: '#60a5fa', // blue-400
+    isGradient: false,
     colors: {
       background: 'bg-gray-900',
       text: 'text-gray-300',
@@ -57,22 +80,9 @@ export const THEMES = [
     }
   },
   {
-    name: 'Ocean Blue',
-    previewColor: '#38bdf8', // sky-400
-    colors: {
-      background: 'bg-slate-900',
-      text: 'text-slate-300',
-      primary: 'text-sky-400',
-      primaryStrong: 'text-sky-300',
-      card: 'bg-slate-800',
-      cardText: 'text-slate-300',
-      heading: 'text-white',
-      accent: 'text-sky-500'
-    }
-  },
-  {
     name: 'Sunset Rose',
     previewColor: '#fb7185', // rose-400
+    isGradient: false,
     colors: {
       background: 'bg-rose-950',
       text: 'text-rose-100',
@@ -87,6 +97,7 @@ export const THEMES = [
   {
     name: 'Royal Purple',
     previewColor: '#a78bfa', // violet-400
+    isGradient: false,
     colors: {
       background: 'bg-violet-950',
       text: 'text-violet-100',
@@ -101,6 +112,7 @@ export const THEMES = [
   {
     name: 'Golden Hour',
     previewColor: '#fbbf24', // amber-400
+    isGradient: false,
     colors: {
       background: 'bg-amber-950',
       text: 'text-amber-100',
@@ -115,6 +127,7 @@ export const THEMES = [
   {
     name: 'Emerald Forest',
     previewColor: '#2dd4bf', // teal-400
+    isGradient: false,
     colors: {
       background: 'bg-teal-950',
       text: 'text-teal-100',
@@ -129,6 +142,7 @@ export const THEMES = [
   {
     name: 'Lime Fresh',
     previewColor: '#a3e635', // lime-400
+    isGradient: false,
     colors: {
       background: 'bg-lime-950',
       text: 'text-lime-100',
@@ -143,6 +157,7 @@ export const THEMES = [
   {
     name: 'Classic Gray',
     previewColor: '#f3f4f6', // gray-200
+    isGradient: false,
     colors: {
       background: 'bg-gray-800',
       text: 'text-gray-200',
@@ -157,6 +172,7 @@ export const THEMES = [
   {
     name: 'Stone Elegance',
     previewColor: '#d6d3d1', // stone-300
+    isGradient: false,
     colors: {
       background: 'bg-stone-900',
       text: 'text-stone-300',

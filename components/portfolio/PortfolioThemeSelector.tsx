@@ -34,6 +34,10 @@ export default function PortfolioThemeSelector({
     setClickedTheme(themeName);
   };
 
+  // Separate gradient and solid themes
+  const gradientThemes = THEMES.filter(t => t.isGradient);
+  const solidThemes = THEMES.filter(t => !t.isGradient);
+
   return (
     <div className="space-y-2 relative">
       <button 
@@ -44,22 +48,54 @@ export default function PortfolioThemeSelector({
         <ChevronDown className={`w-4 h-4 transition-transform ${colorThemeOpen ? 'rotate-180' : ''}`} />
       </button>
       {colorThemeOpen && (
-        <div className="flex gap-1 flex-wrap">
-          {THEMES.map((themeOption) => (
-            <button
-              key={themeOption.name}
-              onClick={() => handleThemeClick(themeOption.name)}
-              className={`rounded-full transition-all focus:outline-none`}
-              style={{
-                width: 22,
-                height: 22,
-                background: themeOption.previewColor,
-                border: theme.name === themeOption.name ? '2px solid #fff' : '1px solid #444',
-                margin: 1,
-              }}
-              title={themeOption.name}
-            />
-          ))}
+        <div className="space-y-3">
+          {/* Gradient Themes */}
+          <div>
+            <div className="text-xs text-gray-400 mb-2 px-1">Gradients</div>
+            <div className="grid grid-cols-4 gap-0.5 p-1">
+              {gradientThemes.map((themeOption) => (
+                <button
+                  key={themeOption.name}
+                  onClick={() => handleThemeClick(themeOption.name)}
+                  className={`aspect-square w-8 h-8 transition-all duration-200 focus:outline-none rounded-md ${
+                    theme.name === themeOption.name 
+                      ? 'ring-2 ring-white ring-offset-1 ring-offset-gray-800' 
+                      : 'hover:scale-105'
+                  }`}
+                  style={{
+                    background: themeOption.gradientColors 
+                      ? `linear-gradient(135deg, ${themeOption.gradientColors[0]} 0%, ${themeOption.gradientColors[1]} 100%)`
+                      : themeOption.previewColor,
+                    border: theme.name === themeOption.name ? '2px solid #fff' : '1px solid rgba(255,255,255,0.1)',
+                  }}
+                  title={themeOption.name}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Solid Themes */}
+          <div>
+            <div className="text-xs text-gray-400 mb-2 px-1">Solid</div>
+            <div className="grid grid-cols-4 gap-0.5 p-1">
+              {solidThemes.map((themeOption) => (
+                <button
+                  key={themeOption.name}
+                  onClick={() => handleThemeClick(themeOption.name)}
+                  className={`aspect-square w-8 h-8 transition-all duration-200 focus:outline-none rounded-md ${
+                    theme.name === themeOption.name 
+                      ? 'ring-2 ring-white ring-offset-1 ring-offset-gray-800' 
+                      : 'hover:scale-105'
+                  }`}
+                  style={{
+                    background: themeOption.previewColor,
+                    border: theme.name === themeOption.name ? '2px solid #fff' : '1px solid rgba(255,255,255,0.1)',
+                  }}
+                  title={themeOption.name}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
       
