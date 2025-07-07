@@ -111,6 +111,14 @@ const PortfolioEditorPage = () => {
   const [showBottomAudioPlayer, setShowBottomAudioPlayer] = useState(false);
   const [showUrlInfo, setShowUrlInfo] = useState(false);
   const urlInfoRef = useRef<HTMLDivElement>(null);
+  const [showUrlSuggestions, setShowUrlSuggestions] = useState<{ [key: number]: boolean }>({});
+  const [urlSuggestions, setUrlSuggestions] = useState<{ [key: number]: string[] }>({});
+
+  // Available sections for auto-complete
+  const availableSections = [
+    'about', 'tracks', 'gallery', 'contact', 'resume', 'key_projects', 
+    'testimonials', 'blog', 'status', 'subscribe', 'post_me', 'sponsors', 'press'
+  ];
 
   const supabase = useMemo(() => createClient(), []);
   const fileUploader = useMemo(() => new PortfolioFileUploader(), []);
@@ -527,6 +535,69 @@ const PortfolioEditorPage = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showUrlInfo]);
+
+  // Handle URL input with auto-complete
+  const handleUrlInput = (index: number, value: string) => {
+    if (!portfolio) return;
+    
+    const buttons = safeGetArray(portfolio.hero_cta_buttons);
+    buttons[index] = { ...buttons[index], link: value };
+    handleFieldChange('hero_cta_buttons', buttons);
+
+    // Show suggestions if typing # followed by text
+    if (value.startsWith('#') && value.length > 1) {
+      const searchTerm = value.substring(1).toLowerCase();
+      const filteredSections = availableSections.filter(section => 
+        section.toLowerCase().includes(searchTerm)
+      );
+      
+      if (filteredSections.length > 0) {
+        setUrlSuggestions(prev => ({ ...prev, [index]: filteredSections }));
+        setShowUrlSuggestions(prev => ({ ...prev, [index]: true }));
+      } else {
+        setShowUrlSuggestions(prev => ({ ...prev, [index]: false }));
+      }
+    } else {
+      setShowUrlSuggestions(prev => ({ ...prev, [index]: false }));
+    }
+  };
+
+  // Handle suggestion selection
+  const selectSuggestion = (index: number, suggestion: string) => {
+    if (!portfolio) return;
+    
+    const buttons = safeGetArray(portfolio.hero_cta_buttons);
+    buttons[index] = { ...buttons[index], link: `#${suggestion}` };
+    handleFieldChange('hero_cta_buttons', buttons);
+    setShowUrlSuggestions(prev => ({ ...prev, [index]: false }));
+  };
+
+  // Handle clicking outside suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const suggestionBoxes = document.querySelectorAll('[data-suggestion-box]');
+      
+      let clickedInside = false;
+      suggestionBoxes.forEach(box => {
+        if (box.contains(target)) {
+          clickedInside = true;
+        }
+      });
+
+      if (!clickedInside) {
+        setShowUrlSuggestions({});
+      }
+    };
+
+    if (Object.values(showUrlSuggestions).some(Boolean)) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUrlSuggestions]);
 
   const getSectionIcon = (sectionKey: string) => {
     const IconComponent = SECTION_ICONS[sectionKey];
@@ -1004,17 +1075,29 @@ const PortfolioEditorPage = () => {
                                        button.link?.startsWith('mailto:') ? 'Email link' :
                                        button.link?.startsWith('tel:') ? 'Phone link' : 'URL or section'}
                                     </p>
-                                    <Input
-                                      type="url"
-                                      value={button.link || ''}
-                                      onChange={(e) => {
-                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                        buttons[index] = { ...button, link: e.target.value };
-                                        handleFieldChange('hero_cta_buttons', buttons);
-                                      }}
-                                      placeholder="e.g., #resume, https://..."
-                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                    />
+                                    <div className="relative">
+                                      <Input
+                                        type="text"
+                                        value={button.link || ''}
+                                        onChange={(e) => handleUrlInput(index, e.target.value)}
+                                        onFocus={() => setShowUrlSuggestions(prev => ({ ...prev, [index]: true }))}
+                                        placeholder="e.g., #resume, https://..."
+                                        className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                      />
+                                      {showUrlSuggestions[index] && (
+                                        <div className={`absolute z-10 w-full border border-white/20 rounded-md shadow-lg max-h-60 overflow-y-auto ${selectedTheme.colors.card}`} data-suggestion-box>
+                                          {urlSuggestions[index]?.map((suggestion, sIndex) => (
+                                            <div
+                                              key={sIndex}
+                                              className={`p-2 cursor-pointer hover:bg-white/10 ${selectedTheme.colors.text}`}
+                                              onClick={() => selectSuggestion(index, suggestion)}
+                                            >
+                                              #{suggestion}
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
                                   <div>
                                     <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-1`}>Button style</p>
