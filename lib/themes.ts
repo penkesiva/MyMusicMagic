@@ -65,123 +65,123 @@ export const THEMES = [
     }
   },
   {
-    name: 'Midnight Dusk',
-    previewColor: '#60a5fa', // blue-400
+    name: 'Midnight Dusk-light',
+    previewColor: '#2C3E50', // accent color
     isGradient: false,
     colors: {
-      background: 'bg-gray-900',
-      text: 'text-gray-300',
-      primary: 'text-blue-400',
-      primaryStrong: 'text-blue-300',
-      card: 'bg-gray-800',
-      cardText: 'text-gray-300',
-      heading: 'text-white',
-      accent: 'text-blue-500'
+      background: 'bg-[#F0F3F5]',
+      text: 'text-[#1A2025]',
+      primary: 'text-[#2C3E50]',
+      primaryStrong: 'text-[#243240]',
+      card: 'bg-[#E1E6EB]',
+      cardText: 'text-[#5A636C]',
+      heading: 'text-[#1A2025]',
+      accent: 'text-[#2C3E50]'
     }
   },
   {
-    name: 'Sunset Rose',
-    previewColor: '#fb7185', // rose-400
+    name: 'Sunset Rose-light',
+    previewColor: '#E5989B', // accent color
     isGradient: false,
     colors: {
-      background: 'bg-rose-950',
-      text: 'text-rose-100',
-      primary: 'text-rose-400',
-      primaryStrong: 'text-rose-300',
-      card: 'bg-rose-900',
-      cardText: 'text-rose-200',
-      heading: 'text-white',
-      accent: 'text-rose-500'
+      background: 'bg-[#FFF2F2]',
+      text: 'text-[#3A2E2F]',
+      primary: 'text-[#E5989B]',
+      primaryStrong: 'text-[#CC7F81]',
+      card: 'bg-[#FFE6E6]',
+      cardText: 'text-[#7D6A6C]',
+      heading: 'text-[#3A2E2F]',
+      accent: 'text-[#E5989B]'
     }
   },
   {
-    name: 'Royal Purple',
-    previewColor: '#a78bfa', // violet-400
+    name: 'Royal Purple-light',
+    previewColor: '#6A0DAD', // accent color
     isGradient: false,
     colors: {
-      background: 'bg-violet-950',
-      text: 'text-violet-100',
-      primary: 'text-violet-400',
-      primaryStrong: 'text-violet-300',
-      card: 'bg-violet-900',
-      cardText: 'text-violet-200',
-      heading: 'text-white',
-      accent: 'text-violet-500'
+      background: 'bg-[#F5F0FA]',
+      text: 'text-[#2F1D3E]',
+      primary: 'text-[#6A0DAD]',
+      primaryStrong: 'text-[#590BA0]',
+      card: 'bg-[#E9E1F5]',
+      cardText: 'text-[#77618A]',
+      heading: 'text-[#2F1D3E]',
+      accent: 'text-[#6A0DAD]'
     }
   },
   {
-    name: 'Golden Hour',
-    previewColor: '#fbbf24', // amber-400
+    name: 'Golden Hour-light',
+    previewColor: '#F1C40F', // accent color
     isGradient: false,
     colors: {
-      background: 'bg-amber-950',
-      text: 'text-amber-100',
-      primary: 'text-amber-400',
-      primaryStrong: 'text-amber-300',
-      card: 'bg-amber-900',
-      cardText: 'text-amber-200',
-      heading: 'text-white',
-      accent: 'text-amber-500'
+      background: 'bg-[#FFFBEA]',
+      text: 'text-[#3A3300]',
+      primary: 'text-[#F1C40F]',
+      primaryStrong: 'text-[#D4AC0D]',
+      card: 'bg-[#FFF8D1]',
+      cardText: 'text-[#7D7200]',
+      heading: 'text-[#3A3300]',
+      accent: 'text-[#F1C40F]'
     }
   },
   {
-    name: 'Emerald Forest',
-    previewColor: '#2dd4bf', // teal-400
+    name: 'Emerald Forest-light',
+    previewColor: '#2E8B57', // accent color
     isGradient: false,
     colors: {
-      background: 'bg-teal-950',
-      text: 'text-teal-100',
-      primary: 'text-teal-400',
-      primaryStrong: 'text-teal-300',
-      card: 'bg-teal-900',
-      cardText: 'text-teal-200',
-      heading: 'text-white',
-      accent: 'text-teal-500'
+      background: 'bg-[#EDF8F1]',
+      text: 'text-[#193522]',
+      primary: 'text-[#2E8B57]',
+      primaryStrong: 'text-[#277046]',
+      card: 'bg-[#DBF2E3]',
+      cardText: 'text-[#5A755F]',
+      heading: 'text-[#193522]',
+      accent: 'text-[#2E8B57]'
     }
   },
   {
-    name: 'Lime Fresh',
-    previewColor: '#a3e635', // lime-400
+    name: 'Lime Fresh-light',
+    previewColor: '#A4C639', // accent color
     isGradient: false,
     colors: {
-      background: 'bg-lime-950',
-      text: 'text-lime-100',
-      primary: 'text-lime-400',
-      primaryStrong: 'text-lime-300',
-      card: 'bg-lime-900',
-      cardText: 'text-lime-200',
-      heading: 'text-white',
-      accent: 'text-lime-500'
+      background: 'bg-[#F7FAE8]',
+      text: 'text-[#3A3D16]',
+      primary: 'text-[#A4C639]',
+      primaryStrong: 'text-[#8EAF34]',
+      card: 'bg-[#EEF5D1]',
+      cardText: 'text-[#767A4A]',
+      heading: 'text-[#3A3D16]',
+      accent: 'text-[#A4C639]'
     }
   },
   {
-    name: 'Classic Gray',
-    previewColor: '#f3f4f6', // gray-200
+    name: 'Classic Gray-light',
+    previewColor: '#7F8C8D', // accent color
     isGradient: false,
     colors: {
-      background: 'bg-gray-800',
-      text: 'text-gray-200',
-      primary: 'text-white',
-      primaryStrong: 'text-white',
-      card: 'bg-gray-700',
-      cardText: 'text-gray-200',
-      heading: 'text-white',
-      accent: 'text-gray-400'
+      background: 'bg-[#F5F7F7]',
+      text: 'text-[#2C3A3B]',
+      primary: 'text-[#7F8C8D]',
+      primaryStrong: 'text-[#6B7A7B]',
+      card: 'bg-[#EBEFF0]',
+      cardText: 'text-[#5A696A]',
+      heading: 'text-[#2C3A3B]',
+      accent: 'text-[#7F8C8D]'
     }
   },
   {
-    name: 'Stone Elegance',
-    previewColor: '#d6d3d1', // stone-300
+    name: 'Stone Elegance-light',
+    previewColor: '#95A5A6', // accent color
     isGradient: false,
     colors: {
-      background: 'bg-stone-900',
-      text: 'text-stone-300',
-      primary: 'text-stone-100',
-      primaryStrong: 'text-white',
-      card: 'bg-stone-800',
-      cardText: 'text-stone-300',
-      heading: 'text-white',
-      accent: 'text-stone-400'
+      background: 'bg-[#F2F4F4]',
+      text: 'text-[#2B3334]',
+      primary: 'text-[#95A5A6]',
+      primaryStrong: 'text-[#7D8C8D]',
+      card: 'bg-[#E6EAEB]',
+      cardText: 'text-[#5D6A6B]',
+      heading: 'text-[#2B3334]',
+      accent: 'text-[#95A5A6]'
     }
   },
   {
