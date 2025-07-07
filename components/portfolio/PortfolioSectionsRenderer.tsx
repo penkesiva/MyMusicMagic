@@ -153,7 +153,28 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                       {portfolio.hero_subtitle}
                     </p>
                   )}
-                  {/* Add CTA buttons if needed */}
+                  {/* CTA Buttons */}
+                  {safeGetArray(portfolio.hero_cta_buttons).length > 0 && (
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                      {safeGetArray(portfolio.hero_cta_buttons).map((button: any, index: number) => (
+                        <a
+                          key={index}
+                          href={button.link || '#'}
+                          target={button.link?.startsWith('http') ? '_blank' : undefined}
+                          rel={button.link?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className={`inline-flex items-center px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 hover:scale-105 ${
+                            button.style === 'primary' 
+                              ? `${theme.colors.button} ${theme.colors.buttonText} ${theme.colors.buttonHover}`
+                              : button.style === 'secondary'
+                              ? `bg-white/10 border border-white/20 text-white hover:bg-white/20`
+                              : `border-2 ${theme.colors.buttonBorder} ${theme.colors.buttonText} hover:${theme.colors.button}`
+                          }`}
+                        >
+                          {button.text}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

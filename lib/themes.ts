@@ -9,6 +9,10 @@ export interface PortfolioTheme {
     cardText: string;
     heading: string;
     accent: string;
+    button: string;
+    buttonText: string;
+    buttonHover: string;
+    buttonBorder: string;
   };
   previewColor: string;
   isGradient?: boolean;
@@ -29,7 +33,11 @@ export const THEMES = [
       card: 'bg-purple-900/50 backdrop-blur-sm border border-purple-800/50',
       cardText: 'text-purple-200',
       heading: 'text-white',
-      accent: 'text-amber-400'
+      accent: 'text-amber-400',
+      button: 'bg-purple-600 hover:bg-purple-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-purple-700',
+      buttonBorder: 'border-purple-600'
     }
   },
   {
@@ -45,7 +53,11 @@ export const THEMES = [
       card: 'bg-red-900/50 backdrop-blur-sm border border-red-800/50',
       cardText: 'text-red-200',
       heading: 'text-white',
-      accent: 'text-amber-400'
+      accent: 'text-amber-400',
+      button: 'bg-red-600 hover:bg-red-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-red-700',
+      buttonBorder: 'border-red-600'
     }
   },
   {
@@ -61,7 +73,11 @@ export const THEMES = [
       card: 'bg-blue-900/50 backdrop-blur-sm border border-blue-800/50',
       cardText: 'text-blue-200',
       heading: 'text-white',
-      accent: 'text-blue-500'
+      accent: 'text-blue-500',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-blue-700',
+      buttonBorder: 'border-blue-600'
     }
   },
   {
@@ -76,7 +92,11 @@ export const THEMES = [
       card: 'bg-[#E1E6EB]',
       cardText: 'text-[#5A636C]',
       heading: 'text-[#1A2025]',
-      accent: 'text-[#2C3E50]'
+      accent: 'text-[#2C3E50]',
+      button: 'bg-gray-600 hover:bg-gray-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-gray-700',
+      buttonBorder: 'border-gray-600'
     }
   },
   {
@@ -91,7 +111,11 @@ export const THEMES = [
       card: 'bg-[#232E35]',
       cardText: 'text-[#A0A8AD]',
       heading: 'text-[#ECEFF1]',
-      accent: 'text-[#2C3E50]'
+      accent: 'text-[#2C3E50]',
+      button: 'bg-gray-600 hover:bg-gray-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-gray-700',
+      buttonBorder: 'border-gray-600'
     }
   },
   {
@@ -106,7 +130,11 @@ export const THEMES = [
       card: 'bg-[#FFE6E6]',
       cardText: 'text-[#7D6A6C]',
       heading: 'text-[#3A2E2F]',
-      accent: 'text-[#E5989B]'
+      accent: 'text-[#E5989B]',
+      button: 'bg-red-600 hover:bg-red-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-red-700',
+      buttonBorder: 'border-red-600'
     }
   },
   {
@@ -121,7 +149,11 @@ export const THEMES = [
       card: 'bg-[#4A3B3C]',
       cardText: 'text-[#B7A9AB]',
       heading: 'text-[#F2EDED]',
-      accent: 'text-[#E5989B]'
+      accent: 'text-[#E5989B]',
+      button: 'bg-red-600 hover:bg-red-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-red-700',
+      buttonBorder: 'border-red-600'
     }
   },
   {
@@ -136,7 +168,11 @@ export const THEMES = [
       card: 'bg-[#E9E1F5]',
       cardText: 'text-[#77618A]',
       heading: 'text-[#2F1D3E]',
-      accent: 'text-[#6A0DAD]'
+      accent: 'text-[#6A0DAD]',
+      button: 'bg-purple-600 hover:bg-purple-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-purple-700',
+      buttonBorder: 'border-purple-600'
     }
   },
   {
@@ -151,7 +187,11 @@ export const THEMES = [
       card: 'bg-[#3C2A53]',
       cardText: 'text-[#9A87A8]',
       heading: 'text-[#F1EEFB]',
-      accent: 'text-[#6A0DAD]'
+      accent: 'text-[#6A0DAD]',
+      button: 'bg-purple-600 hover:bg-purple-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-purple-700',
+      buttonBorder: 'border-purple-600'
     }
   },
   {
@@ -166,7 +206,11 @@ export const THEMES = [
       card: 'bg-[#FFF8D1]',
       cardText: 'text-[#7D7200]',
       heading: 'text-[#3A3300]',
-      accent: 'text-[#F1C40F]'
+      accent: 'text-[#F1C40F]',
+      button: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-yellow-700',
+      buttonBorder: 'border-yellow-600'
     }
   },
   {
@@ -181,7 +225,11 @@ export const THEMES = [
       card: 'bg-[#4A3F0A]',
       cardText: 'text-[#BFAF6A]',
       heading: 'text-[#FEF9E6]',
-      accent: 'text-[#F1C40F]'
+      accent: 'text-[#F1C40F]',
+      button: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-yellow-700',
+      buttonBorder: 'border-yellow-600'
     }
   },
   {
@@ -196,7 +244,11 @@ export const THEMES = [
       card: 'bg-[#DBF2E3]',
       cardText: 'text-[#5A755F]',
       heading: 'text-[#193522]',
-      accent: 'text-[#2E8B57]'
+      accent: 'text-[#2E8B57]',
+      button: 'bg-green-600 hover:bg-green-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-green-700',
+      buttonBorder: 'border-green-600'
     }
   },
   {
@@ -211,7 +263,11 @@ export const THEMES = [
       card: 'bg-[#214231]',
       cardText: 'text-[#7A8C84]',
       heading: 'text-[#E9F3EC]',
-      accent: 'text-[#2E8B57]'
+      accent: 'text-[#2E8B57]',
+      button: 'bg-green-600 hover:bg-green-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-green-700',
+      buttonBorder: 'border-green-600'
     }
   },
   {
@@ -226,7 +282,11 @@ export const THEMES = [
       card: 'bg-[#EEF5D1]',
       cardText: 'text-[#767A4A]',
       heading: 'text-[#3A3D16]',
-      accent: 'text-[#A4C639]'
+      accent: 'text-[#A4C639]',
+      button: 'bg-green-600 hover:bg-green-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-green-700',
+      buttonBorder: 'border-green-600'
     }
   },
   {
@@ -241,7 +301,11 @@ export const THEMES = [
       card: 'bg-[#4B501D]',
       cardText: 'text-[#9FA275]',
       heading: 'text-[#F2F5E8]',
-      accent: 'text-[#A4C639]'
+      accent: 'text-[#A4C639]',
+      button: 'bg-green-600 hover:bg-green-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-green-700',
+      buttonBorder: 'border-green-600'
     }
   },
   {
@@ -256,7 +320,11 @@ export const THEMES = [
       card: 'bg-[#EBEFF0]',
       cardText: 'text-[#5A696A]',
       heading: 'text-[#2C3A3B]',
-      accent: 'text-[#7F8C8D]'
+      accent: 'text-[#7F8C8D]',
+      button: 'bg-gray-600 hover:bg-gray-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-gray-700',
+      buttonBorder: 'border-gray-600'
     }
   },
   {
@@ -271,7 +339,11 @@ export const THEMES = [
       card: 'bg-[#354445]',
       cardText: 'text-[#8A9A9B]',
       heading: 'text-[#E7ECEC]',
-      accent: 'text-[#7F8C8D]'
+      accent: 'text-[#7F8C8D]',
+      button: 'bg-gray-600 hover:bg-gray-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-gray-700',
+      buttonBorder: 'border-gray-600'
     }
   },
   {
@@ -286,7 +358,11 @@ export const THEMES = [
       card: 'bg-[#E6EAEB]',
       cardText: 'text-[#5D6A6B]',
       heading: 'text-[#2B3334]',
-      accent: 'text-[#95A5A6]'
+      accent: 'text-[#95A5A6]',
+      button: 'bg-gray-600 hover:bg-gray-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-gray-700',
+      buttonBorder: 'border-gray-600'
     }
   },
   {
@@ -301,7 +377,11 @@ export const THEMES = [
       card: 'bg-[#344041]',
       cardText: 'text-[#738183]',
       heading: 'text-[#EDEFF0]',
-      accent: 'text-[#95A5A6]'
+      accent: 'text-[#95A5A6]',
+      button: 'bg-gray-600 hover:bg-gray-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-gray-700',
+      buttonBorder: 'border-gray-600'
     }
   },
   {
@@ -316,7 +396,11 @@ export const THEMES = [
       card: 'bg-[#0A2747]',
       cardText: 'text-[#B0B8C1]',
       heading: 'text-white',
-      accent: 'text-[#FF6F61]'
+      accent: 'text-[#FF6F61]',
+      button: 'bg-red-600 hover:bg-red-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-red-700',
+      buttonBorder: 'border-red-600'
     }
   },
   {
@@ -331,7 +415,11 @@ export const THEMES = [
       card: 'bg-[#F0F8F8]',
       cardText: 'text-[#7A7A7A]',
       heading: 'text-[#333333]',
-      accent: 'text-[#008080]'
+      accent: 'text-[#008080]',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-blue-700',
+      buttonBorder: 'border-blue-600'
     }
   },
   {
@@ -346,7 +434,11 @@ export const THEMES = [
       card: 'bg-[#FFFFFF]',
       cardText: 'text-[#6E6E6E]',
       heading: 'text-[#2E2E2E]',
-      accent: 'text-[#D4A32A]'
+      accent: 'text-[#D4A32A]',
+      button: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-yellow-700',
+      buttonBorder: 'border-yellow-600'
     }
   },
   {
@@ -361,7 +453,11 @@ export const THEMES = [
       card: 'bg-[#1A1A1A]',
       cardText: 'text-[#8A8A8A]',
       heading: 'text-[#E0E0E0]',
-      accent: 'text-[#A4C639]'
+      accent: 'text-[#A4C639]',
+      button: 'bg-green-600 hover:bg-green-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-green-700',
+      buttonBorder: 'border-green-600'
     }
   },
   {
@@ -376,7 +472,11 @@ export const THEMES = [
       card: 'bg-[#F2F8FF]',
       cardText: 'text-[#666666]',
       heading: 'text-[#1A1A1A]',
-      accent: 'text-[#007BFF]'
+      accent: 'text-[#007BFF]',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-blue-700',
+      buttonBorder: 'border-blue-600'
     }
   },
   {
@@ -391,7 +491,11 @@ export const THEMES = [
       card: 'bg-[#354B5E]',
       cardText: 'text-[#B0BEC5]',
       heading: 'text-[#ECF0F1]',
-      accent: 'text-[#F1C40F]'
+      accent: 'text-[#F1C40F]',
+      button: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-yellow-700',
+      buttonBorder: 'border-yellow-600'
     }
   },
   {
@@ -406,7 +510,11 @@ export const THEMES = [
       card: 'bg-[#FFF4EC]',
       cardText: 'text-[#8C8C8C]',
       heading: 'text-[#4A4A4A]',
-      accent: 'text-[#E5989B]'
+      accent: 'text-[#E5989B]',
+      button: 'bg-red-600 hover:bg-red-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-red-700',
+      buttonBorder: 'border-red-600'
     }
   },
   {
@@ -421,7 +529,11 @@ export const THEMES = [
       card: 'bg-[#0A7A83]',
       cardText: 'text-[#CED4D6]',
       heading: 'text-[#FAF9F9]',
-      accent: 'text-[#FF8C94]'
+      accent: 'text-[#FF8C94]',
+      button: 'bg-red-600 hover:bg-red-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-red-700',
+      buttonBorder: 'border-red-600'
     }
   },
   {
@@ -436,7 +548,11 @@ export const THEMES = [
       card: 'bg-[#D1EBE9]',
       cardText: 'text-[#546C72]',
       heading: 'text-[#263238]',
-      accent: 'text-[#FF6B6B]'
+      accent: 'text-[#FF6B6B]',
+      button: 'bg-red-600 hover:bg-red-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-red-700',
+      buttonBorder: 'border-red-600'
     }
   },
   {
@@ -451,7 +567,11 @@ export const THEMES = [
       card: 'bg-[#F5F0FA]',
       cardText: 'text-[#777777]',
       heading: 'text-[#333333]',
-      accent: 'text-[#9B59B6]'
+      accent: 'text-[#9B59B6]',
+      button: 'bg-purple-600 hover:bg-purple-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-purple-700',
+      buttonBorder: 'border-purple-600'
     }
   }
 ]; 
