@@ -722,7 +722,7 @@ export default function DashboardPage() {
                       </div>
                       <p className="text-sm text-gray-400 mb-4">/{p.slug}</p>
                       <p className="text-gray-400 text-sm truncate">
-                        {p.subtitle || 'No description provided'}
+                        {p.theme_name ? `${p.theme_name} Theme` : 'Default Theme'}
                       </p>
                       <div className="mt-4 flex gap-2">
                         <Button
