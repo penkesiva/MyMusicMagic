@@ -40,7 +40,7 @@ export default function PortfolioThemeSelector({
           {/* Gradient Themes */}
           <div>
             <div className="text-xs text-gray-400 mb-2 px-1">Gradients</div>
-            <div className="grid grid-cols-4 gap-0.5 p-1">
+            <div className="grid grid-cols-6 gap-1 p-1">
               {gradientThemes.map((themeOption) => (
                 <button
                   key={themeOption.name}
@@ -65,7 +65,7 @@ export default function PortfolioThemeSelector({
           {/* Solid Themes */}
           <div>
             <div className="text-xs text-gray-400 mb-2 px-1">Solid</div>
-            <div className="grid grid-cols-4 gap-0.5 p-1">
+            <div className="grid grid-cols-6 gap-1 p-1">
               {solidThemes.map((themeOption) => (
                 <button
                   key={themeOption.name}
