@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useDebouncedCallback } from "use-debounce";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check, Home, User, Music, ImageIcon, Briefcase, MessageSquare, Newspaper, Contact, Settings, Heart, Code, GraduationCap, Camera, Video, Mic, Headphones, Palette, Globe, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Github, Youtube, ExternalLink as ExternalLinkIcon, Award
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check, Home, User, Music, ImageIcon, Briefcase, MessageSquare, Newspaper, Contact, Settings, Heart, Code, GraduationCap, Camera, Video, Mic, Headphones, Palette, Globe, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Github, Youtube, ExternalLink as ExternalLinkIcon, Award, Info
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -109,6 +109,8 @@ const PortfolioEditorPage = () => {
   const [tracksRefreshKey, setTracksRefreshKey] = useState(0);
   const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
   const [showBottomAudioPlayer, setShowBottomAudioPlayer] = useState(false);
+  const [showUrlInfo, setShowUrlInfo] = useState(false);
+  const urlInfoRef = useRef<HTMLDivElement>(null);
 
   const supabase = useMemo(() => createClient(), []);
   const fileUploader = useMemo(() => new PortfolioFileUploader(), []);
@@ -500,6 +502,36 @@ const PortfolioEditorPage = () => {
     setEditingGalleryItem(item)
     setShowEditGalleryForm(true)
   }
+
+  // Handle clicking outside the URL info popup
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const button = document.querySelector('[data-url-info-button]');
+      
+      // Don't close if clicking on the button itself
+      if (button && button.contains(target)) {
+        return;
+      }
+      
+      if (urlInfoRef.current && !urlInfoRef.current.contains(target)) {
+        setShowUrlInfo(false);
+      }
+    };
+
+    if (showUrlInfo) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUrlInfo]);
+
+  const getSectionIcon = (sectionKey: string) => {
+    const IconComponent = SECTION_ICONS[sectionKey];
+    return IconComponent ? <IconComponent className="w-5 h-5" /> : <Settings className="w-5 h-5" />;
+  };
 
   if (loading) {
     return (
@@ -893,62 +925,114 @@ const PortfolioEditorPage = () => {
                           {/* CTA Buttons Section */}
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
-                                Call-to-Action Buttons
-                              </label>
-                              <Button
-                                onClick={() => {
-                                  const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                  buttons.push({ text: '', link: '', style: 'primary', order: buttons.length + 1 });
-                                  handleFieldChange('hero_cta_buttons', buttons);
-                                }}
-                                variant="outline" size="sm"
-                                className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
-                              >
-                                <Plus className="h-4 w-4 mr-1" />
-                                Add Button
-                              </Button>
+                              <div>
+                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                  Call-to-Action Buttons
+                                </label>
+                                <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
+                                  Add buttons to guide visitors to important sections or external links
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  onClick={() => setShowUrlInfo(!showUrlInfo)}
+                                  variant="outline" size="sm"
+                                  className={`${
+                                    showUrlInfo 
+                                      ? 'bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30' 
+                                      : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                                  }`}
+                                  data-url-info-button
+                                >
+                                  <Info className="h-4 w-4 mr-1" />
+                                  {showUrlInfo ? 'Hide Examples' : 'Examples'}
+                                </Button>
+                                <Button
+                                  onClick={() => {
+                                    const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                    buttons.push({ text: '', link: '', style: 'primary', order: buttons.length + 1 });
+                                    handleFieldChange('hero_cta_buttons', buttons);
+                                  }}
+                                  variant="outline" size="sm"
+                                  className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                                >
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Add Button
+                                </Button>
+                              </div>
                             </div>
+                            
+                            {showUrlInfo && (
+                              <div ref={urlInfoRef} className="p-3 bg-blue-600/10 border border-blue-500/20 rounded-lg mt-2">
+                                <p className={`text-xs ${selectedTheme.colors.text} mb-2 font-medium`}>💡 URL Examples:</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                                  <div>
+                                    <span className={`${selectedTheme.colors.text} opacity-70`}>Internal sections:</span>
+                                    <div className={`${selectedTheme.colors.text} opacity-90`}>• #about, #tracks, #gallery, #contact</div>
+                                    <div className={`${selectedTheme.colors.text} opacity-90`}>• #resume, #key_projects, #testimonials</div>
+                                  </div>
+                                  <div>
+                                    <span className={`${selectedTheme.colors.text} opacity-70`}>External links:</span>
+                                    <div className={`${selectedTheme.colors.text} opacity-90`}>• https://example.com</div>
+                                    <div className={`${selectedTheme.colors.text} opacity-90`}>• mailto:email@example.com</div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                             
                             <div className="space-y-3">
                               {safeGetArray(portfolio.hero_cta_buttons).map((button: any, index: number) => (
                                 <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                                  <Input
-                                    type="text"
-                                    value={button.text || ''}
-                                    onChange={(e) => {
-                                      const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                      buttons[index] = { ...button, text: e.target.value };
-                                      handleFieldChange('hero_cta_buttons', buttons);
-                                    }}
-                                    placeholder="Button text"
-                                    className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                  />
-                                  <Input
-                                    type="url"
-                                    value={button.link || ''}
-                                    onChange={(e) => {
-                                      const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                      buttons[index] = { ...button, link: e.target.value };
-                                      handleFieldChange('hero_cta_buttons', buttons);
-                                    }}
-                                    placeholder="URL"
-                                    className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
-                                  />
-                                  <select
-                                    value={button.style || 'primary'}
-                                    onChange={(e) => {
-                                      const buttons = safeGetArray(portfolio.hero_cta_buttons);
-                                      buttons[index] = { ...button, style: e.target.value };
-                                      handleFieldChange('hero_cta_buttons', buttons);
-                                    }}
-                                    className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 rounded-md`}
-                                  >
-                                    <option value="primary">Primary</option>
-                                    <option value="secondary">Secondary</option>
-                                    <option value="outline">Outline</option>
-                                  </select>
-                                  <div className="flex gap-1">
+                                  <div>
+                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-1`}>Button text</p>
+                                    <Input
+                                      type="text"
+                                      value={button.text || ''}
+                                      onChange={(e) => {
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        buttons[index] = { ...button, text: e.target.value };
+                                        handleFieldChange('hero_cta_buttons', buttons);
+                                      }}
+                                      placeholder="e.g., View Resume, Contact Me"
+                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                  </div>
+                                  <div>
+                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-1`}>
+                                      {button.link?.startsWith('#') ? 'Internal section' : 
+                                       button.link?.startsWith('http') ? 'External link' : 
+                                       button.link?.startsWith('mailto:') ? 'Email link' :
+                                       button.link?.startsWith('tel:') ? 'Phone link' : 'URL or section'}
+                                    </p>
+                                    <Input
+                                      type="url"
+                                      value={button.link || ''}
+                                      onChange={(e) => {
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        buttons[index] = { ...button, link: e.target.value };
+                                        handleFieldChange('hero_cta_buttons', buttons);
+                                      }}
+                                      placeholder="e.g., #resume, https://..."
+                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                    />
+                                  </div>
+                                  <div>
+                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-1`}>Button style</p>
+                                    <select
+                                      value={button.style || 'primary'}
+                                      onChange={(e) => {
+                                        const buttons = safeGetArray(portfolio.hero_cta_buttons);
+                                        buttons[index] = { ...button, style: e.target.value };
+                                        handleFieldChange('hero_cta_buttons', buttons);
+                                      }}
+                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 rounded-md h-9 w-full`}
+                                    >
+                                      <option value="primary">Primary</option>
+                                      <option value="secondary">Secondary</option>
+                                      <option value="outline">Outline</option>
+                                    </select>
+                                  </div>
+                                  <div className="flex gap-1 items-end">
                                     <Button
                                       onClick={() => {
                                         const buttons = safeGetArray(portfolio.hero_cta_buttons);
@@ -958,7 +1042,7 @@ const PortfolioEditorPage = () => {
                                         }
                                       }}
                                       variant="outline" size="sm" disabled={index === 0}
-                                      className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
+                                      className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30 h-9"
                                     >
                                       ↑
                                     </Button>
@@ -971,7 +1055,7 @@ const PortfolioEditorPage = () => {
                                         }
                                       }}
                                       variant="outline" size="sm" disabled={index === safeGetArray(portfolio.hero_cta_buttons).length - 1}
-                                      className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
+                                      className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30 h-9"
                                     >
                                       ↓
                                     </Button>
@@ -982,7 +1066,7 @@ const PortfolioEditorPage = () => {
                                         handleFieldChange('hero_cta_buttons', buttons);
                                       }}
                                       variant="outline" size="sm"
-                                      className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                                      className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30 h-9"
                                     >
                                       <X className="h-4 w-4" />
                                     </Button>
