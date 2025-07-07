@@ -266,6 +266,59 @@ export default function DashboardPage() {
             contact_description: 'Ready to bring your vision to life? I\'m always excited to collaborate on new photography projects and capture those special moments that matter most.',
             footer_about_summary: 'Dedicated to capturing life\'s beautiful moments and creating visual stories that inspire and connect people across the world.'
           };
+        } else if (templateData.name === 'Academic Profile') {
+          defaultThemeName = 'Lime Fresh-light';
+          defaultSectionsConfig = {
+            hero: { enabled: true, name: 'Hero', order: 1 },
+            about: { enabled: true, name: 'About Me', order: 2 },
+            resume: { enabled: true, name: 'Resume', order: 3 },
+            key_projects: { enabled: true, name: 'Key Projects', order: 4 },
+            skills: { enabled: true, name: 'Skills and Tools', order: 5 },
+            hobbies: { enabled: true, name: 'Hobbies', order: 6 },
+            contact: { enabled: true, name: 'Contact Me', order: 7 },
+            blog: { enabled: true, name: 'Post Me', order: 8 },
+            status: { enabled: true, name: 'What I\'m working on', order: 9 },
+            footer: { enabled: true, name: 'Footer', order: 10 }
+          };
+          defaultContent = {
+            hero_title: 'Academic Portfolio',
+            hero_subtitle: 'Student • Researcher • Scholar',
+            about_title: 'About My Academic Journey',
+            about_text: 'I am a dedicated student and researcher passionate about advancing knowledge in my field. Through rigorous academic study and hands-on research experience, I strive to contribute meaningful insights to the academic community. My work focuses on innovative approaches to solving complex problems and pushing the boundaries of current understanding.',
+            hobbies_title: 'Academic Interests',
+            hobbies_json: [
+              { name: 'Research', icon: '🔬' },
+              { name: 'Data Analysis', icon: '📊' },
+              { name: 'Academic Writing', icon: '✍️' },
+              { name: 'Literature Review', icon: '📚' },
+              { name: 'Lab Work', icon: '🧪' },
+              { name: 'Presentations', icon: '🎤' },
+              { name: 'Collaboration', icon: '🤝' }
+            ],
+            skills_title: 'Skills and Tools',
+            skills_json: [
+              { name: 'Research Methods', color: '#059669' },
+              { name: 'Data Analysis', color: '#7C3AED' },
+              { name: 'Academic Writing', color: '#DC2626' },
+              { name: 'Statistical Analysis', color: '#F59E0B' },
+              { name: 'Literature Review', color: '#10B981' },
+              { name: 'Presentation Skills', color: '#EF4444' },
+              { name: 'Critical Thinking', color: '#8B5CF6' }
+            ],
+            resume_title: 'Resume',
+            key_projects_title: 'Key Projects',
+            contact_title: 'Contact Me',
+            contact_description: 'Interested in research collaboration, academic opportunities, or discussing potential projects? I\'m always open to connecting with fellow researchers and academic institutions.',
+            blog_title: 'Post Me',
+            blog_description: 'Share your academic thoughts and research insights',
+            status_title: 'What I\'m working on',
+            footer_about_summary: 'Committed to academic excellence and contributing to the advancement of knowledge through rigorous research and scholarly work.',
+            font_pair: 'Poppins-Roboto',
+            card_shadows: true,
+            section_blending: true,
+            image_frames: true,
+            curved_separators: true
+          };
         } else {
           // Default sections for other templates
           defaultSectionsConfig = {
