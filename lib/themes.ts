@@ -80,6 +80,21 @@ export const THEMES = [
     }
   },
   {
+    name: 'Midnight Dusk-dark',
+    previewColor: '#2C3E50', // accent color
+    isGradient: false,
+    colors: {
+      background: 'bg-[#1A242A]',
+      text: 'text-[#A0A8AD]',
+      primary: 'text-[#ECEFF1]',
+      primaryStrong: 'text-[#ECEFF1]',
+      card: 'bg-[#232E35]',
+      cardText: 'text-[#A0A8AD]',
+      heading: 'text-[#ECEFF1]',
+      accent: 'text-[#2C3E50]'
+    }
+  },
+  {
     name: 'Sunset Rose-light',
     previewColor: '#E5989B', // accent color
     isGradient: false,
@@ -91,6 +106,21 @@ export const THEMES = [
       card: 'bg-[#FFE6E6]',
       cardText: 'text-[#7D6A6C]',
       heading: 'text-[#3A2E2F]',
+      accent: 'text-[#E5989B]'
+    }
+  },
+  {
+    name: 'Sunset Rose-dark',
+    previewColor: '#E5989B', // accent color
+    isGradient: false,
+    colors: {
+      background: 'bg-[#3A2E2F]',
+      text: 'text-[#B7A9AB]',
+      primary: 'text-[#F2EDED]',
+      primaryStrong: 'text-[#F2EDED]',
+      card: 'bg-[#4A3B3C]',
+      cardText: 'text-[#B7A9AB]',
+      heading: 'text-[#F2EDED]',
       accent: 'text-[#E5989B]'
     }
   },
@@ -110,6 +140,21 @@ export const THEMES = [
     }
   },
   {
+    name: 'Royal Purple-dark',
+    previewColor: '#6A0DAD', // accent color
+    isGradient: false,
+    colors: {
+      background: 'bg-[#2F1D3E]',
+      text: 'text-[#9A87A8]',
+      primary: 'text-[#F1EEFB]',
+      primaryStrong: 'text-[#F1EEFB]',
+      card: 'bg-[#3C2A53]',
+      cardText: 'text-[#9A87A8]',
+      heading: 'text-[#F1EEFB]',
+      accent: 'text-[#6A0DAD]'
+    }
+  },
+  {
     name: 'Golden Hour-light',
     previewColor: '#F1C40F', // accent color
     isGradient: false,
@@ -121,6 +166,21 @@ export const THEMES = [
       card: 'bg-[#FFF8D1]',
       cardText: 'text-[#7D7200]',
       heading: 'text-[#3A3300]',
+      accent: 'text-[#F1C40F]'
+    }
+  },
+  {
+    name: 'Golden Hour-dark',
+    previewColor: '#F1C40F', // accent color
+    isGradient: false,
+    colors: {
+      background: 'bg-[#3A3300]',
+      text: 'text-[#BFAF6A]',
+      primary: 'text-[#FEF9E6]',
+      primaryStrong: 'text-[#FEF9E6]',
+      card: 'bg-[#4A3F0A]',
+      cardText: 'text-[#BFAF6A]',
+      heading: 'text-[#FEF9E6]',
       accent: 'text-[#F1C40F]'
     }
   },
@@ -140,6 +200,21 @@ export const THEMES = [
     }
   },
   {
+    name: 'Emerald Forest-dark',
+    previewColor: '#2E8B57', // accent color
+    isGradient: false,
+    colors: {
+      background: 'bg-[#193522]',
+      text: 'text-[#7A8C84]',
+      primary: 'text-[#E9F3EC]',
+      primaryStrong: 'text-[#E9F3EC]',
+      card: 'bg-[#214231]',
+      cardText: 'text-[#7A8C84]',
+      heading: 'text-[#E9F3EC]',
+      accent: 'text-[#2E8B57]'
+    }
+  },
+  {
     name: 'Lime Fresh-light',
     previewColor: '#A4C639', // accent color
     isGradient: false,
@@ -151,6 +226,21 @@ export const THEMES = [
       card: 'bg-[#EEF5D1]',
       cardText: 'text-[#767A4A]',
       heading: 'text-[#3A3D16]',
+      accent: 'text-[#A4C639]'
+    }
+  },
+  {
+    name: 'Lime Fresh-dark',
+    previewColor: '#A4C639', // accent color
+    isGradient: false,
+    colors: {
+      background: 'bg-[#3A3D16]',
+      text: 'text-[#9FA275]',
+      primary: 'text-[#F2F5E8]',
+      primaryStrong: 'text-[#F2F5E8]',
+      card: 'bg-[#4B501D]',
+      cardText: 'text-[#9FA275]',
+      heading: 'text-[#F2F5E8]',
       accent: 'text-[#A4C639]'
     }
   },
@@ -170,6 +260,21 @@ export const THEMES = [
     }
   },
   {
+    name: 'Classic Gray-dark',
+    previewColor: '#7F8C8D', // accent color
+    isGradient: false,
+    colors: {
+      background: 'bg-[#2C3A3B]',
+      text: 'text-[#8A9A9B]',
+      primary: 'text-[#E7ECEC]',
+      primaryStrong: 'text-[#E7ECEC]',
+      card: 'bg-[#354445]',
+      cardText: 'text-[#8A9A9B]',
+      heading: 'text-[#E7ECEC]',
+      accent: 'text-[#7F8C8D]'
+    }
+  },
+  {
     name: 'Stone Elegance-light',
     previewColor: '#95A5A6', // accent color
     isGradient: false,
@@ -181,6 +286,21 @@ export const THEMES = [
       card: 'bg-[#E6EAEB]',
       cardText: 'text-[#5D6A6B]',
       heading: 'text-[#2B3334]',
+      accent: 'text-[#95A5A6]'
+    }
+  },
+  {
+    name: 'Stone Elegance-dark',
+    previewColor: '#95A5A6', // accent color
+    isGradient: false,
+    colors: {
+      background: 'bg-[#2B3334]',
+      text: 'text-[#738183]',
+      primary: 'text-[#EDEFF0]',
+      primaryStrong: 'text-[#EDEFF0]',
+      card: 'bg-[#344041]',
+      cardText: 'text-[#738183]',
+      heading: 'text-[#EDEFF0]',
       accent: 'text-[#95A5A6]'
     }
   },
