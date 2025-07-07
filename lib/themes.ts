@@ -66,7 +66,7 @@ export const THEMES = [
   },
   {
     name: 'Midnight Dusk-light',
-    previewColor: '#2C3E50', // accent color
+    previewColor: '#5A7A8A', // lighter version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#F0F3F5]',
@@ -81,7 +81,7 @@ export const THEMES = [
   },
   {
     name: 'Midnight Dusk-dark',
-    previewColor: '#2C3E50', // accent color
+    previewColor: '#1E2A35', // darker version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#1A242A]',
@@ -96,7 +96,7 @@ export const THEMES = [
   },
   {
     name: 'Sunset Rose-light',
-    previewColor: '#E5989B', // accent color
+    previewColor: '#F4A5A8', // lighter version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#FFF2F2]',
@@ -111,7 +111,7 @@ export const THEMES = [
   },
   {
     name: 'Sunset Rose-dark',
-    previewColor: '#E5989B', // accent color
+    previewColor: '#8B5A5D', // darker version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#3A2E2F]',
@@ -126,7 +126,7 @@ export const THEMES = [
   },
   {
     name: 'Royal Purple-light',
-    previewColor: '#6A0DAD', // accent color
+    previewColor: '#9B6BC7', // lighter version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#F5F0FA]',
@@ -141,7 +141,7 @@ export const THEMES = [
   },
   {
     name: 'Royal Purple-dark',
-    previewColor: '#6A0DAD', // accent color
+    previewColor: '#4A0D6B', // darker version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#2F1D3E]',
@@ -156,7 +156,7 @@ export const THEMES = [
   },
   {
     name: 'Golden Hour-light',
-    previewColor: '#F1C40F', // accent color
+    previewColor: '#F7D794', // lighter version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#FFFBEA]',
@@ -171,7 +171,7 @@ export const THEMES = [
   },
   {
     name: 'Golden Hour-dark',
-    previewColor: '#F1C40F', // accent color
+    previewColor: '#B8940B', // darker version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#3A3300]',
@@ -186,7 +186,7 @@ export const THEMES = [
   },
   {
     name: 'Emerald Forest-light',
-    previewColor: '#2E8B57', // accent color
+    previewColor: '#6BBF8A', // lighter version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#EDF8F1]',
@@ -201,7 +201,7 @@ export const THEMES = [
   },
   {
     name: 'Emerald Forest-dark',
-    previewColor: '#2E8B57', // accent color
+    previewColor: '#1A5A3A', // darker version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#193522]',
@@ -216,7 +216,7 @@ export const THEMES = [
   },
   {
     name: 'Lime Fresh-light',
-    previewColor: '#A4C639', // accent color
+    previewColor: '#B8D95A', // lighter version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#F7FAE8]',
@@ -231,7 +231,7 @@ export const THEMES = [
   },
   {
     name: 'Lime Fresh-dark',
-    previewColor: '#A4C639', // accent color
+    previewColor: '#6B7A2A', // darker version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#3A3D16]',
@@ -246,7 +246,7 @@ export const THEMES = [
   },
   {
     name: 'Classic Gray-light',
-    previewColor: '#7F8C8D', // accent color
+    previewColor: '#9BA8A9', // lighter version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#F5F7F7]',
@@ -261,7 +261,7 @@ export const THEMES = [
   },
   {
     name: 'Classic Gray-dark',
-    previewColor: '#7F8C8D', // accent color
+    previewColor: '#4A5A5B', // darker version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#2C3A3B]',
@@ -276,7 +276,7 @@ export const THEMES = [
   },
   {
     name: 'Stone Elegance-light',
-    previewColor: '#95A5A6', // accent color
+    previewColor: '#A8B5B6', // lighter version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#F2F4F4]',
@@ -291,7 +291,7 @@ export const THEMES = [
   },
   {
     name: 'Stone Elegance-dark',
-    previewColor: '#95A5A6', // accent color
+    previewColor: '#4A5A5B', // darker version of accent color
     isGradient: false,
     colors: {
       background: 'bg-[#2B3334]',
