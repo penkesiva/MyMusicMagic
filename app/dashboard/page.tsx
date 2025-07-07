@@ -267,7 +267,7 @@ export default function DashboardPage() {
             footer_about_summary: 'Dedicated to capturing life\'s beautiful moments and creating visual stories that inspire and connect people across the world.'
           };
         } else if (templateData.name === 'Academic Profile') {
-          defaultThemeName = 'Lime Fresh-light';
+          defaultThemeName = 'Black & Lime';
           defaultSectionsConfig = {
             hero: { enabled: true, name: 'Hero', order: 1 },
             about: { enabled: true, name: 'About Me', order: 2 },
@@ -313,7 +313,57 @@ export default function DashboardPage() {
             blog_description: 'Share your academic thoughts and research insights',
             status_title: 'What I\'m working on',
             footer_about_summary: 'Committed to academic excellence and contributing to the advancement of knowledge through rigorous research and scholarly work.',
-            font_pair: 'Poppins-Roboto',
+            font_pair: 'SF-Pro-Display',
+            card_shadows: true,
+            section_blending: true,
+            image_frames: true,
+            curved_separators: true,
+            animations: true
+          };
+        } else if (templateData.name === 'Artist Showcase') {
+          defaultThemeName = 'Midnight Dusk-dark';
+          defaultSectionsConfig = {
+            hero: { enabled: true, name: 'Welcome', order: 1 },
+            about: { enabled: true, name: 'About My Art', order: 2 },
+            gallery: { enabled: true, name: 'Portfolio', order: 3 },
+            key_projects: { enabled: true, name: 'Featured Works', order: 4 },
+            skills: { enabled: true, name: 'Artistic Skills', order: 5 },
+            hobbies: { enabled: true, name: 'Creative Interests', order: 6 },
+            testimonials: { enabled: true, name: 'Client Reviews', order: 7 },
+            contact: { enabled: true, name: 'Get In Touch', order: 8 },
+            footer: { enabled: true, name: 'Footer', order: 9 }
+          };
+          defaultContent = {
+            hero_title: 'Artist Portfolio',
+            hero_subtitle: 'Visual Artist • Creative Designer • Art Enthusiast',
+            about_title: 'About My Art',
+            about_text: 'I am a passionate visual artist dedicated to creating meaningful and inspiring artwork that speaks to the soul. Through various mediums and techniques, I explore themes of beauty, emotion, and human connection. My work reflects my deep appreciation for color, form, and the stories that art can tell.',
+            hobbies_title: 'Creative Interests',
+            hobbies_json: [
+              { name: 'Painting', icon: '🎨' },
+              { name: 'Drawing', icon: '✏️' },
+              { name: 'Digital Art', icon: '💻' },
+              { name: 'Sculpture', icon: '🗿' },
+              { name: 'Photography', icon: '📸' },
+              { name: 'Mixed Media', icon: '🖼️' },
+              { name: 'Art History', icon: '🏛️' }
+            ],
+            skills_title: 'Artistic Skills',
+            skills_json: [
+              { name: 'Oil Painting', color: '#7C3AED' },
+              { name: 'Watercolor', color: '#3B82F6' },
+              { name: 'Digital Art', color: '#10B981' },
+              { name: 'Sketching', color: '#F59E0B' },
+              { name: 'Color Theory', color: '#EF4444' },
+              { name: 'Composition', color: '#8B5CF6' },
+              { name: 'Mixed Media', color: '#06B6D4' }
+            ],
+            key_projects_title: 'Featured Works',
+            testimonials_title: 'Client Reviews',
+            contact_title: 'Let\'s Create Together',
+            contact_description: 'Interested in commissioning artwork, collaborating on creative projects, or discussing potential opportunities? I\'m always excited to connect with fellow artists and art enthusiasts.',
+            footer_about_summary: 'Dedicated to creating beautiful artwork that inspires, connects, and brings joy to people\'s lives through the power of visual expression.',
+            font_pair: 'SF-Pro-Display',
             card_shadows: true,
             section_blending: true,
             image_frames: true,
