@@ -31,7 +31,6 @@ export default function DashboardPage() {
   const [templates, setTemplates] = useState<PortfolioTemplate[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isEditingProfile, setIsEditingProfile] = useState(false)
-  const [isCreatingPortfolio, setIsCreatingPortfolio] = useState(false)
   const [newPortfolioName, setNewPortfolioName] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
@@ -42,6 +41,10 @@ export default function DashboardPage() {
     username: ''
   })
   
+  // Add state for AI prompt
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [showTemplates, setShowTemplates] = useState(false);
+
   const router = useRouter()
   const supabase = createClient()
 
@@ -164,7 +167,7 @@ export default function DashboardPage() {
   }
 
   const handleCreatePortfolio = async () => {
-    if (!newPortfolioName.trim()) return
+    if (!newPortfolioName.trim() && !aiPrompt.trim()) return
 
     try {
       const slug = newPortfolioName.toLowerCase().replace(/[^a-z0-9]/g, '-')
@@ -411,9 +414,10 @@ export default function DashboardPage() {
       if (error) throw error
 
       setPortfolios([data, ...portfolios])
-      setIsCreatingPortfolio(false)
       setNewPortfolioName('')
       setSelectedTemplate('')
+      setAiPrompt('')
+      setShowTemplates(false)
       setSuccess('Portfolio created successfully!')
       setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
@@ -681,99 +685,107 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Right Column - Portfolios */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-white">Portfolios</h2>
-                <button
-                  onClick={() => setIsCreatingPortfolio(true)}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
-                >
-                  Create Portfolio
-                </button>
-              </div>
-
-              {isCreatingPortfolio && (
+            {/* Right Column - Create Portfolio and My Portfolios */}
+            <div className="space-y-8">
+              {/* Create Portfolio Card - always visible */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-white">Create Portfolio</h2>
+                </div>
+                {/* Create Portfolio form (always visible) */}
                 <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Portfolio Name</label>
-                      <input
-                        type="text"
-                        value={newPortfolioName}
-                        onChange={(e) => setNewPortfolioName(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                        placeholder="My Awesome Portfolio"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Template</label>
-                      
-                      {/* Template Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                        {templates.map((template) => (
-                          <TemplatePreview
-                            key={template.id}
-                            template={{
-                              ...template,
-                              description: template.description || 'No description available'
-                            }}
-                            isSelected={selectedTemplate === template.id}
-                            onSelect={setSelectedTemplate}
-                          />
-                        ))}
-                      </div>
-                      
-                      {/* No template option */}
-                      <div
-                        className={`p-3 rounded-lg border-2 transition-all duration-300 cursor-pointer ${
-                          !selectedTemplate
-                            ? 'border-purple-500 bg-purple-500/10'
-                            : 'border-white/10 bg-white/5 hover:border-white/20'
-                        }`}
-                        onClick={() => setSelectedTemplate('')}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-lg bg-gray-700 flex items-center justify-center">
-                            <Sparkles className="w-4 h-4 text-gray-400" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-white text-sm">Start from Scratch</h3>
-                            <p className="text-gray-400 text-xs">Create a custom portfolio with basic sections</p>
-                          </div>
-                          {!selectedTemplate && (
-                            <div className="ml-auto w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {selectedTemplate && (
-                        <div className="mt-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                          <p className="text-sm text-purple-300">
-                            {templates.find(t => t.id === selectedTemplate)?.description}
-                          </p>
-                          <p className="text-xs text-purple-400 mt-1">
-                            This template will set up your portfolio with industry-specific sections and styling.
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                  {/* Portfolio Name first */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Portfolio Name</label>
+                    <input
+                      type="text"
+                      value={newPortfolioName}
+                      onChange={(e) => setNewPortfolioName(e.target.value)}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      placeholder="My Awesome Portfolio"
+                    />
                   </div>
-                  <div className="flex space-x-2 mt-4">
+                  {/* AI Prompt below Portfolio Name, with Sparkles icon */}
+                  <div className="mb-4">
+                    <div className="flex items-center mb-2">
+                      <span className="mr-2"><Sparkles className="w-5 h-5 text-purple-300" /></span>
+                      <label className="block text-sm font-medium text-gray-300">Start from Scratch using AI</label>
+                    </div>
+                    <textarea
+                      value={aiPrompt}
+                      onChange={e => {
+                        setAiPrompt(e.target.value);
+                        if (e.target.value) setSelectedTemplate(''); // mutually exclusive
+                      }}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all min-h-[60px] max-h-[120px] text-sm"
+                      placeholder="Describe your dream portfolio (e.g. 'A portfolio for a jazz musician with a gallery and contact form')"
+                      rows={3}
+                      style={{ minHeight: 60, maxHeight: 120 }}
+                    />
+                    <p className="text-xs text-purple-300 pt-2">Use AI to generate a custom portfolio structure and content based on your prompt.</p>
+                  </div>
+                  {/* Templates toggle and grid */}
+                  <div className="mb-4 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowTemplates((prev) => !prev)}
+                      className="px-3 py-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all duration-300 text-sm font-medium mb-2"
+                    >
+                      Show Templates
+                    </button>
+                    {selectedTemplate && !showTemplates && (
+                      <div className="inline-flex items-center px-3 py-1 bg-purple-700/30 text-purple-200 rounded-full text-xs font-medium ml-2">
+                        {templates.find(t => t.id === selectedTemplate)?.name || 'Template selected'}
+                      </div>
+                    )}
+                  </div>
+                  {/* Template grid, toggled */}
+                  {showTemplates && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 mb-3">
+                      {templates.map((template) => (
+                        <TemplatePreview
+                          key={template.id}
+                          template={{
+                            ...template,
+                            description: template.description || 'No description available'
+                          }}
+                          isSelected={selectedTemplate === template.id}
+                          onSelect={id => {
+                            setSelectedTemplate(id);
+                            setAiPrompt(''); // mutually exclusive
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {/* Template description if selected */}
+                  {selectedTemplate && (
+                    <div className="mt-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                      <p className="text-sm text-purple-300">
+                        {templates.find(t => t.id === selectedTemplate)?.description}
+                      </p>
+                      <p className="text-xs text-purple-400 mt-1">
+                        This template will set up your portfolio with industry-specific sections and styling.
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex justify-center space-x-2 mt-4">
                     <button
                       onClick={handleCreatePortfolio}
-                      disabled={!newPortfolioName.trim()}
+                      disabled={
+                        !newPortfolioName.trim() ||
+                        (!aiPrompt.trim() && !selectedTemplate)
+                      }
                       className="px-4 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Create
+                      Create Portfolio
                     </button>
                     <button
                       onClick={() => {
-                        setIsCreatingPortfolio(false)
                         setNewPortfolioName('')
                         setSelectedTemplate('')
+                        setAiPrompt('')
+                        setShowTemplates(false)
                       }}
                       className="px-4 py-2 bg-gray-500/20 border border-gray-500/30 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-all duration-300"
                     >
@@ -781,91 +793,91 @@ export default function DashboardPage() {
                     </button>
                   </div>
                 </div>
-              )}
+              </div>
 
-              {portfolios.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-gray-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-white mb-2">No portfolios yet</h3>
-                  <p className="text-gray-400 mb-4">Create your first portfolio to get started</p>
-                  <button
-                    onClick={() => setIsCreatingPortfolio(true)}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-purple-500/25"
-                  >
-                    Create Your First Portfolio
-                  </button>
+              {/* My Portfolios Card - remove Create Portfolio button */}
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-white">My Portfolios</h2>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {portfolios.map((p) => (
-                    <div key={p.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300">
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-lg font-medium text-white">{p.name}</h3>
-                        <div className="flex space-x-1">
-                          <button
-                            onClick={() => handleTogglePublish(p.id, p.is_published)}
-                            className={`px-2 py-1 text-xs rounded ${
-                              p.is_published
-                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                            } hover:opacity-80 transition-all duration-300`}
-                          >
-                            {p.is_published ? 'Published' : 'Draft'}
-                          </button>
-                          {p.is_default && (
-                            <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded">
-                              Default
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-400 mb-4">/{p.slug}</p>
-                      <p className="text-gray-400 text-sm truncate">
-                        {p.theme_name ? `${p.theme_name} Theme` : 'Default Theme'}
-                      </p>
-                      <div className="mt-4 flex gap-2">
-                        <Button
-                          onClick={() => router.push(`/dashboard/portfolio/${p.id}/edit`)}
-                          size="sm"
-                          className="bg-purple-600 hover:bg-purple-700 text-white"
-                        >
-                          <Edit className="h-3 w-3 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          onClick={() => window.open(`/portfolio/${profile?.username || 'user'}/${p.slug}`, '_blank', 'noopener,noreferrer')}
-                          variant="outline"
-                          size="sm"
-                          className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                        >
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          View
-                        </Button>
-                        <Button
-                          onClick={() => handleDeletePortfolio(p.id)}
-                          variant="outline"
-                          size="sm"
-                          className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
-                        >
-                          <Trash2 className="h-3 w-3 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
-                      {p.slug && (
-                        <div className="mt-4 pt-4 border-t border-white/10">
-                          <p className="text-sm text-gray-400">
-                            Public URL: <a href={`/portfolio/${profile?.username || 'user'}/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">{`/portfolio/${profile?.username || 'user'}/${p.slug}`}</a>
-                          </p>
-                        </div>
-                      )}
+                {portfolios.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
                     </div>
-                  ))}
-                </div>
-              )}
+                    <h3 className="text-lg font-medium text-white mb-2">No portfolios yet</h3>
+                    <p className="text-gray-400 mb-4">Create your first portfolio to get started</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {portfolios.map((p) => (
+                      <div key={p.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300">
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className="text-lg font-medium text-white">{p.name}</h3>
+                          <div className="flex space-x-1">
+                            <button
+                              onClick={() => handleTogglePublish(p.id, p.is_published)}
+                              className={`px-2 py-1 text-xs rounded ${
+                                p.is_published
+                                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                  : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                              } hover:opacity-80 transition-all duration-300`}
+                            >
+                              {p.is_published ? 'Published' : 'Draft'}
+                            </button>
+                            {p.is_default && (
+                              <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-4">/{p.slug}</p>
+                        <p className="text-gray-400 text-sm truncate">
+                          {p.theme_name ? `${p.theme_name} Theme` : 'Default Theme'}
+                        </p>
+                        <div className="mt-4 flex gap-2">
+                          <Button
+                            onClick={() => router.push(`/dashboard/portfolio/${p.id}/edit`)}
+                            size="sm"
+                            className="bg-purple-600 hover:bg-purple-700 text-white"
+                          >
+                            <Edit className="h-3 w-3 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => window.open(`/portfolio/${profile?.username || 'user'}/${p.slug}`, '_blank', 'noopener,noreferrer')}
+                            variant="outline"
+                            size="sm"
+                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            View
+                          </Button>
+                          <Button
+                            onClick={() => handleDeletePortfolio(p.id)}
+                            variant="outline"
+                            size="sm"
+                            className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
+                        {p.slug && (
+                          <div className="mt-4 pt-4 border-t border-white/10">
+                            <p className="text-sm text-gray-400">
+                              Public URL: <a href={`/portfolio/${profile?.username || 'user'}/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">{`/portfolio/${profile?.username || 'user'}/${p.slug}`}</a>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
