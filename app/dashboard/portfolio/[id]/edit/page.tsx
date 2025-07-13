@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check, Home, User, Music, ImageIcon, Briefcase, MessageSquare, Newspaper, Contact, Settings, Heart, Code, GraduationCap, Camera, Video, Mic, Headphones, Palette, Globe, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Github, Youtube, ExternalLink as ExternalLinkIcon, Award, Info
+  PlusCircle, Trash2, Edit, Upload, Image, X, RefreshCw, ExternalLink, ChevronDown, List, Grid, FileText, Sparkles, Star, Plus, Eye, Wand2, Save, Layout, Check, Home, User, Music, ImageIcon, Briefcase, MessageSquare, Newspaper, Contact, Settings, Heart, Code, GraduationCap, Camera, Video, Mic, Headphones, Palette, Globe, Mail, Phone, MapPin, Twitter, Instagram, Linkedin, Github, Youtube, ExternalLink as ExternalLinkIcon, Award, Info, User as UserIconSolid, Crown, Shield, HelpCircle, Bell, LogOut
 } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import { SECTIONS_CONFIG } from "@/lib/sections";
@@ -38,6 +38,7 @@ import { Switch } from '@/components/ui/switch';
 import SponsorsForm from '@/components/portfolio/SponsorsForm';
 import SubscribeForm from '@/components/portfolio/SubscribeForm';
 import PostMeForm from '@/components/portfolio/PostMeForm';
+import { Avatar } from '@/components/ui/avatar';
 
 const NAVBAR_HEIGHT = 56;
 const SIDEBAR_MIN_WIDTH = 220;
@@ -113,6 +114,7 @@ const PortfolioEditorPage = () => {
   const urlInfoRef = useRef<HTMLDivElement>(null);
   const [showUrlSuggestions, setShowUrlSuggestions] = useState<{ [key: number]: boolean }>({});
   const [urlSuggestions, setUrlSuggestions] = useState<{ [key: number]: string[] }>({});
+
 
   // Available sections for auto-complete
   const availableSections = [
@@ -604,6 +606,8 @@ const PortfolioEditorPage = () => {
     return IconComponent ? <IconComponent className="w-5 h-5" /> : <Settings className="w-5 h-5" />;
   };
 
+
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900">
@@ -806,6 +810,13 @@ const PortfolioEditorPage = () => {
               <ExternalLink className="h-4 w-4 mr-1" />
               Public
             </Button>
+
+            {/* Enhanced Avatar Component */}
+            <Avatar 
+              userProfile={userProfile} 
+              size="md" 
+              showMenu={true}
+            />
           </div>
         </div>
         {/* Error Popup */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
@@ -17,6 +17,9 @@ import Link from 'next/link'
 import { TemplatePreview } from '@/components/ui/template-preview'
 import { Sparkles, Layout, Edit, ExternalLink, Trash2, FileText, Star, Music, Image, Video, MessageSquare, Briefcase, Award, Heart, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { User as UserIcon, Settings, LogOut, User as UserIconSolid, Crown, Shield, HelpCircle, Bell, ChevronDown } from 'lucide-react';
+import Portal from '@/components/Portal'
+import { Avatar } from '@/components/ui/avatar';
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 type UserSubscription = Database['public']['Tables']['user_subscriptions']['Row']
@@ -47,6 +50,8 @@ export default function DashboardPage() {
 
   const router = useRouter()
   const supabase = createClient()
+
+
 
   useEffect(() => {
     const checkUser = async () => {
@@ -139,6 +144,8 @@ export default function DashboardPage() {
 
     checkUser()
   }, [supabase, router])
+
+
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -482,10 +489,12 @@ export default function DashboardPage() {
     }
   }
 
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-gray-200">
       {/* Header */}
-      <header className="bg-white/5 backdrop-blur-sm border-b border-white/10 shadow-lg">
+      <header className="bg-white/5 backdrop-blur-sm border-b border-white/10 shadow-lg relative z-20">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
@@ -495,14 +504,20 @@ export default function DashboardPage() {
             </div>
             <h1 className="text-2xl font-bold text-white">Hero Portfolio</h1>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-300">Welcome, {profile?.username || user?.email}</span>
-            <button
-              onClick={handleSignOut}
-              className="px-4 py-2 bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition-all duration-300"
-            >
-              Sign Out
-            </button>
+          <div className="flex items-center space-x-4 relative z-30">
+            {/* Welcome message (desktop only) */}
+            {profile?.username && (
+              <span className="hidden md:inline-block text-white text-lg font-medium mr-4">Welcome {profile.username}</span>
+            )}
+            
+            {/* Enhanced Avatar Component */}
+            <Avatar 
+              userProfile={profile} 
+              size="lg" 
+              showMenu={true}
+              menuPosition="portal"
+              menuTargetId="create-portfolio-card"
+            />
           </div>
         </div>
       </header>
@@ -527,276 +542,138 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - Profile and Subscription */}
-            <div className="space-y-8">
-              {/* Profile Section */}
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold text-white">Profile</h2>
-                  <button
-                    onClick={() => setIsEditingProfile(!isEditingProfile)}
-                    className="px-3 py-1 bg-white/10 border border-white/20 text-white text-sm rounded hover:bg-white/20 transition-all duration-300"
-                  >
-                    {isEditingProfile ? 'Cancel' : 'Edit'}
-                  </button>
-                </div>
-
-                {!profile?.username && (
-                  <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                    <p className="text-yellow-400 text-sm">
-                      ⚠️ Please set a username to enable public portfolio URLs. Your portfolios won't be accessible until you do.
-                    </p>
-                  </div>
-                )}
-
-                {isEditingProfile ? (
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Username</label>
-                      <input
-                        type="text"
-                        value={editingProfile.username}
-                        onChange={(e) => setEditingProfile({ ...editingProfile, username: e.target.value })}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      />
+            {/* Removed Profile and Subscription cards */}
+            {/* Right Column - Create Portfolio and My Portfolios */}
+            <div className="space-y-8 col-span-2">
+              {/* Create Portfolio Card - always visible */}
+              <div id="create-portfolio-card" className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-purple-600/10 backdrop-blur-sm border border-purple-400/20 rounded-2xl p-6 shadow-2xl z-10">
+                {/* Background decoration */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-50"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                        <PlusIcon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-white">Create Portfolio</h2>
+                        <p className="text-sm text-purple-200">Build your next masterpiece</p>
+                      </div>
                     </div>
-                    <div className="flex space-x-2">
+                  </div>
+                  
+                  {/* Compact Create Portfolio form */}
+                  <div className="space-y-5">
+                    {/* Portfolio Name and AI Prompt in a row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="relative">
+                        <label className="block text-sm font-semibold text-purple-200 mb-2">Portfolio Name</label>
+                        <input
+                          type="text"
+                          value={newPortfolioName}
+                          onChange={(e) => setNewPortfolioName(e.target.value)}
+                          className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm"
+                          placeholder="My Awesome Portfolio"
+                        />
+                      </div>
+                      <div className="relative">
+                        <div className="flex items-center mb-2">
+                          <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center mr-2">
+                            <Sparkles className="w-3 h-3 text-white" />
+                          </div>
+                          <label className="block text-sm font-semibold text-purple-200">AI Description</label>
+                        </div>
+                        <input
+                          type="text"
+                          value={aiPrompt}
+                          onChange={e => {
+                            setAiPrompt(e.target.value);
+                            if (e.target.value) setSelectedTemplate('');
+                          }}
+                          className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm"
+                          placeholder="Describe your portfolio (optional)"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Templates section */}
+                    <div className="flex items-center justify-between">
                       <button
-                        onClick={handleSaveProfile}
-                        className="px-4 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300"
+                        type="button"
+                        onClick={() => setShowTemplates((prev) => !prev)}
+                        className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium"
                       >
-                        Save
+                        {showTemplates ? 'Hide Templates' : 'Show Templates'}
                       </button>
+                      {selectedTemplate && (
+                        <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-100 rounded-full text-xs font-medium border border-purple-400/30">
+                          {templates.find(t => t.id === selectedTemplate)?.name || 'Template selected'}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Template grid */}
+                    {showTemplates && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {templates.map((template) => (
+                          <TemplatePreview
+                            key={template.id}
+                            template={{
+                              ...template,
+                              description: template.description || 'No description available'
+                            }}
+                            isSelected={selectedTemplate === template.id}
+                            onSelect={id => {
+                              setSelectedTemplate(id);
+                              setAiPrompt('');
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Template description if selected */}
+                    {selectedTemplate && (
+                      <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/20 rounded-xl">
+                        <p className="text-sm text-purple-200">
+                          {templates.find(t => t.id === selectedTemplate)?.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
+                    <div className="flex justify-end space-x-3 pt-2">
                       <button
-                        onClick={() => setIsEditingProfile(false)}
-                        className="px-4 py-2 bg-gray-500/20 border border-gray-500/30 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-all duration-300"
+                        onClick={() => {
+                          setNewPortfolioName('');
+                          setSelectedTemplate('');
+                          setAiPrompt('');
+                          setShowTemplates(false);
+                        }}
+                        className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all duration-300"
                       >
                         Cancel
                       </button>
+                      <button
+                        onClick={handleCreatePortfolio}
+                        disabled={
+                          !newPortfolioName.trim() ||
+                          (!aiPrompt.trim() && !selectedTemplate)
+                        }
+                        className="px-6 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 text-green-300 rounded-xl hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                      >
+                        Create Portfolio
+                      </button>
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-400 mb-1">Username</h3>
-                      <p className="text-white">{profile?.username || 'Not set'}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-400 mb-1">Email</h3>
-                      <p className="text-white">{profile?.email || 'Not set'}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Subscription Section */}
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
-                <h2 className="text-xl font-semibold text-white mb-4">Subscription</h2>
-                <div className="space-y-4">
-                  {/* Current Plan */}
-                  <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="text-lg font-medium text-white capitalize">{subscription?.plan_type || 'Free'} Plan</h3>
-                        <p className="text-gray-300">Status: <span className="text-green-400">{subscription?.status || 'Active'}</span></p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-white">
-                          {subscription?.plan_type === 'free' ? 'Free' : '$9.99'}
-                        </p>
-                        <p className="text-sm text-gray-400">per month</p>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-300 mb-2">Features:</h4>
-                      <ul className="space-y-1">
-                        {getPlanFeatures(subscription?.plan_type || 'free').map((feature, index) => (
-                          <li key={index} className="text-sm text-gray-300 flex items-center">
-                            <svg className="w-4 h-4 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Upgrade Plan */}
-                  <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-500/30 rounded-lg p-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <h3 className="text-lg font-medium text-white">Pro Plan</h3>
-                        <p className="text-blue-300 text-sm">Unlock your full potential</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-white">Coming Soon</p>
-                        <p className="text-sm text-blue-400">Pricing TBA</p>
-                      </div>
-                    </div>
-                    <div className="mb-4">
-                      <h4 className="text-sm font-medium text-gray-300 mb-2">Pro Features:</h4>
-                      <ul className="space-y-1">
-                        <li className="text-sm text-gray-300 flex items-center">
-                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Unlimited portfolios
-                        </li>
-                        <li className="text-sm text-gray-300 flex items-center">
-                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Premium templates & themes
-                        </li>
-                        <li className="text-sm text-gray-300 flex items-center">
-                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Advanced analytics & insights
-                        </li>
-                        <li className="text-sm text-gray-300 flex items-center">
-                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Custom domain support
-                        </li>
-                        <li className="text-sm text-gray-300 flex items-center">
-                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Priority support
-                        </li>
-                        <li className="text-sm text-gray-300 flex items-center">
-                          <svg className="w-4 h-4 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                          Advanced SEO tools
-                        </li>
-                      </ul>
-                    </div>
-                    <button
-                      className="w-full px-4 py-2 bg-blue-500/20 border border-blue-500/30 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled
-                    >
-                      Coming Soon
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Create Portfolio and My Portfolios */}
-            <div className="space-y-8">
-              {/* Create Portfolio Card - always visible */}
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold text-white">Create Portfolio</h2>
-                </div>
-                {/* Create Portfolio form (always visible) */}
-                <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
-                  {/* Portfolio Name first */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Portfolio Name</label>
-                    <input
-                      type="text"
-                      value={newPortfolioName}
-                      onChange={(e) => setNewPortfolioName(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                      placeholder="My Awesome Portfolio"
-                    />
-                  </div>
-                  {/* AI Prompt below Portfolio Name, with Sparkles icon */}
-                  <div className="mb-4">
-                    <div className="flex items-center mb-2">
-                      <span className="mr-2"><Sparkles className="w-5 h-5 text-purple-300" /></span>
-                      <label className="block text-sm font-medium text-gray-300">Start from Scratch using AI</label>
-                    </div>
-                    <textarea
-                      value={aiPrompt}
-                      onChange={e => {
-                        setAiPrompt(e.target.value);
-                        if (e.target.value) setSelectedTemplate(''); // mutually exclusive
-                      }}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all min-h-[60px] max-h-[120px] text-sm"
-                      placeholder="Describe your dream portfolio (e.g. 'A portfolio for a jazz musician with a gallery and contact form')"
-                      rows={3}
-                      style={{ minHeight: 60, maxHeight: 120 }}
-                    />
-                    <p className="text-xs text-purple-300 pt-2">Use AI to generate a custom portfolio structure and content based on your prompt.</p>
-                  </div>
-                  {/* Templates toggle and grid */}
-                  <div className="mb-4 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setShowTemplates((prev) => !prev)}
-                      className="px-3 py-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all duration-300 text-sm font-medium mb-2"
-                    >
-                      Show Templates
-                    </button>
-                    {selectedTemplate && !showTemplates && (
-                      <div className="inline-flex items-center px-3 py-1 bg-purple-700/30 text-purple-200 rounded-full text-xs font-medium ml-2">
-                        {templates.find(t => t.id === selectedTemplate)?.name || 'Template selected'}
-                      </div>
-                    )}
-                  </div>
-                  {/* Template grid, toggled */}
-                  {showTemplates && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 mb-3">
-                      {templates.map((template) => (
-                        <TemplatePreview
-                          key={template.id}
-                          template={{
-                            ...template,
-                            description: template.description || 'No description available'
-                          }}
-                          isSelected={selectedTemplate === template.id}
-                          onSelect={id => {
-                            setSelectedTemplate(id);
-                            setAiPrompt(''); // mutually exclusive
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {/* Template description if selected */}
-                  {selectedTemplate && (
-                    <div className="mt-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                      <p className="text-sm text-purple-300">
-                        {templates.find(t => t.id === selectedTemplate)?.description}
-                      </p>
-                      <p className="text-xs text-purple-400 mt-1">
-                        This template will set up your portfolio with industry-specific sections and styling.
-                      </p>
-                    </div>
-                  )}
-                  <div className="flex justify-center space-x-2 mt-4">
-                    <button
-                      onClick={handleCreatePortfolio}
-                      disabled={
-                        !newPortfolioName.trim() ||
-                        (!aiPrompt.trim() && !selectedTemplate)
-                      }
-                      className="px-4 py-2 bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Create Portfolio
-                    </button>
-                    <button
-                      onClick={() => {
-                        setNewPortfolioName('')
-                        setSelectedTemplate('')
-                        setAiPrompt('')
-                        setShowTemplates(false)
-                      }}
-                      className="px-4 py-2 bg-gray-500/20 border border-gray-500/30 text-gray-400 rounded-lg hover:bg-gray-500/30 transition-all duration-300"
-                    >
-                      Cancel
-                    </button>
                   </div>
                 </div>
               </div>
 
               {/* My Portfolios Card - remove Create Portfolio button */}
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl">
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl relative z-10">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold text-white">My Portfolios</h2>
                 </div>
@@ -811,15 +688,21 @@ export default function DashboardPage() {
                     <p className="text-gray-400 mb-4">Create your first portfolio to get started</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {portfolios.map((p) => (
-                      <div key={p.id} className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-300">
-                        <div className="flex justify-between items-start mb-3">
-                          <h3 className="text-lg font-medium text-white">{p.name}</h3>
-                          <div className="flex space-x-1">
+                      <div key={p.id} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/10 transition-all duration-300 group">
+                        {/* Portfolio Header */}
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-semibold text-white truncate group-hover:text-purple-300 transition-colors">
+                              {p.name}
+                            </h3>
+                            <p className="text-sm text-gray-400 mt-1">/{p.slug}</p>
+                          </div>
+                          <div className="flex flex-col items-end space-y-2">
                             <button
                               onClick={() => handleTogglePublish(p.id, p.is_published)}
-                              className={`px-2 py-1 text-xs rounded ${
+                              className={`px-3 py-1 text-xs rounded-full font-medium ${
                                 p.is_published
                                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                                   : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
@@ -828,49 +711,62 @@ export default function DashboardPage() {
                               {p.is_published ? 'Published' : 'Draft'}
                             </button>
                             {p.is_default && (
-                              <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded">
+                              <span className="px-3 py-1 text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full">
                                 Default
                               </span>
                             )}
                           </div>
                         </div>
-                        <p className="text-sm text-gray-400 mb-4">/{p.slug}</p>
-                        <p className="text-gray-400 text-sm truncate">
-                          {p.theme_name ? `${p.theme_name} Theme` : 'Default Theme'}
-                        </p>
-                        <div className="mt-4 flex gap-2">
-                          <Button
-                            onClick={() => router.push(`/dashboard/portfolio/${p.id}/edit`)}
-                            size="sm"
-                            className="bg-purple-600 hover:bg-purple-700 text-white"
-                          >
-                            <Edit className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
-                          <Button
-                            onClick={() => window.open(`/portfolio/${profile?.username || 'user'}/${p.slug}`, '_blank', 'noopener,noreferrer')}
-                            variant="outline"
-                            size="sm"
-                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                          >
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            View
-                          </Button>
-                          <Button
-                            onClick={() => handleDeletePortfolio(p.id)}
-                            variant="outline"
-                            size="sm"
-                            className="bg-red-600/20 border-red-500/30 text-red-300 hover:bg-red-600/30"
-                          >
-                            <Trash2 className="h-3 w-3 mr-1" />
-                            Delete
-                          </Button>
+
+                        {/* Portfolio Details */}
+                        <div className="mb-4">
+                          <p className="text-gray-400 text-sm">
+                            {p.theme_name ? `${p.theme_name} Theme` : 'Default Theme'}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-2">
+                            Created {new Date(p.created_at).toLocaleDateString()}
+                          </p>
                         </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex justify-between items-center">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => router.push(`/dashboard/portfolio/${p.id}/edit`)}
+                              className="p-2 bg-purple-600/20 border border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-600/30 transition-all duration-300 group"
+                              title="Edit Portfolio"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => window.open(`/portfolio/${profile?.username || 'user'}/${p.slug}`, '_blank', 'noopener,noreferrer')}
+                              className="p-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 group"
+                              title="View Portfolio"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeletePortfolio(p.id)}
+                              className="p-2 bg-red-600/20 border border-red-500/30 text-red-300 rounded-lg hover:bg-red-600/30 transition-all duration-300 group"
+                              title="Delete Portfolio"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Public URL */}
                         {p.slug && (
                           <div className="mt-4 pt-4 border-t border-white/10">
-                            <p className="text-sm text-gray-400">
-                              Public URL: <a href={`/portfolio/${profile?.username || 'user'}/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">{`/portfolio/${profile?.username || 'user'}/${p.slug}`}</a>
-                            </p>
+                            <p className="text-xs text-gray-400 mb-1">Public URL:</p>
+                            <a 
+                              href={`/portfolio/${profile?.username || 'user'}/${p.slug}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-purple-400 hover:underline text-xs break-all"
+                            >
+                              {`/portfolio/${profile?.username || 'user'}/${p.slug}`}
+                            </a>
                           </div>
                         )}
                       </div>
