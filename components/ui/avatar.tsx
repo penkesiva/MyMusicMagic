@@ -74,6 +74,11 @@ export function Avatar({
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (avatarRef.current && !(avatarRef.current as HTMLButtonElement).contains(event.target as Node)) {
+        // Check if the click is on a menu item button - if so, don't close the menu
+        const target = event.target as Element;
+        if (target.closest('[data-menu-item]')) {
+          return;
+        }
         setMenuOpen(false);
       }
     }
@@ -114,7 +119,7 @@ export function Avatar({
 
   // Calculate menu position for portal
   const getMenuPosition = () => {
-    if (menuPosition === 'portal' && menuTargetId && typeof document !== 'undefined') {
+    if (menuPosition === 'portal' && menuTargetId && typeof document !== 'undefined' && typeof window !== 'undefined') {
       const targetElement = document.getElementById(menuTargetId);
       if (targetElement) {
         const rect = targetElement.getBoundingClientRect();
@@ -145,11 +150,11 @@ export function Avatar({
     return {};
   };
 
-  const [menuStyle, setMenuStyle] = useState(getMenuPosition());
+  const [menuStyle, setMenuStyle] = useState({});
 
   // Recalculate position when menu opens
   useEffect(() => {
-    if (menuOpen && menuPosition === 'portal') {
+    if (menuOpen && menuPosition === 'portal' && typeof window !== 'undefined') {
       setMenuStyle(getMenuPosition());
     }
   }, [menuOpen, menuPosition, menuTargetId, size]);
@@ -195,6 +200,7 @@ export function Avatar({
             style={menuStyle}
             tabIndex={-1}
             onClick={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
           >
           {/* User Info Header */}
           <div className="p-4 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
@@ -229,11 +235,20 @@ export function Avatar({
           {/* Menu Items */}
           <div className="py-2">
             <button
-              onClick={() => {
+              data-menu-item
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 console.log('Profile Settings clicked!');
+                console.log('Current router:', router);
+                console.log('Menu open state:', menuOpen);
                 setMenuOpen(false);
                 console.log('Navigating to /dashboard/profile');
-                router.push('/dashboard/profile');
+                // Use setTimeout to ensure menu closes before navigation
+                setTimeout(() => {
+                  console.log('Executing navigation...');
+                  router.push('/dashboard/profile');
+                }, 100);
               }}
               className="w-full flex items-center px-4 py-3 text-gray-900 dark:text-white hover:bg-purple-100/30 dark:hover:bg-purple-900/30 transition-all duration-200 text-sm font-medium cursor-pointer group"
             >
@@ -242,7 +257,10 @@ export function Avatar({
             </button>
             
             <button
-              onClick={() => {
+              data-menu-item
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 setMenuOpen(false);
                 // TODO: Implement billing page
                 alert('Billing & Plan management coming soon! This feature will allow you to upgrade your plan and manage your subscription.');
@@ -254,7 +272,10 @@ export function Avatar({
             </button>
             
             <button
-              onClick={() => {
+              data-menu-item
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 setMenuOpen(false);
                 // TODO: Implement help page
                 alert('Help & Support coming soon! This will provide documentation, tutorials, and contact support.');
@@ -266,7 +287,10 @@ export function Avatar({
             </button>
             
             <button
-              onClick={() => {
+              data-menu-item
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 setMenuOpen(false);
                 // TODO: Implement notifications page
                 alert('Notifications coming soon! This will allow you to manage your notification preferences.');
@@ -284,9 +308,18 @@ export function Avatar({
           {/* Sign Out */}
           <div className="py-2">
             <button
-              onClick={() => {
+              data-menu-item
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Sign Out clicked!');
+                console.log('Current router:', router);
                 setMenuOpen(false);
-                handleSignOut();
+                // Use setTimeout to ensure menu closes before signout
+                setTimeout(() => {
+                  console.log('Executing sign out...');
+                  handleSignOut();
+                }, 100);
               }}
               className="w-full flex items-center px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-100/20 dark:hover:bg-red-900/20 transition-all duration-200 text-sm font-medium cursor-pointer group"
             >

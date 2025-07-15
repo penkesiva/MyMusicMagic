@@ -89,13 +89,16 @@ function getPrompt(prompt: string, templateName?: string) {
     - For skills_json, include 3-5 relevant technical or professional skills with hex color codes
     - For hobbies_json, include 3-5 relevant hobbies or interests with emojis
     - For sections_config, intelligently enable sections that make sense for the user's profession
-    - For developers: enable key_projects, skills, blog, status, resume
-    - For designers: enable gallery, key_projects, skills, testimonials
-    - For musicians: enable tracks, gallery, press, skills, hobbies
-    - For photographers: enable gallery, press, skills, hobbies
-    - For writers: enable blog, press, key_projects, testimonials
-    - For educators: enable resume, skills, blog, testimonials, status
+    - For developers: enable key_projects, skills, blog, status, resume, gallery
+    - For designers: enable gallery, key_projects, skills, testimonials, press
+    - For musicians: enable tracks, gallery, press, skills, hobbies, testimonials
+    - For photographers: enable gallery, press, skills, hobbies, testimonials
+    - For writers: enable blog, press, key_projects, testimonials, gallery
+    - For educators: enable resume, skills, blog, testimonials, status, key_projects
+    - For students: enable skills, resume, hobbies, key_projects, blog
+    - For professionals: enable skills, resume, key_projects, testimonials, press
     - Always enable hero, about, and contact sections
+    - Enable at least 5-7 sections total for a rich portfolio experience
     - Generate appropriate titles for each enabled section
     - Only output the raw JSON
   `;

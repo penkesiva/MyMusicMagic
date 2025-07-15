@@ -26,7 +26,6 @@ import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } 
 import { CSS } from '@dnd-kit/utilities';
 import PressMentionsForm from '@/components/portfolio/PressMentionsForm';
 import { generateEnhancedAITitle } from '@/lib/utils';
-import PortfolioAIAssistant from '@/components/portfolio/PortfolioAIAssistant';
 import PortfolioThemeSelector from '@/components/portfolio/PortfolioThemeSelector';
 import PortfolioFontSelector from '@/components/portfolio/PortfolioFontSelector';
 import PortfolioStylingSelector from '@/components/portfolio/PortfolioStylingSelector';
@@ -101,7 +100,6 @@ const PortfolioEditorPage = () => {
   const [uploadingResume, setUploadingResume] = useState(false);
   const [hobbySearch, setHobbySearch] = useState("");
   const [skillSearch, setSkillSearch] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [sectionOrder, setSectionOrder] = useState<string[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH);
@@ -659,26 +657,7 @@ const PortfolioEditorPage = () => {
           </div>
         </div>
 
-        {/* AI Assistant Component */}
-        <PortfolioAIAssistant
-          portfolio={portfolio}
-          onPortfolioUpdate={(updatedPortfolio) => {
-            setPortfolio(updatedPortfolio);
-            // Update sectionOrder to include all enabled sections, sorted by order/defaultOrder
-            const enabledSections = Object.keys(updatedPortfolio.sections_config)
-              .filter(key => updatedPortfolio.sections_config[key]?.enabled);
-            const sortedSections = enabledSections.sort((a, b) => {
-              const orderA = updatedPortfolio.sections_config[a]?.order ?? SECTIONS_CONFIG[a]?.defaultOrder ?? 999;
-              const orderB = updatedPortfolio.sections_config[b]?.order ?? SECTIONS_CONFIG[b]?.defaultOrder ?? 999;
-              return orderA - orderB;
-            });
-            setSectionOrder(sortedSections);
-          }}
-          isGenerating={isGenerating}
-          setIsGenerating={setIsGenerating}
-          theme={selectedTheme}
-          onSave={handleExplicitSave}
-        />
+        {/* AI Assistant removed - now available in dashboard */}
 
         {/* Theme Selector Component */}
         <PortfolioThemeSelector
@@ -839,21 +818,7 @@ const PortfolioEditorPage = () => {
 
         {/* Main Editor Content */}
         <main className={`flex-1 p-6 overflow-y-auto ${selectedTheme.colors.background}`} style={{ minHeight: 0 }}>
-          {/* AI Loading Animation */}
-          {isGenerating && (
-            <div className="mb-6">
-              <div className="bg-white/10 rounded-full h-2 overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full animate-pulse" style={{ width: '100%' }}></div>
-              </div>
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-sm text-purple-300">AI is generating content...</span>
-                </div>
-                <span className="text-xs text-gray-500">Please wait</span>
-              </div>
-            </div>
-          )}
+                  {/* AI Loading Animation removed - AI now available in dashboard */}
           
           <div className="max-w-5xl mx-auto space-y-6">
             <div className="flex justify-end items-center gap-2">

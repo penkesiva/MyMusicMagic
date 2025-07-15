@@ -193,9 +193,67 @@ export default function DashboardPage() {
       // Prepare default sections config based on template
       let defaultSectionsConfig = {};
       let defaultThemeName = 'Midnight Dusk';
-      let defaultContent = {};
+      let defaultContent: any = {};
 
-      if (templateData) {
+      // AI Generation Logic
+      if (aiPrompt.trim()) {
+        setSuccess('🤖 AI is generating your portfolio... This may take a moment.');
+        
+        try {
+          // Call AI API to generate portfolio content
+          const response = await fetch('/api/generate-portfolio', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              prompt: aiPrompt,
+              type: 'full_generation'
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error('AI generation failed');
+          }
+
+          const aiGeneratedData = await response.json();
+          
+          // Use AI-generated content
+          defaultContent = {
+            subtitle: aiGeneratedData.subtitle,
+            hero_title: aiGeneratedData.hero_title,
+            hero_subtitle: aiGeneratedData.hero_subtitle,
+            about_title: aiGeneratedData.about_title,
+            about_text: aiGeneratedData.about_text,
+            contact_title: aiGeneratedData.contact_title,
+            contact_description: aiGeneratedData.contact_description,
+            contact_email: aiGeneratedData.contact_email,
+            skills_title: aiGeneratedData.skills_title,
+            skills_json: aiGeneratedData.skills_json,
+            hobbies_title: aiGeneratedData.hobbies_title,
+            hobbies_json: aiGeneratedData.hobbies_json,
+            resume_title: aiGeneratedData.resume_title,
+            footer_about_summary: aiGeneratedData.footer_about_summary
+          };
+
+          // Handle sections_config from AI response
+          if (aiGeneratedData.sections_config) {
+            defaultSectionsConfig = aiGeneratedData.sections_config;
+          }
+
+          // Set theme based on AI analysis or template
+          if (templateData) {
+            defaultThemeName = templateData.name;
+          } else {
+            // AI can suggest theme based on content
+            defaultThemeName = 'Midnight Dusk';
+          }
+
+          setSuccess('✨ AI has generated your portfolio! Creating your masterpiece...');
+        } catch (aiError) {
+          console.error('AI generation error:', aiError);
+          setError('AI generation failed, creating portfolio with template defaults');
+          // Fall back to template-based creation
+        }
+      } else if (templateData) {
         // Apply template-specific settings
         if (templateData.name === 'Music Maestro') {
           defaultThemeName = 'Music Maestro';
@@ -425,7 +483,7 @@ export default function DashboardPage() {
       setSelectedTemplate('')
       setAiPrompt('')
       setShowTemplates(false)
-      setSuccess('Portfolio created successfully!')
+      setSuccess(aiPrompt.trim() ? '✨ AI-generated portfolio created successfully!' : 'Portfolio created successfully!')
       setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
       console.error('Portfolio creation error:', err)
@@ -580,22 +638,44 @@ export default function DashboardPage() {
                         />
                       </div>
                       <div className="relative">
-                        <div className="flex items-center mb-2">
-                          <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center mr-2">
-                            <Sparkles className="w-3 h-3 text-white" />
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center">
+                            <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center mr-2">
+                              <Sparkles className="w-3 h-3 text-white" />
+                            </div>
+                            <label className="block text-sm font-semibold text-purple-200">AI Description</label>
                           </div>
-                          <label className="block text-sm font-semibold text-purple-200">AI Description</label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const examples = [
+                                "A jazz musician with 10 years of experience performing in clubs and festivals",
+                                "A full-stack developer specializing in React and Node.js with a passion for clean code",
+                                "A freelance photographer capturing weddings and corporate events",
+                                "A UI/UX designer creating beautiful mobile apps and websites",
+                                "A classical pianist with a love for contemporary compositions"
+                              ];
+                              const randomExample = examples[Math.floor(Math.random() * examples.length)];
+                              setAiPrompt(randomExample);
+                            }}
+                            className="text-xs text-purple-300 hover:text-purple-200 transition-colors"
+                          >
+                            Try Example
+                          </button>
                         </div>
-                        <input
-                          type="text"
+                        <textarea
                           value={aiPrompt}
                           onChange={e => {
                             setAiPrompt(e.target.value);
                             if (e.target.value) setSelectedTemplate('');
                           }}
-                          className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm"
-                          placeholder="Describe your portfolio (optional)"
+                          className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm resize-none"
+                          placeholder="Describe your portfolio in detail... (e.g., 'A jazz musician with 10 years of experience performing in clubs and festivals')"
+                          rows={3}
                         />
+                        <p className="text-xs text-purple-300 mt-1">
+                          AI will generate sections, content, and styling based on your description
+                        </p>
                       </div>
                     </div>
 
@@ -657,6 +737,15 @@ export default function DashboardPage() {
                       >
                         Cancel
                       </button>
+                      {aiPrompt.trim() && (
+                        <button
+                          onClick={handleCreatePortfolio}
+                          disabled={!newPortfolioName.trim()}
+                          className="px-6 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                        >
+                          Generate with AI
+                        </button>
+                      )}
                       <button
                         onClick={handleCreatePortfolio}
                         disabled={
@@ -665,7 +754,7 @@ export default function DashboardPage() {
                         }
                         className="px-6 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 text-green-300 rounded-xl hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                       >
-                        Create Portfolio
+                        {aiPrompt.trim() ? 'Create Portfolio' : 'Create Portfolio'}
                       </button>
                     </div>
                   </div>
