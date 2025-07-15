@@ -262,8 +262,10 @@ export function Avatar({
                 e.preventDefault();
                 e.stopPropagation();
                 setMenuOpen(false);
-                // TODO: Implement billing page
-                alert('Billing & Plan management coming soon! This feature will allow you to upgrade your plan and manage your subscription.');
+                // Navigate to billing page
+                setTimeout(() => {
+                  router.push('/dashboard/billing');
+                }, 100);
               }}
               className="w-full flex items-center px-4 py-3 text-gray-900 dark:text-white hover:bg-purple-100/30 dark:hover:bg-purple-900/30 transition-all duration-200 text-sm font-medium cursor-pointer group"
             >
