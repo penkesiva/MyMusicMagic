@@ -261,8 +261,11 @@ export default function DashboardPage() {
           // Set theme based on AI analysis or template
           if (templateData) {
             defaultThemeName = templateData.name;
+          } else if (aiGeneratedData.theme_name) {
+            // Use AI's theme suggestion
+            defaultThemeName = aiGeneratedData.theme_name;
           } else {
-            // AI can suggest theme based on content
+            // Fallback to a default theme
             defaultThemeName = 'Midnight Dusk';
           }
 

@@ -30,6 +30,7 @@ function getPrompt(prompt: string, templateName?: string) {
     Generate a JSON object with the following structure. Do NOT include any markdown or explanatory text around the JSON object.
 
     {
+      "theme_name": "Choose the most appropriate theme name from: Royal Purple, Crimson Sunset, Deep Ocean, Midnight Dusk-light, Midnight Dusk-dark, Sunset Rose-light, Sunset Rose-dark, Royal Purple-light, Royal Purple-dark, Golden Hour-light, Golden Hour-dark, Emerald Forest-light, Emerald Forest-dark, Lime Fresh-light, Lime Fresh-dark, Classic Gray-light, Classic Gray-dark, Stone Elegance-light, Stone Elegance-dark, Navy & Coral, White & Teal, Light Gray & Mustard, Black & Lime, White & Electric Blue, Midnight & Gold, Cream & Blush, Teal & Salmon, Mint & Coral, White & Vibrant Purple (string)",
       "subtitle": "An engaging one-sentence subtitle or tagline. (string)",
       "hero_title": "A compelling hero section title. (string)",
       "hero_subtitle": "A brief hero section subtitle or tagline. (string)",
@@ -86,6 +87,21 @@ function getPrompt(prompt: string, templateName?: string) {
 
     Instructions:
     - Generate creative content directly inspired by the user's prompt
+    - For theme_name, choose the most appropriate theme based on the user's profession and style:
+      * For musicians, artists, creative professionals: choose "Royal Purple" or "Deep Ocean"
+      * For photographers, visual artists: choose "Crimson Sunset" or "Deep Ocean"
+      * For developers, tech professionals: choose "Deep Ocean" or "Black & Lime"
+      * For designers, creative professionals: choose "Royal Purple" or "Crimson Sunset"
+      * For writers, content creators: choose "Midnight Dusk-dark" or "Classic Gray-dark"
+      * For educators, academics: choose "Deep Ocean" or "Classic Gray-light"
+      * For students: choose "Lime Fresh-light" or "White & Electric Blue"
+      * For corporate professionals: choose "Classic Gray-dark" or "Midnight Dusk-dark"
+      * For warm, friendly professions: choose "Sunset Rose-light" or "Golden Hour-light"
+      * For modern, minimalist styles: choose "White & Teal" or "White & Electric Blue"
+      * For bold, dramatic styles: choose "Crimson Sunset" or "Black & Lime"
+      * For elegant, sophisticated styles: choose "Royal Purple" or "Midnight & Gold"
+      * For natural, organic styles: choose "Emerald Forest-light" or "Teal & Salmon"
+      * For vibrant, energetic styles: choose "Lime Fresh-light" or "White & Vibrant Purple"
     - For skills_json, include 3-5 relevant technical or professional skills with hex color codes
     - For hobbies_json, include 3-5 relevant hobbies or interests with emojis
     - For sections_config, intelligently enable sections that make sense for the user's profession
@@ -333,9 +349,11 @@ export async function POST(request: Request) {
         generatedData.sections_config = finalSectionsConfig;
 
         // Preserve the existing portfolio name - don't let AI change it
+        // For theme, use AI's suggestion if provided, otherwise keep existing theme
         const finalData = {
           ...generatedData,
-          name: currentPortfolio?.name || 'Untitled Portfolio' // Keep the user's original portfolio name
+          name: currentPortfolio?.name || 'Untitled Portfolio', // Keep the user's original portfolio name
+          theme_name: generatedData.theme_name || currentPortfolio?.theme_name // Use AI's theme suggestion or keep existing
         };
 
         // Also update individual section title fields based on sections_config titles
