@@ -191,7 +191,7 @@ export default function DashboardPage() {
       }
 
       // Prepare default sections config based on template
-      let defaultSectionsConfig = {};
+      let defaultSectionsConfig: Record<string, any> = {};
       let defaultThemeName = 'Midnight Dusk';
       let defaultContent: any = {};
 
@@ -236,7 +236,26 @@ export default function DashboardPage() {
 
           // Handle sections_config from AI response
           if (aiGeneratedData.sections_config) {
-            defaultSectionsConfig = aiGeneratedData.sections_config;
+            defaultSectionsConfig = aiGeneratedData.sections_config as Record<string, any>;
+            
+            // Ensure essential sections are enabled
+            const essentialSections = ['hero', 'about', 'contact'];
+            essentialSections.forEach(sectionKey => {
+              if (defaultSectionsConfig[sectionKey] && !defaultSectionsConfig[sectionKey].enabled) {
+                defaultSectionsConfig[sectionKey].enabled = true;
+              }
+            });
+            
+            // Additional fallback: If AI enabled too few sections, enable some defaults
+            const enabledSections = Object.keys(defaultSectionsConfig).filter(key => defaultSectionsConfig[key].enabled);
+            if (enabledSections.length < 6) {
+              const defaultSections = ['skills', 'hobbies', 'gallery', 'tracks'];
+              defaultSections.forEach(sectionKey => {
+                if (defaultSectionsConfig[sectionKey] && !defaultSectionsConfig[sectionKey].enabled) {
+                  defaultSectionsConfig[sectionKey].enabled = true;
+                }
+              });
+            }
           }
 
           // Set theme based on AI analysis or template

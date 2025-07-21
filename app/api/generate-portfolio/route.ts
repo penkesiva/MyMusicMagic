@@ -99,6 +99,10 @@ function getPrompt(prompt: string, templateName?: string) {
     - For professionals: enable skills, resume, key_projects, testimonials, press
     - Always enable hero, about, and contact sections
     - Enable at least 5-7 sections total for a rich portfolio experience
+    - IMPORTANT: When in doubt, enable more sections rather than fewer
+    - Default to enabling: hero, about, skills, hobbies, contact, gallery, tracks
+    - CRITICAL: Always enable at least 6-8 sections for a rich portfolio
+    - CRITICAL: If unsure about a section, enable it rather than disable it
     - Generate appropriate titles for each enabled section
     - Only output the raw JSON
   `;
@@ -265,7 +269,22 @@ export async function POST(request: Request) {
         const generatedData = JSON.parse(jsonString);
 
         // Smart section enabling logic: respect user's manual choices
-        const finalSectionsConfig = { ...(currentPortfolio?.sections_config || {}) };
+        const finalSectionsConfig: Record<string, any> = { ...(currentPortfolio?.sections_config || {}) };
+        
+        // Ensure we have a complete sections_config with all available sections
+        const allSections = ['hero', 'about', 'tracks', 'gallery', 'key_projects', 'testimonials', 'press', 'blog', 'status', 'skills', 'resume', 'hobbies', 'contact'];
+        
+        // Initialize missing sections with defaults
+        allSections.forEach(sectionKey => {
+          if (!finalSectionsConfig[sectionKey]) {
+            finalSectionsConfig[sectionKey] = {
+              enabled: false,
+              title: '',
+              order: 999
+            };
+          }
+        });
+        
         for (const key in generatedData.sections_config) {
             if (finalSectionsConfig[key]) {
                 const currentSection = finalSectionsConfig[key];
@@ -290,6 +309,25 @@ export async function POST(request: Request) {
                     };
                 }
             }
+        }
+        
+        // Fallback: Ensure essential sections are enabled if AI didn't enable them
+        const essentialSections = ['hero', 'about', 'contact'];
+        essentialSections.forEach(sectionKey => {
+          if (finalSectionsConfig[sectionKey] && !finalSectionsConfig[sectionKey].enabled) {
+            finalSectionsConfig[sectionKey].enabled = true;
+          }
+        });
+        
+        // Additional fallback: If AI enabled too few sections, enable some defaults
+        const enabledSections = Object.keys(finalSectionsConfig).filter(key => finalSectionsConfig[key].enabled);
+        if (enabledSections.length < 6) {
+          const defaultSections = ['skills', 'hobbies', 'gallery', 'tracks'];
+          defaultSections.forEach(sectionKey => {
+            if (finalSectionsConfig[sectionKey] && !finalSectionsConfig[sectionKey].enabled) {
+              finalSectionsConfig[sectionKey].enabled = true;
+            }
+          });
         }
 
         generatedData.sections_config = finalSectionsConfig;
