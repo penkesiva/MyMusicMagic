@@ -37,7 +37,7 @@ const getIndustryIcon = (industry: string) => {
 
 const getTemplateColors = (templateName: string) => {
   switch (templateName) {
-    case 'Music Maestro':
+    case 'Royal Purple':
       return {
         primary: '#4F46E5',
         secondary: '#7C3AED',
@@ -58,7 +58,7 @@ const getTemplateColors = (templateName: string) => {
         accent: '#10B981',
         background: 'from-slate-900 to-slate-800'
       };
-    case 'Photo Gallery':
+    case 'Crimson Sunset':
       return {
         primary: '#DC2626',
         secondary: '#374151',

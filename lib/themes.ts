@@ -21,7 +21,7 @@ export interface PortfolioTheme {
 
 export const THEMES = [
   {
-    name: 'Music Maestro',
+    name: 'Royal Purple',
     previewColor: '#a78bfa', // purple-400
     isGradient: true,
     gradientColors: ['#581c87', '#7c3aed'], // purple-950 to purple-600
@@ -41,7 +41,7 @@ export const THEMES = [
     }
   },
   {
-    name: 'Photo Gallery',
+    name: 'Crimson Sunset',
     previewColor: '#f87171', // red-400
     isGradient: true,
     gradientColors: ['#7f1d1d', '#dc2626'], // red-950 to red-600
@@ -61,7 +61,7 @@ export const THEMES = [
     }
   },
   {
-    name: 'Ocean Blue',
+    name: 'Deep Ocean',
     previewColor: '#1e40af', // blue-800
     isGradient: true,
     gradientColors: ['#1e3a8a', '#3b82f6'], // blue-950 to blue-500

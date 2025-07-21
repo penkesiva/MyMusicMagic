@@ -274,8 +274,8 @@ export default function DashboardPage() {
         }
       } else if (templateData) {
         // Apply template-specific settings
-        if (templateData.name === 'Music Maestro') {
-          defaultThemeName = 'Music Maestro';
+        if (templateData.name === 'Royal Purple') {
+          defaultThemeName = 'Royal Purple';
           defaultSectionsConfig = {
             hero: { enabled: true, name: 'Welcome', order: 1 },
             about: { enabled: true, name: 'About My Music', order: 2 },
@@ -313,8 +313,8 @@ export default function DashboardPage() {
             contact_description: 'Ready to collaborate on your next musical project? I\'m always excited to work with fellow musicians and creators.',
             footer_about_summary: 'Dedicated to creating beautiful music that inspires and connects people across the world.'
           };
-        } else if (templateData.name === 'Photo Gallery') {
-          defaultThemeName = 'Photo Gallery';
+        } else if (templateData.name === 'Crimson Sunset') {
+          defaultThemeName = 'Crimson Sunset';
           defaultSectionsConfig = {
             hero: { enabled: true, name: 'Welcome', order: 1 },
             about: { enabled: true, name: 'About My Photography', order: 2 },

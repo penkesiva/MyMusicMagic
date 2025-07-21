@@ -8,14 +8,14 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 function getPrompt(prompt: string, templateName?: string) {
   let templateSpecificInstructions = "";
   
-  if (templateName === 'Photo Gallery') {
+  if (templateName === 'Crimson Sunset') {
     templateSpecificInstructions = `
-    Template: Photo Gallery - This is a photography-focused portfolio template.
+    Template: Crimson Sunset - This is a photography-focused portfolio template.
     Focus on photography skills, techniques, and visual storytelling.
     `;
-  } else if (templateName === 'Music Maestro') {
+  } else if (templateName === 'Royal Purple') {
     templateSpecificInstructions = `
-    Template: Music Maestro - This is a music-focused portfolio template.
+    Template: Royal Purple - This is a music-focused portfolio template.
     Focus on musical skills, instruments, and performance.
     `;
   }
@@ -112,17 +112,17 @@ function getPrompt(prompt: string, templateName?: string) {
 function getSectionTitlesPrompt(prompt: string, templateName?: string) {
   let templateSpecificInstructions = "";
   
-  if (templateName === 'Photo Gallery') {
+  if (templateName === 'Crimson Sunset') {
     templateSpecificInstructions = `
-    Template: Photo Gallery - This is a photography-focused portfolio template.
+    Template: Crimson Sunset - This is a photography-focused portfolio template.
     Photography-specific section titles:
     - tracks: "Audio Stories", "Soundscapes", "Audio Work"
     - gallery: "Photo Portfolio", "My Photography", "Visual Stories"
     - press: "Exhibitions", "Publications", "Press Features"
     `;
-  } else if (templateName === 'Music Maestro') {
+  } else if (templateName === 'Royal Purple') {
     templateSpecificInstructions = `
-    Template: Music Maestro - This is a music-focused portfolio template.
+    Template: Royal Purple - This is a music-focused portfolio template.
     Music-specific section titles:
     - tracks: "My Compositions", "Musical Works", "Discography"
     - gallery: "Performance Photos", "Behind the Scenes", "Studio Sessions"
