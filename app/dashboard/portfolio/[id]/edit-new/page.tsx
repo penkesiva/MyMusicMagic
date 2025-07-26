@@ -488,13 +488,7 @@ const PortfolioEditorPage = () => {
                 
                 {openSections[key] && (
                   <div className="p-6">
-                    {!isEnabled && (
-                      <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                        <p className="text-yellow-300 text-sm">
-                          This section is currently disabled. Enable it in the Sections panel to the left to start editing.
-                        </p>
-                      </div>
-                    )}
+
 
                     {/* Section Title Editor */}
                     {sectionConfig.hasCustomTitle && (
