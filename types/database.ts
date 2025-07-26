@@ -203,6 +203,9 @@ export interface Database {
           preview_image_url: string | null
           theme_colors: Json | null
           is_active: boolean
+          is_free: boolean
+          is_locked: boolean
+          display_order: number
           created_at: string
         }
         Insert: {
@@ -214,6 +217,9 @@ export interface Database {
           preview_image_url?: string | null
           theme_colors?: Json | null
           is_active?: boolean
+          is_free?: boolean
+          is_locked?: boolean
+          display_order?: number
           created_at?: string
         }
         Update: {
@@ -225,6 +231,9 @@ export interface Database {
           preview_image_url?: string | null
           theme_colors?: Json | null
           is_active?: boolean
+          is_free?: boolean
+          is_locked?: boolean
+          display_order?: number
           created_at?: string
         }
       }

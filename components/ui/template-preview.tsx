@@ -9,9 +9,15 @@ interface TemplatePreviewProps {
     industry: string;
     style: string;
     theme_colors?: any;
+    is_free?: boolean;
+    is_locked?: boolean;
   };
   isSelected: boolean;
   onSelect: (templateId: string) => void;
+  onUpgrade?: () => void;
+  userSubscription?: {
+    plan_type: string;
+  };
 }
 
 const getIndustryIcon = (industry: string) => {
@@ -37,6 +43,13 @@ const getIndustryIcon = (industry: string) => {
 
 const getTemplateColors = (templateName: string) => {
   switch (templateName) {
+    case 'Basic Template':
+      return {
+        primary: '#6B7280',
+        secondary: '#374151',
+        accent: '#F59E0B',
+        background: 'from-gray-900 to-gray-800'
+      };
     case 'Royal Purple':
       return {
         primary: '#4F46E5',
@@ -75,17 +88,30 @@ const getTemplateColors = (templateName: string) => {
   }
 };
 
-export function TemplatePreview({ template, isSelected, onSelect }: TemplatePreviewProps) {
+export function TemplatePreview({ template, isSelected, onSelect, onUpgrade, userSubscription }: TemplatePreviewProps) {
   const colors = getTemplateColors(template.name);
+  
+  // Check if template is locked for current user
+  const isLocked = template.is_locked && userSubscription?.plan_type === 'free';
   
   return (
     <div
-      className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+      className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+        isLocked 
+          ? 'cursor-not-allowed opacity-60' 
+          : 'cursor-pointer hover:border-white/20 hover:bg-white/10'
+      } ${
         isSelected
           ? 'border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/25'
-          : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+          : 'border-white/10 bg-white/5'
       }`}
-      onClick={() => onSelect(template.id)}
+      onClick={() => {
+        if (!isLocked) {
+          onSelect(template.id);
+        } else if (onUpgrade) {
+          onUpgrade();
+        }
+      }}
     >
       {/* Template Preview */}
       <div className={`w-full h-24 rounded-lg bg-gradient-to-br ${colors.background} mb-3 relative overflow-hidden`}>
@@ -133,10 +159,34 @@ export function TemplatePreview({ template, isSelected, onSelect }: TemplatePrev
         </div>
       </div>
 
+      {/* Lock indicator for locked templates */}
+      {isLocked && (
+        <div className="absolute top-2 right-2 w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+          </svg>
+        </div>
+      )}
+
       {/* Selection indicator */}
-      {isSelected && (
+      {isSelected && !isLocked && (
         <div className="absolute top-2 right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
           <div className="w-2 h-2 bg-white rounded-full"></div>
+        </div>
+      )}
+
+      {/* Upgrade button for locked templates */}
+      {isLocked && (
+        <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onUpgrade) onUpgrade();
+            }}
+            className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-medium rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all"
+          >
+            Upgrade
+          </button>
         </div>
       )}
     </div>

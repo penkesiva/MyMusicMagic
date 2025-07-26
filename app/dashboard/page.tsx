@@ -39,6 +39,16 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   
+  // Set Basic Template as default when templates load
+  useEffect(() => {
+    if (templates.length > 0 && !selectedTemplate) {
+      const basicTemplate = templates.find(t => t.name === 'Basic Template');
+      if (basicTemplate) {
+        setSelectedTemplate(basicTemplate.id);
+      }
+    }
+  }, [templates, selectedTemplate]);
+  
   // Profile editing state
   const [editingProfile, setEditingProfile] = useState({
     username: ''
@@ -124,12 +134,13 @@ export default function DashboardPage() {
         setPortfolios(portfoliosData)
       }
 
-      // Fetch portfolio templates
-      const { data: templatesData, error: templatesError } = await supabase
-        .from('portfolio_templates')
-        .select('*')
-        .eq('is_active', true)
-        .order('name', { ascending: true })
+        // Fetch portfolio templates - Basic Template first, then others
+  const { data: templatesData, error: templatesError } = await supabase
+    .from('portfolio_templates')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+    .order('name', { ascending: true })
 
       // Temporarily set empty templates array if there's an error
       if (templatesError) {
@@ -174,7 +185,25 @@ export default function DashboardPage() {
   }
 
   const handleCreatePortfolio = async () => {
-    if (!newPortfolioName.trim() && !aiPrompt.trim()) return
+    if (!newPortfolioName.trim()) {
+      setError('Please enter a portfolio name')
+      setTimeout(() => setError(null), 3000)
+      return
+    }
+
+    if (!aiPrompt.trim()) {
+      setError('Please enter an AI description')
+      setTimeout(() => setError(null), 3000)
+      return
+    }
+
+    // Ensure Basic Template is selected by default if no template is selected
+    if (!selectedTemplate) {
+      const basicTemplate = templates.find(t => t.name === 'Basic Template');
+      if (basicTemplate) {
+        setSelectedTemplate(basicTemplate.id);
+      }
+    }
 
     try {
       const slug = newPortfolioName.toLowerCase().replace(/[^a-z0-9]/g, '-')
@@ -277,7 +306,43 @@ export default function DashboardPage() {
         }
       } else if (templateData) {
         // Apply template-specific settings
-        if (templateData.name === 'Royal Purple') {
+        if (templateData.name === 'Basic Template') {
+          defaultThemeName = 'Midnight Dusk-light';
+          defaultSectionsConfig = {
+            hero: { enabled: true, name: 'Welcome', order: 1 },
+            about: { enabled: true, name: 'About Me', order: 2 },
+            skills: { enabled: true, name: 'Skills', order: 3 },
+            hobbies: { enabled: true, name: 'Interests', order: 4 },
+            contact: { enabled: true, name: 'Contact', order: 5 },
+            footer: { enabled: true, name: 'Footer', order: 6 }
+          };
+          defaultContent = {
+            hero_title: 'Welcome to My Portfolio',
+            hero_subtitle: 'Professional • Creative • Dedicated',
+            about_title: 'About Me',
+            about_text: 'I am a passionate professional dedicated to creating meaningful work and delivering exceptional results. With a focus on quality and innovation, I strive to make a positive impact in everything I do.',
+            hobbies_title: 'Interests',
+            hobbies_json: [
+              { name: 'Problem Solving', icon: '🧩' },
+              { name: 'Creative Design', icon: '🎨' },
+              { name: 'Technology', icon: '💻' },
+              { name: 'Learning', icon: '📚' },
+              { name: 'Collaboration', icon: '🤝' },
+              { name: 'Innovation', icon: '💡' }
+            ],
+            skills_title: 'Skills',
+            skills_json: [
+              { name: 'Project Management', color: '#059669' },
+              { name: 'Problem Solving', color: '#7C3AED' },
+              { name: 'Communication', color: '#F59E0B' },
+              { name: 'Leadership', color: '#EF4444' },
+              { name: 'Analytical Thinking', color: '#10B981' }
+            ],
+            contact_title: 'Get In Touch',
+            contact_description: 'Ready to work together? I\'m always open to new opportunities and exciting projects.',
+            footer_about_summary: 'Committed to excellence and continuous improvement in all aspects of my work.'
+          };
+        } else if (templateData.name === 'Royal Purple') {
           defaultThemeName = 'Royal Purple';
           defaultSectionsConfig = {
             hero: { enabled: true, name: 'Welcome', order: 1 },
@@ -645,60 +710,61 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   
-                  {/* Compact Create Portfolio form */}
-                  <div className="space-y-5">
-                    {/* Portfolio Name and AI Prompt in a row */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div className="relative">
-                        <label className="block text-sm font-semibold text-purple-200 mb-2">Portfolio Name</label>
-                        <input
-                          type="text"
-                          value={newPortfolioName}
-                          onChange={(e) => setNewPortfolioName(e.target.value)}
-                          className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm"
-                          placeholder="My Awesome Portfolio"
-                        />
-                      </div>
-                      <div className="relative">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center">
-                            <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center mr-2">
-                              <Sparkles className="w-3 h-3 text-white" />
-                            </div>
-                            <label className="block text-sm font-semibold text-purple-200">AI Description</label>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const examples = [
-                                "A jazz musician with 10 years of experience performing in clubs and festivals",
-                                "A full-stack developer specializing in React and Node.js with a passion for clean code",
-                                "A freelance photographer capturing weddings and corporate events",
-                                "A UI/UX designer creating beautiful mobile apps and websites",
-                                "A classical pianist with a love for contemporary compositions"
-                              ];
-                              const randomExample = examples[Math.floor(Math.random() * examples.length)];
-                              setAiPrompt(randomExample);
-                            }}
-                            className="text-xs text-purple-300 hover:text-purple-200 transition-colors"
-                          >
-                            Try Example
-                          </button>
+                  {/* AI-First Create Portfolio form */}
+                  <div className="space-y-6">
+                    {/* AI Description - Prominent and Centered */}
+                    <div className="text-center mb-6">
+                      <div className="flex items-center justify-center mb-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center mr-3">
+                          <Sparkles className="w-4 h-4 text-white" />
                         </div>
-                        <textarea
-                          value={aiPrompt}
-                          onChange={e => {
-                            setAiPrompt(e.target.value);
-                            if (e.target.value) setSelectedTemplate('');
-                          }}
-                          className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm resize-none"
-                          placeholder="Describe your portfolio in detail... (e.g., 'A jazz musician with 10 years of experience performing in clubs and festivals')"
-                          rows={3}
-                        />
-                        <p className="text-xs text-purple-300 mt-1">
-                          AI will generate sections, content, and styling based on your description
-                        </p>
+                        <h3 className="text-lg font-bold text-white">AI Description</h3>
                       </div>
+                      <p className="text-sm text-purple-200 mb-4">Tell AI about your portfolio and watch it create magic</p>
+                    </div>
+                    
+                    <div className="relative">
+                      <textarea
+                        value={aiPrompt}
+                        onChange={e => {
+                          setAiPrompt(e.target.value);
+                          if (e.target.value) setSelectedTemplate('');
+                        }}
+                        className="w-full px-6 py-4 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm resize-none text-center"
+                        placeholder="Describe your portfolio in detail... (e.g., 'A jazz musician with 10 years of experience performing in clubs and festivals')"
+                        rows={4}
+                      />
+                      <div className="flex justify-center mt-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const examples = [
+                              "A jazz musician with 10 years of experience performing in clubs and festivals",
+                              "A full-stack developer specializing in React and Node.js with a passion for clean code",
+                              "A freelance photographer capturing weddings and corporate events",
+                              "A UI/UX designer creating beautiful mobile apps and websites",
+                              "A classical pianist with a love for contemporary compositions"
+                            ];
+                            const randomExample = examples[Math.floor(Math.random() * examples.length)];
+                            setAiPrompt(randomExample);
+                          }}
+                          className="text-sm text-purple-300 hover:text-purple-200 transition-colors underline"
+                        >
+                          Try Example
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Portfolio Name - Smaller and below AI */}
+                    <div className="max-w-md mx-auto">
+                      <label className="block text-sm font-semibold text-purple-200 mb-2 text-center">Portfolio Name</label>
+                      <input
+                        type="text"
+                        value={newPortfolioName}
+                        onChange={(e) => setNewPortfolioName(e.target.value)}
+                        className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm text-center"
+                        placeholder="My Awesome Portfolio"
+                      />
                     </div>
 
                     {/* Templates section */}
@@ -732,19 +798,17 @@ export default function DashboardPage() {
                               setSelectedTemplate(id);
                               setAiPrompt('');
                             }}
+                            onUpgrade={() => {
+                              // Redirect to billing page for upgrade
+                              router.push('/dashboard/billing');
+                            }}
+                            userSubscription={subscription ? { plan_type: subscription.plan_type } : undefined}
                           />
                         ))}
                       </div>
                     )}
 
-                    {/* Template description if selected */}
-                    {selectedTemplate && (
-                      <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-400/20 rounded-xl">
-                        <p className="text-sm text-purple-200">
-                          {templates.find(t => t.id === selectedTemplate)?.description}
-                        </p>
-                      </div>
-                    )}
+
 
                     {/* Action buttons */}
                     <div className="flex justify-end space-x-3 pt-2">
@@ -759,24 +823,12 @@ export default function DashboardPage() {
                       >
                         Cancel
                       </button>
-                      {aiPrompt.trim() && (
-                        <button
-                          onClick={handleCreatePortfolio}
-                          disabled={!newPortfolioName.trim()}
-                          className="px-6 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-                        >
-                          Generate with AI
-                        </button>
-                      )}
                       <button
                         onClick={handleCreatePortfolio}
-                        disabled={
-                          !newPortfolioName.trim() ||
-                          (!aiPrompt.trim() && !selectedTemplate)
-                        }
+                        disabled={!newPortfolioName.trim() || !aiPrompt.trim()}
                         className="px-6 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 text-green-300 rounded-xl hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                       >
-                        {aiPrompt.trim() ? 'Create Portfolio' : 'Create Portfolio'}
+                        Create Portfolio
                       </button>
                     </div>
                   </div>
