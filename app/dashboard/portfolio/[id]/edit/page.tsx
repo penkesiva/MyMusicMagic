@@ -835,7 +835,7 @@ const PortfolioEditorPage = () => {
               const isEnabled = (portfolio.sections_config as any)?.[key]?.enabled;
               
               return (
-                <section key={key} id={key} className={`bg-white/5 rounded-xl border border-white/10 overflow-hidden transition-all duration-300 ${!isEnabled ? 'opacity-50' : ''}`}>
+                <section key={key} id={key} className={`bg-white/5 rounded-xl border border-gray-500/30 overflow-hidden transition-all duration-300 ${!isEnabled ? 'opacity-50' : ''}`}>
                   <button 
                     onClick={() => toggleSection(key)} 
                     className={`w-full flex items-center justify-between p-4 ${selectedTheme.colors.card} hover:bg-opacity-80 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
@@ -868,7 +868,7 @@ const PortfolioEditorPage = () => {
 
                       {/* Section Title Editor */}
                       {sectionConfig.hasCustomTitle && (
-                        <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                        <div className="mb-6 p-4 bg-white/5 rounded-lg border border-gray-500/30">
                           <div className="flex items-center justify-between mb-3">
                             <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
                               Section Title
@@ -879,7 +879,7 @@ const PortfolioEditorPage = () => {
                             value={getSectionTitle(key, portfolio)}
                             onChange={(e) => handleSectionConfigChange(key as keyof typeof SECTIONS_CONFIG, 'title', e.target.value)}
                             placeholder={`Enter title for ${sectionConfig.defaultName} section`}
-                            className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                            className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                           />
                           <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
                             This title will be displayed at the top of the {sectionConfig.defaultName} section on your portfolio. Use the AI Assistant to generate creative titles.
@@ -904,7 +904,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_title || ''}
                                   onChange={(e) => handleFieldChange('hero_title', e.target.value)}
                                   placeholder="Your main title"
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                                 />
                               </div>
                               <div>
@@ -916,7 +916,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_subtitle || ''}
                                   onChange={(e) => handleFieldChange('hero_subtitle', e.target.value)}
                                   placeholder="Brief description or tagline"
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                                 />
                               </div>
                             </div>
@@ -947,7 +947,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_image_url || ''}
                                   onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
                                   placeholder="Paste image URL"
-                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                                 />
                                 <input
                                   type="file" id="hero-upload" accept="image/*"
@@ -1041,7 +1041,7 @@ const PortfolioEditorPage = () => {
                                         handleFieldChange('hero_cta_buttons', buttons);
                                       }}
                                       placeholder="e.g., View Resume, Contact Me"
-                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                      className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                                     />
                                   </div>
                                   <div>
@@ -1058,7 +1058,7 @@ const PortfolioEditorPage = () => {
                                         onChange={(e) => handleUrlInput(index, e.target.value)}
                                         onFocus={() => setShowUrlSuggestions(prev => ({ ...prev, [index]: true }))}
                                         placeholder="e.g., #resume, https://..."
-                                        className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                        className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                                       />
                                       {showUrlSuggestions[index] && (
                                         <div className={`absolute z-10 w-full border border-white/20 rounded-md shadow-lg max-h-60 overflow-y-auto ${selectedTheme.colors.card}`} data-suggestion-box>
@@ -1084,7 +1084,7 @@ const PortfolioEditorPage = () => {
                                         buttons[index] = { ...button, style: e.target.value };
                                         handleFieldChange('hero_cta_buttons', buttons);
                                       }}
-                                      className={`text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400 rounded-md h-9 w-full`}
+                                      className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400 rounded-md h-9 w-full`}
                                     >
                                       <option value="primary">Primary</option>
                                       <option value="secondary">Secondary</option>
@@ -1151,7 +1151,7 @@ const PortfolioEditorPage = () => {
                                   onChange={(e) => handleFieldChange('about_text', e.target.value)}
                                   placeholder="Tell your story..."
                                   rows={8}
-                                  className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                                 />
                               </div>
                             </div>
@@ -1163,7 +1163,7 @@ const PortfolioEditorPage = () => {
                               </label>
                               {portfolio.profile_photo_url ? (
                                   <div className="relative group">
-                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-48 object-cover rounded-lg border border-white/10" />
+                                      <img src={portfolio.profile_photo_url} alt="Profile" className="w-full h-48 object-cover rounded-lg border border-gray-500/30" />
                                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
                                           <button onClick={() => handleFieldChange('profile_photo_url', '')} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
                                               <Trash2 className="h-4 w-4" />
@@ -1171,7 +1171,7 @@ const PortfolioEditorPage = () => {
                                       </div>
                                   </div>
                               ) : (
-                                  <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                  <div className="border-2 border-dashed border-gray-500/50 rounded-lg p-6 text-center">
                                     <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
                                     <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
                                   </div>
@@ -1182,7 +1182,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.profile_photo_url || ''}
                                   onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
                                   placeholder="Paste photo URL"
-                                  className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                  className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                                 />
                                 <input
                                   type="file" id="profile-upload" accept="image/*"
@@ -1242,7 +1242,7 @@ const PortfolioEditorPage = () => {
                           </div>
 
                           {/* Audio Player Mode Preference */}
-                          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                          <div className="bg-white/5 rounded-lg p-4 border border-gray-500/30">
                             <div className="flex items-center justify-between">
                               <div>
                                 <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
@@ -1431,7 +1431,7 @@ const PortfolioEditorPage = () => {
                                 value={hobbySearch}
                                 onChange={(e) => setHobbySearch(e.target.value)}
                                 placeholder="Search hobbies..."
-                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                               />
                             </div>
                             
@@ -1440,10 +1440,10 @@ const PortfolioEditorPage = () => {
                                 <button
                                   key={hobby.name}
                                   onClick={() => handleAddHobby(hobby)}
-                                  className="flex flex-col items-center p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                                  className={`flex flex-col items-center p-3 rounded-lg border transition-colors ${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder} hover:${selectedTheme.colors.card} hover:opacity-80`}
                                 >
                                   <span className="text-2xl mb-1">{hobby.icon}</span>
-                                  <span className="text-xs text-center">{hobby.name}</span>
+                                  <span className={`text-xs text-center ${selectedTheme.colors.text}`}>{hobby.name}</span>
                                 </button>
                               ))}
                             </div>
@@ -1455,9 +1455,9 @@ const PortfolioEditorPage = () => {
                             </label>
                             <div className="flex flex-wrap gap-2">
                               {safeGetArray(portfolio.hobbies_json).map((hobby: any, index: number) => (
-                                <div key={`hobby-${index}-${hobby.name}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
+                                <div key={`hobby-${index}-${hobby.name}`} className={`flex items-center gap-2 p-2 rounded-lg border ${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder}`}>
                                   <span className="text-lg">{hobby.icon}</span>
-                                  <span className="text-sm">{hobby.name}</span>
+                                  <span className={`text-sm ${selectedTheme.colors.text}`}>{hobby.name}</span>
                                   <button
                                     onClick={() => handleRemoveHobby(hobby.name)}
                                     className="text-red-400 hover:text-red-300"
@@ -1483,7 +1483,7 @@ const PortfolioEditorPage = () => {
                                 value={skillSearch}
                                 onChange={(e) => setSkillSearch(e.target.value)}
                                 placeholder="Search skills..."
-                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                               />
                             </div>
                             
@@ -1492,10 +1492,10 @@ const PortfolioEditorPage = () => {
                                 <button
                                   key={skill.name}
                                   onClick={() => handleAddSkill(skill)}
-                                  className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                                  className={`flex items-center gap-2 p-3 rounded-lg border transition-colors ${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder} hover:${selectedTheme.colors.card} hover:opacity-80`}
                                 >
                                   <skill.icon className="h-5 w-5" style={{ color: skill.color }} />
-                                  <span className="text-sm">{skill.name}</span>
+                                  <span className={`text-sm ${selectedTheme.colors.text}`}>{skill.name}</span>
                                 </button>
                               ))}
                             </div>
@@ -1507,8 +1507,8 @@ const PortfolioEditorPage = () => {
                             </label>
                             <div className="flex flex-wrap gap-2">
                               {safeGetArray(portfolio.skills_json).map((skill: any, index: number) => (
-                                <div key={`skill-${index}-${skill.name}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg border border-white/20">
-                                  <span className="text-sm">{skill.name}</span>
+                                <div key={`skill-${index}-${skill.name}`} className={`flex items-center gap-2 p-2 rounded-lg border ${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder}`}>
+                                  <span className={`text-sm ${selectedTheme.colors.text}`}>{skill.name}</span>
                                   <button
                                     onClick={() => handleRemoveSkill(skill.name)}
                                     className="text-red-400 hover:text-red-300"
@@ -1534,7 +1534,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.resume_url || ''}
                                 onChange={(e) => handleFieldChange('resume_url', e.target.value)}
                                 placeholder="Paste resume URL"
-                                className={`flex-1 text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                               />
                               <input
                                 type="file" id="resume-upload" accept=".pdf,.doc,.docx"
@@ -1548,7 +1548,7 @@ const PortfolioEditorPage = () => {
                               <Button
                                 onClick={() => document.getElementById('resume-upload')?.click()}
                                 variant="outline" size="sm" disabled={uploadingResume}
-                                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                className={`${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.text} hover:${selectedTheme.colors.card} hover:opacity-80`}
                               >
                                 {uploadingResume ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                               </Button>
@@ -1584,7 +1584,7 @@ const PortfolioEditorPage = () => {
                               onChange={(e) => handleFieldChange('contact_description', e.target.value)}
                               placeholder="Ready to work together? Let's talk!"
                               rows={3}
-                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1597,7 +1597,7 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_email || ''}
                               onChange={(e) => handleFieldChange('contact_email', e.target.value)}
                               placeholder="your.email@example.com"
-                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1610,7 +1610,7 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_phone || ''}
                               onChange={(e) => handleFieldChange('contact_phone', e.target.value)}
                               placeholder="e.g. +1 555-123-4567"
-                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1623,7 +1623,7 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_location || ''}
                               onChange={(e) => handleFieldChange('contact_location', e.target.value)}
                               placeholder="e.g. New York, NY"
-                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1636,7 +1636,7 @@ const PortfolioEditorPage = () => {
                               value={portfolio.website_url || ''}
                               onChange={(e) => handleFieldChange('website_url', e.target.value)}
                               placeholder="https://yourwebsite.com"
-                              className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1650,7 +1650,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.linkedin_url || ''}
                                 onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
                                 placeholder="https://linkedin.com/in/yourprofile"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
@@ -1662,7 +1662,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.twitter_url || ''}
                                 onChange={(e) => handleFieldChange('twitter_url', e.target.value)}
                                 placeholder="https://twitter.com/yourhandle"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
@@ -1674,7 +1674,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.instagram_url || ''}
                                 onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
                                 placeholder="https://instagram.com/yourhandle"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
@@ -1686,7 +1686,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.github_url || ''}
                                 onChange={(e) => handleFieldChange('github_url', e.target.value)}
                                 placeholder="https://github.com/yourusername"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
@@ -1698,7 +1698,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.youtube_url || ''}
                                 onChange={(e) => handleFieldChange('youtube_url', e.target.value)}
                                 placeholder="https://youtube.com/@yourchannel"
-                                className={`w-full text-sm ${selectedTheme.colors.background} ${selectedTheme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                               />
                             </div>
                           </div>

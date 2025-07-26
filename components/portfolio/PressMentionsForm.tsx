@@ -268,7 +268,7 @@ export default function PressMentionsForm({ portfolioId, theme }: PressMentionsF
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Rolling Stone Feature"
-                className={`mt-1 ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                 isRequired
               />
             </div>
@@ -281,7 +281,7 @@ export default function PressMentionsForm({ portfolioId, theme }: PressMentionsF
                 value={formData.source}
                 onChange={(e) => setFormData({ ...formData, source: e.target.value })}
                 placeholder="e.g., Rolling Stone"
-                className={`mt-1 ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
               />
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function PressMentionsForm({ portfolioId, theme }: PressMentionsF
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Brief description of the press mention..."
-              className={`mt-1 ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+              className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
               rows={3}
             />
           </div>
@@ -308,7 +308,7 @@ export default function PressMentionsForm({ portfolioId, theme }: PressMentionsF
                 value={formData.url}
                 onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                 placeholder="https://example.com/article"
-                className={`mt-1 ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                 isRequired
               />
             </div>
@@ -321,7 +321,7 @@ export default function PressMentionsForm({ portfolioId, theme }: PressMentionsF
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className={`mt-1 ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
               />
             </div>
           </div>
@@ -334,7 +334,7 @@ export default function PressMentionsForm({ portfolioId, theme }: PressMentionsF
               value={formData.image_url}
               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
               placeholder="https://example.com/logo.png"
-              className={`mt-1 ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+              className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
             />
           </div>
 

@@ -157,7 +157,7 @@ export default function SponsorsForm({ portfolio, onFieldChange, theme }: Sponso
                     value={sponsor.name || ''}
                     onChange={(e) => handleSponsorChange(sponsor.id, 'name', e.target.value)}
                     placeholder="Enter sponsor name"
-                    className={`w-full text-sm ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                    className={`w-full text-sm ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                   />
                 </div>
 
@@ -170,7 +170,7 @@ export default function SponsorsForm({ portfolio, onFieldChange, theme }: Sponso
                     value={sponsor.website_url || ''}
                     onChange={(e) => handleSponsorChange(sponsor.id, 'website_url', e.target.value)}
                     placeholder="https://sponsor-website.com"
-                    className={`w-full text-sm ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                    className={`w-full text-sm ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                   />
                 </div>
               </div>
@@ -210,7 +210,7 @@ export default function SponsorsForm({ portfolio, onFieldChange, theme }: Sponso
                       value={sponsor.icon_url || ''}
                       onChange={(e) => handleSponsorChange(sponsor.id, 'icon_url', e.target.value)}
                       placeholder="Paste icon URL"
-                      className={`flex-1 text-sm ${theme.colors.background} ${theme.colors.text} border-transparent focus:ring-2 focus:ring-purple-400`}
+                      className={`flex-1 text-sm ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
                     />
                     <input
                       type="file"

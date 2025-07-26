@@ -27,7 +27,7 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_subtitle || ''}
           onChange={e => onFieldChange('post_me_subtitle', e.target.value)}
           placeholder="Share your musical thoughts"
-          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
+          className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder}`}
         />
         <p className="mt-1 text-xs text-gray-400">Short description under the title</p>
       </div>
@@ -41,7 +41,7 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_email_placeholder || ''}
           onChange={e => onFieldChange('post_me_email_placeholder', e.target.value)}
           placeholder="your@email.com"
-          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
+          className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder}`}
         />
         <p className="mt-1 text-xs text-gray-400">Placeholder for the email input</p>
       </div>
@@ -55,7 +55,7 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_message_placeholder || ''}
           onChange={e => onFieldChange('post_me_message_placeholder', e.target.value)}
           placeholder="Your message here..."
-          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
+          className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder}`}
         />
         <p className="mt-1 text-xs text-gray-400">Placeholder for the message textarea</p>
       </div>
@@ -69,7 +69,7 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_button_text || ''}
           onChange={e => onFieldChange('post_me_button_text', e.target.value)}
           placeholder="Send Message"
-          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
+          className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder}`}
         />
         <p className="mt-1 text-xs text-gray-400">Text displayed on the submit button</p>
       </div>
@@ -83,7 +83,7 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_success_message || ''}
           onChange={e => onFieldChange('post_me_success_message', e.target.value)}
           placeholder="Message sent! Thank you for reaching out."
-          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
+          className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder}`}
         />
         <p className="mt-1 text-xs text-gray-400">Message shown after successful submission</p>
       </div>
@@ -97,7 +97,7 @@ export default function PostMeForm({ portfolio, onFieldChange, theme }: PostMeFo
           value={portfolio.post_me_error_message || ''}
           onChange={e => onFieldChange('post_me_error_message', e.target.value)}
           placeholder="Something went wrong. Please try again."
-          className={`mt-1 ${theme.colors.background} border-gray-600 ${theme.colors.text} placeholder-gray-400`}
+          className={`mt-1 ${theme.colors.textBox} ${theme.colors.textBoxBorder} ${theme.colors.textBoxText} ${theme.colors.textBoxPlaceholder}`}
         />
         <p className="mt-1 text-xs text-gray-400">Message shown if submission fails</p>
       </div>

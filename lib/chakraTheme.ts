@@ -117,6 +117,21 @@ const theme = extendTheme({
             },
           },
         },
+        outline: {
+          field: {
+            bg: 'transparent',
+            border: '1px solid',
+            borderColor: 'inherit',
+            _hover: {
+              bg: 'transparent',
+              borderColor: 'inherit',
+            },
+            _focus: {
+              bg: 'transparent',
+              borderColor: 'inherit',
+            },
+          },
+        },
       },
     },
     Textarea: {
@@ -131,6 +146,19 @@ const theme = extendTheme({
           },
           _focus: {
             bg: 'gray.700',
+          },
+        },
+        outline: {
+          bg: 'transparent',
+          border: '1px solid',
+          borderColor: 'inherit',
+          _hover: {
+            bg: 'transparent',
+            borderColor: 'inherit',
+          },
+          _focus: {
+            bg: 'transparent',
+            borderColor: 'inherit',
           },
         },
       },
