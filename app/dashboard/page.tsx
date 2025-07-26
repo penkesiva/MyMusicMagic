@@ -670,7 +670,7 @@ export default function DashboardPage() {
           <div className="flex items-center space-x-4 relative z-30">
             {/* Welcome message (desktop only) */}
             {profile?.username && (
-              <span className="hidden md:inline-block text-white text-lg font-medium mr-4">Welcome {profile.username}</span>
+              <span className="hidden md:inline-block text-white text-sm font-medium mr-4">Welcome {profile.username}</span>
             )}
             
             {/* Enhanced Avatar Component */}

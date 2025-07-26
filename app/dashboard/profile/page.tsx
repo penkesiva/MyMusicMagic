@@ -188,19 +188,36 @@ export default function ProfilePage() {
         .replace(/_{2,}/g, '_') // Replace multiple underscores with single
         .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
       
-      const fileName = `avatars/${user.id}/${Date.now()}-${sanitizedName}`;
+      const fileName = `${user.id}/${Date.now()}-${sanitizedName}`;
+
+      console.log('Uploading avatar:', {
+        bucket: 'avatars',
+        fileName,
+        fileSize: file.size,
+        fileType: file.type
+      });
 
       // Upload to Supabase Storage
       const { data, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error details:', uploadError);
+        throw new Error(`Upload failed: ${uploadError.message}`);
+      }
+
+      console.log('Upload successful:', data);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
+
+      console.log('Public URL generated:', publicUrl);
 
       // Update profile with new avatar URL
       const { error: updateError } = await supabase
@@ -211,7 +228,10 @@ export default function ProfilePage() {
         })
         .eq('id', user.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+        throw new Error(`Profile update failed: ${updateError.message}`);
+      }
 
       setFormData({ ...formData, avatar_url: publicUrl });
       setProfile({ ...profile!, avatar_url: publicUrl });
@@ -219,10 +239,15 @@ export default function ProfilePage() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error('Error uploading avatar:', err);
-      setError('Failed to upload profile picture. Please try again.');
-      setTimeout(() => setError(null), 3000);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload profile picture. Please try again.';
+      setError(errorMessage);
+      setTimeout(() => setError(null), 5000);
     } finally {
       setIsSaving(false);
+      // Clear the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -382,10 +407,20 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium flex items-center space-x-2"
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Camera className="w-4 h-4" />
-                    <span>Upload Photo</span>
+                    {isSaving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-400"></div>
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="w-4 h-4" />
+                        <span>Upload Photo</span>
+                      </>
+                    )}
                   </button>
                   <input
                     ref={fileInputRef}
@@ -393,8 +428,11 @@ export default function ProfilePage() {
                     accept="image/*"
                     onChange={handleAvatarUpload}
                     className="hidden"
+                    disabled={isSaving}
                   />
-                  <p className="text-xs text-purple-300 mt-1">Upload a profile picture (max 5MB)</p>
+                  <p className="text-xs text-purple-300 mt-1">
+                    {isSaving ? 'Uploading profile picture...' : 'Upload a profile picture (max 5MB)'}
+                  </p>
                 </div>
               </div>
             </div>
