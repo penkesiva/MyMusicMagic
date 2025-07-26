@@ -94,7 +94,15 @@ export function TrackCard({
       card: 'bg-gray-800',
       cardText: 'text-gray-300',
       heading: 'text-white',
-      accent: 'text-blue-500'
+      accent: 'text-blue-500',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
+      buttonText: 'text-white',
+      buttonHover: 'bg-blue-700',
+      buttonBorder: 'border-blue-600',
+      textBox: 'bg-gray-800/50 backdrop-blur-sm',
+      textBoxBorder: 'border-gray-400/30',
+      textBoxText: 'text-white',
+      textBoxPlaceholder: 'placeholder-gray-400'
     },
     previewColor: 'bg-gray-900'
   }
