@@ -127,7 +127,7 @@ export default function PortfolioTestimonialsDisplay({
                             className={`w-4 h-4 ${
                               testimonial.rating && testimonial.rating >= star 
                                 ? 'text-yellow-400 fill-current' 
-                                : 'text-gray-400'
+                                : `${colors.text} opacity-40`
                             }`}
                           />
                         ))}
@@ -163,13 +163,13 @@ export default function PortfolioTestimonialsDisplay({
                 onClick={prevSlide}
                 className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 p-2 rounded-full transition-colors ${theme?.imageFrames ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-100/10 hover:bg-gray-200/20'}`}
               >
-                <ChevronLeft className={`w-5 h-5 ${theme?.imageFrames ? 'text-white' : 'text-gray-600'}`} />
+                <ChevronLeft className={`w-5 h-5 ${colors.text}`} />
               </button>
               <button
                 onClick={nextSlide}
                 className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 p-2 rounded-full transition-colors ${theme?.imageFrames ? 'bg-white/10 hover:bg-white/20' : 'bg-gray-100/10 hover:bg-gray-200/20'}`}
               >
-                                  <ChevronRight className={`w-5 h-5 ${theme?.imageFrames ? 'text-white' : 'text-gray-600'}`} />
+                                  <ChevronRight className={`w-5 h-5 ${colors.text}`} />
               </button>
             </>
           )}
@@ -183,8 +183,8 @@ export default function PortfolioTestimonialsDisplay({
                   onClick={() => goToSlide(i * 3)}
                   className={`w-2 h-2 rounded-full transition-colors ${
                     Math.floor(currentSlide / 3) === i 
-                      ? (theme?.imageFrames ? 'bg-white' : 'bg-gray-600')
-                      : (theme?.imageFrames ? 'bg-white/30' : 'bg-gray-300/30')
+                      ? `${colors.text}`
+                      : `${colors.text} opacity-30`
                   }`}
                 />
               ))}

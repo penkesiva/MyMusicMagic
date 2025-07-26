@@ -29,7 +29,7 @@ export const THEMES = [
     name: 'Royal Purple',
     previewColor: '#a78bfa', // purple-400
     isGradient: true,
-    gradientColors: ['#1e1b4b', '#a855f7'], // purple-950 to purple-500
+    gradientColors: ['#1e1b4b', '#7c3aed'], // purple-950 to purple-600 (darker to lighter)
     colors: {
       background: 'bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900',
       text: 'text-purple-100',
@@ -54,7 +54,7 @@ export const THEMES = [
     name: 'Crimson Sunset',
     previewColor: '#f87171', // red-400
     isGradient: true,
-    gradientColors: ['#450a0a', '#ef4444'], // red-950 to red-500
+    gradientColors: ['#450a0a', '#dc2626'], // red-950 to red-600 (darker to lighter)
     colors: {
       background: 'bg-gradient-to-br from-red-950 via-red-900 to-red-800',
       text: 'text-red-100',
@@ -79,7 +79,7 @@ export const THEMES = [
     name: 'Deep Ocean',
     previewColor: '#1e40af', // blue-800
     isGradient: true,
-    gradientColors: ['#0f172a', '#3b82f6'], // slate-950 to blue-500
+    gradientColors: ['#0f172a', '#1d4ed8'], // slate-950 to blue-700 (darker to lighter)
     colors: {
       background: 'bg-gradient-to-br from-blue-950 via-indigo-950 to-blue-900',
       text: 'text-blue-100',
