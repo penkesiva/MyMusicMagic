@@ -354,7 +354,7 @@ export default function PortfolioPage({ params }: PageProps) {
             {portfolio.profile_photo_url && (
               <div className="lg:col-span-5 relative">
                 <div className="relative group">
-                  <div className="absolute -inset-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                  <div className={`absolute -inset-4 ${theme.colors.accent.replace('text-', 'bg-')} rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200`}></div>
                   <Image
                     src={portfolio.profile_photo_url}
                     alt={portfolio.artist_name || 'Artist profile photo'}
@@ -378,7 +378,7 @@ export default function PortfolioPage({ params }: PageProps) {
             <div className={portfolio.profile_photo_url ? "lg:col-span-7" : "lg:col-span-12"}>
               <div className="space-y-8">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <div className={`w-12 h-12 ${theme.colors.accent.replace('text-', 'bg-')} rounded-xl flex items-center justify-center`}>
                     <User className="w-6 h-6 text-white" />
                   </div>
                   <h3 className={`text-3xl font-bold ${theme.colors.heading}`}>About Me</h3>
@@ -418,7 +418,7 @@ export default function PortfolioPage({ params }: PageProps) {
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-20">
             <h2 className={`text-5xl md:text-6xl font-bold mb-6 ${theme.colors.heading}`}>{sectionTitle}</h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full mb-8"></div>
+            <div className={`w-24 h-1 ${theme.colors.accent.replace('text-', 'bg-')} mx-auto rounded-full mb-8`}></div>
             <p className={`text-xl ${theme.colors.text} opacity-80 max-w-2xl mx-auto`}>
               Explore my latest musical creations and discover the stories behind each track
             </p>
@@ -527,13 +527,13 @@ export default function PortfolioPage({ params }: PageProps) {
     return (
       <section id="gallery" className={`${theme.colors.background} ${theme.colors.text} py-32 px-4 md:px-8 relative overflow-hidden`}>
         {/* Background decorative elements */}
-        <div className="absolute top-0 right-1/4 w-72 h-72 bg-gradient-to-bl from-purple-500/5 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-gradient-to-tr from-pink-500/5 to-transparent rounded-full blur-3xl"></div>
+        <div className={`absolute top-0 right-1/4 w-72 h-72 ${theme.colors.accent.replace('text-', 'bg-')}/5 to-transparent rounded-full blur-3xl`}></div>
+        <div className={`absolute bottom-0 left-1/4 w-64 h-64 ${theme.colors.accent.replace('text-', 'bg-')}/5 to-transparent rounded-full blur-3xl`}></div>
         
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-20">
             <h2 className={`text-5xl md:text-6xl font-bold mb-6 ${theme.colors.heading}`}>{sectionTitle}</h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full mb-8"></div>
+            <div className={`w-24 h-1 ${theme.colors.accent.replace('text-', 'bg-')} mx-auto rounded-full mb-8`}></div>
             <p className={`text-xl ${theme.colors.text} opacity-80 max-w-2xl mx-auto`}>
               A visual journey through my creative work and artistic vision
             </p>
@@ -563,9 +563,9 @@ export default function PortfolioPage({ params }: PageProps) {
                     {item.title && (
                       <div className="absolute inset-0 flex items-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
                         <div className="w-full">
-                          <h3 className="text-white text-lg font-semibold mb-2">{item.title}</h3>
+                          <h3 className={`text-lg font-semibold mb-2 ${theme.colors.text}`}>{item.title}</h3>
                           {item.description && (
-                            <p className="text-white/80 text-sm line-clamp-2">{item.description}</p>
+                            <p className={`text-sm line-clamp-2 ${theme.colors.text} opacity-80`}>{item.description}</p>
                           )}
                           
                           {/* Action buttons */}
@@ -583,7 +583,7 @@ export default function PortfolioPage({ params }: PageProps) {
                     
                     {/* Floating badge for featured items */}
                     {index % 4 === 0 && (
-                      <div className="absolute top-4 left-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                      <div className={`absolute top-4 left-4 ${theme.colors.accent.replace('text-', 'bg-')} text-white text-xs px-3 py-1 rounded-full font-medium`}>
                         Featured
                       </div>
                     )}
@@ -597,7 +597,7 @@ export default function PortfolioPage({ params }: PageProps) {
           ) : (
             <div className="text-center py-20">
               <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <ImageIcon className="w-12 h-12 text-white/50" />
+                <ImageIcon className={`w-12 h-12 ${theme.colors.text} opacity-50`} />
               </div>
               <h3 className={`text-2xl font-bold mb-4 ${theme.colors.heading}`}>Gallery empty</h3>
               <p className={`${theme.colors.text} opacity-80 max-w-md mx-auto`}>

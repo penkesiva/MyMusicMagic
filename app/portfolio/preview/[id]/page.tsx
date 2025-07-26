@@ -355,13 +355,13 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
           {/* Tabs for Photos and Videos */}
           <div className="flex justify-center gap-4 mb-6">
             <button
-              className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'photo' ? 'bg-purple-600 text-white shadow' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+              className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'photo' ? `${theme.colors.accent} shadow` : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
               onClick={() => setTab('photo')}
             >
               Photos
             </button>
             <button
-              className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'video' ? 'bg-purple-600 text-white shadow' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+              className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'video' ? `${theme.colors.accent} shadow` : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
               onClick={() => setTab('video')}
             >
               Videos
@@ -384,22 +384,22 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
                     <img src={item.image_url} alt={item.title} className="w-full h-full object-cover"/>
                     {item.media_type === 'video' && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <div className="w-14 h-14 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                        <div className={`w-14 h-14 ${theme.colors.primary.replace('text-', 'bg-')} rounded-full flex items-center justify-center shadow-lg`}>
                           <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </div>
                       </div>
                     )}
                     {/* Optional: Featured badge */}
                     {Boolean((item as any)['is_featured']) ? (
-                      <span className="absolute top-3 left-3 bg-gradient-to-r from-purple-500 to-pink-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow">Featured</span>
+                      <span className={`absolute top-3 left-3 ${theme.colors.accent.replace('text-', 'bg-')} text-white text-xs font-bold px-3 py-1 rounded-full shadow`}>Featured</span>
                     ) : null}
                   </div>
                   {/* Content */}
                   <div className="p-3 flex-1 flex flex-col justify-between">
-                    <h4 className="font-medium text-sm mb-1 line-clamp-1 text-white">{item.title}</h4>
-                    <p className="text-gray-400 text-xs mb-2 line-clamp-2">{item.description}</p>
+                    <h4 className={`font-medium text-sm mb-1 line-clamp-1 ${theme.colors.text}`}>{item.title}</h4>
+                    <p className={`text-xs mb-2 line-clamp-2 ${theme.colors.text} opacity-70`}>{item.description}</p>
                     <div className="flex justify-between items-center mt-auto">
-                      <p className="text-gray-500 text-xs">{new Date(item.created_at).toLocaleDateString()}</p>
+                      <p className={`text-xs ${theme.colors.text} opacity-50`}>{new Date(item.created_at).toLocaleDateString()}</p>
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                         item.media_type === 'video' ? 'bg-blue-900/20 text-blue-300 border border-blue-500/20' : 'bg-green-900/20 text-green-300 border border-green-500/20'
                       }`}>{item.media_type === 'video' ? 'Video' : 'Image'}</span>

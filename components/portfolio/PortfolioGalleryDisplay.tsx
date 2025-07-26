@@ -124,19 +124,19 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
       {/* Tabs for All, Photos, Videos */}
       <div className="flex justify-center gap-4 mb-6">
         <button
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'all' ? `${colors.accent} shadow` : `${imageFrames ? 'bg-white/10 text-white/60 hover:bg-white/20' : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
+          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'all' ? `${colors.accent} shadow` : `${imageFrames ? `bg-white/10 ${colors.text} opacity-60 hover:bg-white/20` : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
           onClick={() => setTab('all')}
         >
           All
         </button>
         <button
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'photo' ? `${colors.accent} shadow` : `${imageFrames ? 'bg-white/10 text-white/60 hover:bg-white/20' : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
+          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'photo' ? `${colors.accent} shadow` : `${imageFrames ? `bg-white/10 ${colors.text} opacity-60 hover:bg-white/20` : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
           onClick={() => setTab('photo')}
         >
           Photos
         </button>
         <button
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'video' ? `${colors.accent} shadow` : `${imageFrames ? 'bg-white/10 text-white/60 hover:bg-white/20' : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
+          className={`px-6 py-2 rounded-full font-semibold transition-all ${tab === 'video' ? `${colors.accent} shadow` : `${imageFrames ? `bg-white/10 ${colors.text} opacity-60 hover:bg-white/20` : 'bg-gray-100/10 text-gray-600/60 hover:bg-gray-200/20'}`}`}
           onClick={() => setTab('video')}
         >
           Videos
@@ -159,19 +159,19 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
                 <img src={item.image_url} alt={item.title} className="w-full h-full object-cover rounded-md" />
                 {item.media_type === 'video' && (
                   <div className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center">
-                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                    <div className={`w-8 h-8 ${colors.primary.replace('text-', 'bg-')} rounded-full flex items-center justify-center shadow-lg`}>
                       <svg className="w-5 h-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </div>
                   </div>
                 )}
                 {Boolean((item as any)['is_featured']) ? (
-                  <span className="absolute top-1 left-1 bg-gradient-to-r from-purple-500 to-pink-400 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">Featured</span>
+                  <span className={`absolute top-1 left-1 ${colors.accent.replace('text-', 'bg-')} text-white text-xs font-bold px-2 py-0.5 rounded-full shadow`}>Featured</span>
                 ) : null}
               </div>
               <div className="flex-1 min-w-0 mx-4">
                 <h4 className={`font-medium text-sm ${colors.text} truncate`}>{item.title}</h4>
-                <p className="text-gray-400 text-xs truncate">{item.description}</p>
-                <p className="text-gray-500 text-xs mt-1">{formatDate(item.created_at)}</p>
+                <p className={`text-xs truncate ${colors.text} opacity-70`}>{item.description}</p>
+                <p className={`text-xs mt-1 ${colors.text} opacity-50`}>{formatDate(item.created_at)}</p>
               </div>
               <span className={`px-2 py-1 text-xs font-semibold rounded-full mx-4 ${
                 item.media_type === 'video' ? 'bg-blue-900/20 text-blue-300 border border-blue-500/20' : 'bg-green-900/20 text-green-300 border border-green-500/20'
@@ -179,7 +179,7 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
               {isEditMode && (
                 <div className="flex items-center gap-2">
                   {onEdit && (
-                    <button onClick={() => onEdit(item)} className="p-2 text-blue-400 hover:text-blue-300 transition-colors" title="Edit"><PencilIcon className="h-4 w-4" /></button>
+                    <button onClick={() => onEdit(item)} className={`p-2 ${colors.primary} hover:opacity-80 transition-colors`} title="Edit"><PencilIcon className="h-4 w-4" /></button>
                   )}
                   <button onClick={() => handleDelete(item.id)} disabled={deletingItem === item.id} className="p-2 text-red-400 hover:text-red-300 transition-colors" title="Delete"><TrashIcon className="h-4 w-4" /></button>
                 </div>
@@ -196,19 +196,19 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
                 <img src={item.image_url} alt={item.title} className={`w-full h-full object-cover ${imageFrames ? 'rounded-t-xl' : ''}`}/>
                 {item.media_type === 'video' && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <div className="w-14 h-14 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                    <div className={`w-14 h-14 ${colors.primary.replace('text-', 'bg-')} rounded-full flex items-center justify-center shadow-lg`}>
                       <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </div>
                   </div>
                 )}
                 {/* Optional: Featured badge */}
                 {Boolean((item as any)['is_featured']) ? (
-                  <span className="absolute top-3 left-3 bg-gradient-to-r from-purple-500 to-pink-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow">Featured</span>
+                  <span className={`absolute top-3 left-3 ${colors.accent.replace('text-', 'bg-')} text-white text-xs font-bold px-3 py-1 rounded-full shadow`}>Featured</span>
                 ) : null}
                 {isEditMode && (
                   <div className="absolute top-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     {onEdit && (
-                      <button onClick={() => onEdit(item)} className="p-2 bg-blue-500/80 text-white rounded-full hover:bg-blue-500" title="Edit"><PencilIcon className="h-4 w-4" /></button>
+                      <button onClick={() => onEdit(item)} className={`p-2 ${colors.primary.replace('text-', 'bg-')}/80 text-white rounded-full hover:${colors.primary.replace('text-', 'bg-')}`} title="Edit"><PencilIcon className="h-4 w-4" /></button>
                     )}
                     <button onClick={() => handleDelete(item.id)} disabled={deletingItem === item.id} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500" title="Delete"><TrashIcon className="h-4 w-4" /></button>
                   </div>
@@ -218,9 +218,9 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
               {/* Content */}
               <div className="p-3 flex-1 flex flex-col justify-between">
                 <h4 className={`font-medium text-sm mb-1 line-clamp-1 ${colors.text}`}>{item.title}</h4>
-                <p className="text-gray-400 text-xs mb-2 line-clamp-2">{item.description}</p>
+                <p className={`text-xs mb-2 line-clamp-2 ${colors.text} opacity-70`}>{item.description}</p>
                 <div className="flex justify-between items-center mt-auto">
-                  <p className="text-gray-500 text-xs">{formatDate(item.created_at)}</p>
+                  <p className={`text-xs ${colors.text} opacity-50`}>{formatDate(item.created_at)}</p>
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                     item.media_type === 'video' ? 'bg-blue-900/20 text-blue-300 border border-blue-500/20' : 'bg-green-900/20 text-green-300 border border-green-500/20'
                   }`}>{item.media_type === 'video' ? 'Video' : 'Image'}</span>
