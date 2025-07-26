@@ -698,81 +698,78 @@ export default function DashboardPage() {
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl"></div>
                 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                        <PlusIcon className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-bold text-white">Create Portfolio</h2>
-                        <p className="text-sm text-purple-200">Build your next masterpiece</p>
-                      </div>
-                    </div>
+                  <div className="mb-4">
+                                            <h2 className="text-base font-bold text-white">Create Portfolio</h2>
                   </div>
                   
-                  {/* AI-First Create Portfolio form */}
-                  <div className="space-y-6">
-                    {/* AI Description - Prominent and Centered */}
-                    <div className="text-center mb-6">
-                      <div className="flex items-center justify-center mb-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center mr-3">
-                          <Sparkles className="w-4 h-4 text-white" />
-                        </div>
-                        <h3 className="text-lg font-bold text-white">AI Description</h3>
-                      </div>
-                      <p className="text-sm text-purple-200 mb-4">Tell AI about your portfolio and watch it create magic</p>
-                    </div>
-                    
+                  {/* Modern AI-First Create Portfolio form */}
+                  <div className="space-y-4">
+                    {/* AI Description Section */}
                     <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center">
+                            <Sparkles className="w-3 h-3 text-white" />
+                          </div>
+                          <h3 className="text-sm font-semibold text-white">Describe your portfolio</h3>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const examples = [
+                              "A passionate jazz musician with 10+ years of experience performing at prestigious clubs and festivals across the country, specializing in contemporary jazz fusion and experimental compositions",
+                              "A full-stack developer with 5 years of experience specializing in React, Node.js, and cloud architecture, passionate about creating scalable web applications and mentoring junior developers",
+                              "A freelance photographer with expertise in wedding photography and corporate events, capturing authentic moments and creating stunning visual narratives for clients worldwide",
+                              "A UI/UX designer with 7 years of experience creating beautiful mobile apps and websites, focusing on user-centered design and accessibility for major tech companies",
+                              "A classical pianist and music educator with a love for contemporary compositions, performing regularly at concert halls and teaching students of all skill levels"
+                            ];
+                            const randomExample = examples[Math.floor(Math.random() * examples.length)];
+                            setAiPrompt(randomExample);
+                          }}
+                          className="text-xs text-purple-300 hover:text-purple-200 transition-colors underline"
+                        >
+                          Try Example
+                        </button>
+                      </div>
                       <textarea
                         value={aiPrompt}
                         onChange={e => {
                           setAiPrompt(e.target.value);
                           if (e.target.value) setSelectedTemplate('');
                         }}
-                        className="w-full px-6 py-4 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm resize-none text-center"
-                        placeholder="Describe your portfolio in detail... (e.g., 'A jazz musician with 10 years of experience performing in clubs and festivals')"
-                        rows={4}
+                        className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm resize-none"
+                        placeholder="Tell us about your portfolio... (e.g., 'A jazz musician with 10 years of experience performing in clubs and festivals')"
+                        rows={3}
                       />
-                      <div className="flex justify-center mt-3">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const examples = [
-                              "A jazz musician with 10 years of experience performing in clubs and festivals",
-                              "A full-stack developer specializing in React and Node.js with a passion for clean code",
-                              "A freelance photographer capturing weddings and corporate events",
-                              "A UI/UX designer creating beautiful mobile apps and websites",
-                              "A classical pianist with a love for contemporary compositions"
-                            ];
-                            const randomExample = examples[Math.floor(Math.random() * examples.length)];
-                            setAiPrompt(randomExample);
-                          }}
-                          className="text-sm text-purple-300 hover:text-purple-200 transition-colors underline"
-                        >
-                          Try Example
-                        </button>
-                      </div>
                     </div>
 
-                    {/* Portfolio Name - Smaller and below AI */}
-                    <div className="max-w-md mx-auto">
-                      <label className="block text-sm font-semibold text-purple-200 mb-2 text-center">Portfolio Name</label>
+                    {/* Portfolio Name - Username Style */}
+                    <div className="flex items-center space-x-3">
                       <input
                         type="text"
                         value={newPortfolioName}
-                        onChange={(e) => setNewPortfolioName(e.target.value)}
-                        className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm text-center"
-                        placeholder="My Awesome Portfolio"
+                        onChange={(e) => {
+                          // Limit to 30 characters (Instagram username limit)
+                          const value = e.target.value.slice(0, 30);
+                          // Only allow letters, numbers, underscores, and hyphens
+                          const sanitizedValue = value.replace(/[^a-zA-Z0-9_-]/g, '');
+                          setNewPortfolioName(sanitizedValue);
+                        }}
+                        className="w-48 px-3 py-2 bg-white/10 border border-purple-400/30 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm text-sm"
+                        placeholder="My Hero Portfolio Name"
+                        maxLength={30}
                       />
+                      <span className="text-xs text-purple-300">
+                        {newPortfolioName.length}/30
+                      </span>
                     </div>
 
-                    {/* Templates section */}
+                    {/* Templates section - Compact */}
                     <div className="flex items-center justify-between">
                       <button
                         type="button"
                         onClick={() => setShowTemplates((prev) => !prev)}
-                        className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium"
+                        className="px-3 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium"
                       >
                         {showTemplates ? 'Hide Templates' : 'Show Templates'}
                       </button>
@@ -783,9 +780,9 @@ export default function DashboardPage() {
                       )}
                     </div>
 
-                    {/* Template grid */}
+                    {/* Template grid - Compact */}
                     {showTemplates && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                         {templates.map((template) => (
                           <TemplatePreview
                             key={template.id}
@@ -810,8 +807,8 @@ export default function DashboardPage() {
 
 
 
-                    {/* Action buttons */}
-                    <div className="flex justify-end space-x-3 pt-2">
+                    {/* Action buttons - Compact */}
+                    <div className="flex justify-end space-x-3 pt-3">
                       <button
                         onClick={() => {
                           setNewPortfolioName('');
@@ -819,14 +816,14 @@ export default function DashboardPage() {
                           setAiPrompt('');
                           setShowTemplates(false);
                         }}
-                        className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all duration-300"
+                        className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleCreatePortfolio}
                         disabled={!newPortfolioName.trim() || !aiPrompt.trim()}
-                        className="px-6 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 text-green-300 rounded-xl hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                        className="px-6 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 text-green-300 rounded-lg hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
                       >
                         Create Portfolio
                       </button>
@@ -838,7 +835,7 @@ export default function DashboardPage() {
               {/* My Portfolios Card - remove Create Portfolio button */}
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl relative z-10">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold text-white">My Portfolios</h2>
+                  <h2 className="text-base font-bold text-white">My Portfolios</h2>
                 </div>
                 {portfolios.length === 0 ? (
                   <div className="text-center py-12">
