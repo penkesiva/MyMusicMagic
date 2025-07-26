@@ -21,7 +21,7 @@ export interface PortfolioTheme {
   };
   previewColor: string;
   isGradient?: boolean;
-  gradientColors?: [string, string]; // [startColor, endColor]
+  gradientColors?: string[]; // [startColor, endColor]
 }
 
 export const THEMES = [
