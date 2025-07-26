@@ -1363,7 +1363,7 @@ const PortfolioEditorPage = () => {
                                   size="sm"
                                   variant={galleryViewMode === 'list' ? 'default' : 'outline'}
                                   onClick={() => setGalleryViewMode('list')}
-                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                  className={`${galleryViewMode === 'list' ? selectedTheme.colors.button : 'bg-white/10'} border-white/20 ${selectedTheme.colors.buttonText} hover:bg-white/20`}
                                 >
                                   <List className="h-4 w-4" />
                                 </Button>
@@ -1371,7 +1371,7 @@ const PortfolioEditorPage = () => {
                                   size="sm"
                                   variant={galleryViewMode === 'grid' ? 'default' : 'outline'}
                                   onClick={() => setGalleryViewMode('grid')}
-                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                  className={`${galleryViewMode === 'grid' ? selectedTheme.colors.button : 'bg-white/10'} border-white/20 ${selectedTheme.colors.buttonText} hover:bg-white/20`}
                                 >
                                   <Grid className="h-4 w-4" />
                                 </Button>
@@ -1379,7 +1379,7 @@ const PortfolioEditorPage = () => {
                               <Button
                                 onClick={() => setShowAddGalleryForm(true)}
                                 variant="outline"
-                                className="bg-green-600/20 border-green-500/30 text-green-300 hover:bg-green-600/30"
+                                className={`${selectedTheme.colors.button} ${selectedTheme.colors.buttonText} ${selectedTheme.colors.buttonHover} border ${selectedTheme.colors.buttonBorder}`}
                               >
                                 <Plus className="h-4 w-4 mr-2" />
                                 Add Item
@@ -1400,6 +1400,7 @@ const PortfolioEditorPage = () => {
                           {showAddGalleryForm && (
                             <PortfolioGalleryForm
                               portfolioId={portfolio.id}
+                              theme={selectedTheme}
                               onCancel={() => setShowAddGalleryForm(false)}
                               onSuccess={() => {
                                 setShowAddGalleryForm(false);
@@ -1412,6 +1413,7 @@ const PortfolioEditorPage = () => {
                             <PortfolioGalleryForm
                               portfolioId={portfolio.id}
                               item={editingGalleryItem}
+                              theme={selectedTheme}
                               onCancel={() => {
                                 setShowEditGalleryForm(false);
                                 setEditingGalleryItem(null);

@@ -145,7 +145,13 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
 
       {/* List or Grid display */}
       {filteredItems.length === 0 ? (
-        <div className={`text-center p-8 border-2 border-dashed rounded-lg ${imageFrames ? 'border-white/20' : 'border-gray-300/20'}`}>
+        <div className={`text-center p-8 border-2 border-dashed rounded-lg ${
+          imageFrames 
+            ? (colors.text.includes('text-white') || colors.text.includes('text-purple-100') || colors.text.includes('text-red-100') || colors.text.includes('text-blue-100')
+                ? 'border-white/20' // Dark theme
+                : 'border-gray-400/40') // Light theme
+            : 'border-gray-300/20'
+        }`}>
           <h3 className={`text-lg font-semibold ${colors.text} opacity-80`}>No {tab === 'photo' ? 'Photos' : tab === 'video' ? 'Videos' : 'Items'} Found</h3>
           <p className={`text-sm ${colors.text} opacity-50 mt-2`}>
             {tab === 'photo' ? 'Add your first photo to get started.' : tab === 'video' ? 'No videos found. Try uploading a video.' : 'No items found. Try adding a new item.'}
