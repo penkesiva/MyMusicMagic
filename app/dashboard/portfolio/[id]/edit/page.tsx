@@ -666,11 +666,17 @@ const PortfolioEditorPage = () => {
           theme={selectedTheme}
         />
 
+        {/* Separator */}
+        <div className="border-t border-white/10 my-4"></div>
+
         {/* Font Selector Component */}
         <PortfolioFontSelector
           selectedFontPair={portfolio.font_pair || 'sf-pro'}
           onFontPairChange={(fontPair) => handleFieldChange('font_pair', fontPair)}
         />
+
+        {/* Separator */}
+        <div className="border-t border-white/10 my-4"></div>
 
         {/* Styling Selector Component */}
         <PortfolioStylingSelector
@@ -679,6 +685,9 @@ const PortfolioEditorPage = () => {
           animations={portfolio.animations ?? true}
           onStylingChange={(setting, value) => handleFieldChange(setting === 'cardShadows' ? 'card_shadows' : setting === 'imageFrames' ? 'image_frames' : 'animations', value)}
         />
+
+        {/* Separator */}
+        <div className="border-t border-white/10 my-4"></div>
 
         {/* Section Manager Component */}
         <PortfolioSectionManager

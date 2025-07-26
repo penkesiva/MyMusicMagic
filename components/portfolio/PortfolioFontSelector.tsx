@@ -6,37 +6,37 @@ import { ChevronDown, Check } from 'lucide-react';
 const FONT_PAIRS = [
   {
     id: 'sf-pro',
-    name: 'SF Pro Display & SF Pro Text',
+    name: 'SF Pro',
     description: 'Apple\'s signature system fonts'
   },
   {
     id: 'montserrat-merriweather',
-    name: 'Montserrat & Merriweather',
+    name: 'Montserrat',
     description: 'Clean and professional'
   },
   {
     id: 'playfair-source',
-    name: 'Playfair Display & Source Sans Pro',
+    name: 'Playfair Display',
     description: 'Elegant and modern'
   },
   {
     id: 'poppins-roboto',
-    name: 'Poppins & Roboto',
+    name: 'Poppins',
     description: 'Contemporary and readable'
   },
   {
     id: 'lato-open-sans',
-    name: 'Lato & Open Sans',
+    name: 'Lato',
     description: 'Friendly and approachable'
   },
   {
     id: 'raleway-roboto-slab',
-    name: 'Raleway & Roboto Slab',
+    name: 'Raleway',
     description: 'Sophisticated with personality'
   },
   {
     id: 'raleway-thin-nunito',
-    name: 'Raleway Thin & Nunito Sans',
+    name: 'Raleway Thin',
     description: 'Light and modern'
   }
 ];
@@ -63,12 +63,12 @@ const PortfolioFontSelector: React.FC<PortfolioFontSelectorProps> = ({
       </button>
       
       {isExpanded && (
-        <div className="space-y-2 pl-2">
+        <div className="space-y-1 pl-2">
           {FONT_PAIRS.map((fontPair) => (
             <button
               key={fontPair.id}
               onClick={() => onFontPairChange(fontPair.id)}
-              className="w-full p-3 text-left transition-all duration-200 border-b border-gray-50/30 last:border-b-0"
+              className="w-full p-3 text-left transition-all duration-200"
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
