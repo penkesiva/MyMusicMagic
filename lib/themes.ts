@@ -119,7 +119,7 @@ export const THEMES = [
       buttonBorder: 'border-gray-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#1A2025]',
       textBoxPlaceholder: 'placeholder-gray-500'
     }
@@ -143,7 +143,7 @@ export const THEMES = [
       buttonBorder: 'border-gray-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#2C3E50]/30 backdrop-blur-sm',
-      textBoxBorder: 'border-[#5A7A8A]/30',
+      textBoxBorder: 'border-[#5A7A8A]/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#A0A8AD]'
     }
@@ -167,7 +167,7 @@ export const THEMES = [
       buttonBorder: 'border-red-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#3A2E2F]',
       textBoxPlaceholder: 'placeholder-[#7D6A6C]'
     }
@@ -191,7 +191,7 @@ export const THEMES = [
       buttonBorder: 'border-red-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#4A3B3C]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-[#E5989B]/30',
+      textBoxBorder: 'border-white/10',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#B7A9AB]'
     }
@@ -215,7 +215,7 @@ export const THEMES = [
       buttonBorder: 'border-purple-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#2F1D3E]',
       textBoxPlaceholder: 'placeholder-[#77618A]'
     }
@@ -239,7 +239,7 @@ export const THEMES = [
       buttonBorder: 'border-purple-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#3C2A53]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-[#6A0DAD]/30',
+      textBoxBorder: 'border-[#6A0DAD]/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#9A87A8]'
     }
@@ -263,7 +263,7 @@ export const THEMES = [
       buttonBorder: 'border-yellow-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#3A3300]',
       textBoxPlaceholder: 'placeholder-yellow-600'
     }
@@ -287,7 +287,7 @@ export const THEMES = [
       buttonBorder: 'border-yellow-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#4A3F0A]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-yellow-400/30',
+      textBoxBorder: 'border-yellow-400/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#BFAF6A]'
     }
@@ -311,7 +311,7 @@ export const THEMES = [
       buttonBorder: 'border-green-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#193522]',
       textBoxPlaceholder: 'placeholder-green-600'
     }
@@ -335,7 +335,7 @@ export const THEMES = [
       buttonBorder: 'border-green-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#214231]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-green-400/30',
+      textBoxBorder: 'border-green-400/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#7A8C84]'
     }
@@ -359,7 +359,7 @@ export const THEMES = [
       buttonBorder: 'border-green-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#3A3D16]',
       textBoxPlaceholder: 'placeholder-green-600'
     }
@@ -383,7 +383,7 @@ export const THEMES = [
       buttonBorder: 'border-green-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#4B501D]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-green-400/30',
+      textBoxBorder: 'border-green-400/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#9FA275]'
     }
@@ -407,7 +407,7 @@ export const THEMES = [
       buttonBorder: 'border-gray-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#2C3A3B]',
       textBoxPlaceholder: 'placeholder-gray-500'
     }
@@ -431,7 +431,7 @@ export const THEMES = [
       buttonBorder: 'border-gray-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#354445]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-400/30',
+      textBoxBorder: 'border-gray-400/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#8A9A9B]'
     }
@@ -455,7 +455,7 @@ export const THEMES = [
       buttonBorder: 'border-gray-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#2B3334]',
       textBoxPlaceholder: 'placeholder-gray-500'
     }
@@ -479,7 +479,7 @@ export const THEMES = [
       buttonBorder: 'border-gray-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#344041]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-400/30',
+      textBoxBorder: 'border-gray-400/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#738183]'
     }
@@ -503,7 +503,7 @@ export const THEMES = [
       buttonBorder: 'border-red-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#0A2747]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-[#FF6F61]/30',
+      textBoxBorder: 'border-[#FF6F61]/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#B0B8C1]'
     }
@@ -527,7 +527,7 @@ export const THEMES = [
       buttonBorder: 'border-blue-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#333333]',
       textBoxPlaceholder: 'placeholder-teal-500'
     }
@@ -551,7 +551,7 @@ export const THEMES = [
       buttonBorder: 'border-yellow-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#2E2E2E]',
       textBoxPlaceholder: 'placeholder-yellow-600'
     }
@@ -575,7 +575,7 @@ export const THEMES = [
       buttonBorder: 'border-green-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#1A1A1A]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-green-400/30',
+      textBoxBorder: 'border-green-400/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#8A8A8A]'
     }
@@ -599,7 +599,7 @@ export const THEMES = [
       buttonBorder: 'border-blue-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#1A1A1A]',
       textBoxPlaceholder: 'placeholder-blue-500'
     }
@@ -623,7 +623,7 @@ export const THEMES = [
       buttonBorder: 'border-yellow-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#354B5E]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-yellow-400/30',
+      textBoxBorder: 'border-yellow-400/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#B0BEC5]'
     }
@@ -647,7 +647,7 @@ export const THEMES = [
       buttonBorder: 'border-red-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#4A4A4A]',
       textBoxPlaceholder: 'placeholder-[#E5989B]'
     }
@@ -671,7 +671,7 @@ export const THEMES = [
       buttonBorder: 'border-red-600',
       // Text box colors for Editor forms
       textBox: 'bg-[#0A7A83]/50 backdrop-blur-sm',
-      textBoxBorder: 'border-[#FF8C94]/30',
+      textBoxBorder: 'border-[#FF8C94]/15',
       textBoxText: 'text-white',
       textBoxPlaceholder: 'placeholder-[#CED4D6]'
     }
@@ -695,7 +695,7 @@ export const THEMES = [
       buttonBorder: 'border-red-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#263238]',
       textBoxPlaceholder: 'placeholder-[#FF6B6B]'
     }
@@ -719,7 +719,7 @@ export const THEMES = [
       buttonBorder: 'border-purple-600',
       // Text box colors for Editor forms
       textBox: 'bg-white/80 backdrop-blur-sm',
-      textBoxBorder: 'border-gray-500/30 border',
+      textBoxBorder: 'border-gray-500/60 border',
       textBoxText: 'text-[#333333]',
       textBoxPlaceholder: 'placeholder-purple-500'
     }

@@ -945,7 +945,11 @@ const PortfolioEditorPage = () => {
                                       </div>
                                   </div>
                               ) : (
-                                  <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                  <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
+                                    selectedTheme.colors.text.includes('text-white') || selectedTheme.colors.text.includes('text-purple-100') || selectedTheme.colors.text.includes('text-red-100') || selectedTheme.colors.text.includes('text-blue-100')
+                                      ? 'border-white/20' // Dark theme
+                                      : 'border-gray-400/40' // Light theme
+                                  }`}>
                                     <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
                                     <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No image set</p>
                                   </div>
