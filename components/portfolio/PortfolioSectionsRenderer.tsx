@@ -127,7 +127,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
          }`}
          style={{
            background: theme.isGradient && theme.gradientColors 
-             ? `linear-gradient(135deg, ${theme.gradientColors[0]} 0%, ${theme.gradientColors[1]} 100%)`
+             ? `linear-gradient(135deg, ${theme.gradientColors[0]} 0%, ${theme.gradientColors[0]} 40%, ${theme.gradientColors[1]} 100%)`
              : undefined
          }}>
       {showPreviewBanner && (
