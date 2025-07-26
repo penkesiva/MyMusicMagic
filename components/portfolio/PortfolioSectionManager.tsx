@@ -155,13 +155,28 @@ export default function PortfolioSectionManager({
         <div className="space-y-2">
           <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
             <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
-              {sectionOrder.map((key) => {
-                const sectionConfig = SECTIONS_CONFIG[key as keyof typeof SECTIONS_CONFIG];
-                if (!sectionConfig) return null;
-                
-                const isEnabled = (portfolio.sections_config as any)?.[key]?.enabled;
-                
-                return (
+              {sectionOrder
+                .map((key) => {
+                  const sectionConfig = SECTIONS_CONFIG[key as keyof typeof SECTIONS_CONFIG];
+                  if (!sectionConfig) return null;
+                  
+                  const isEnabled = (portfolio.sections_config as any)?.[key]?.enabled;
+                  
+                  return {
+                    key,
+                    sectionConfig,
+                    isEnabled
+                  };
+                })
+                .filter((item): item is { key: string; sectionConfig: any; isEnabled: any } => item !== null)
+                .sort((a, b) => {
+                  // Sort enabled sections first, then disabled sections
+                  if (a.isEnabled && !b.isEnabled) return -1;
+                  if (!a.isEnabled && b.isEnabled) return 1;
+                  // If both have same enabled status, maintain original order
+                  return sectionOrder.indexOf(a.key) - sectionOrder.indexOf(b.key);
+                })
+                .map(({ key, sectionConfig, isEnabled }) => (
                   <SortableSectionItem
                     key={key}
                     id={key}
@@ -175,8 +190,7 @@ export default function PortfolioSectionManager({
                     dragHandleProps={{}}
                     onSectionClick={onSectionClick}
                   />
-                );
-              })}
+                ))}
             </SortableContext>
           </DndContext>
         </div>
