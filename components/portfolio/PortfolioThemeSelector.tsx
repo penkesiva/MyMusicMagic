@@ -87,8 +87,8 @@ export default function PortfolioThemeSelector({
         </div>
       )}
       
-      {/* Theme name display at bottom right of section - now permanent */}
-      {theme.name && (
+      {/* Theme name display at bottom right of section - only when expanded */}
+      {colorThemeOpen && theme.name && (
         <div className="absolute bottom-0 right-0 bg-black/80 text-white px-2 py-1 rounded text-xs font-medium">
           {theme.name}
         </div>
