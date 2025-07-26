@@ -57,6 +57,10 @@ export default function DashboardPage() {
   // Add state for AI prompt
   const [aiPrompt, setAiPrompt] = useState('');
   const [showTemplates, setShowTemplates] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({
+    portfolioName: false,
+    aiPrompt: false
+  });
 
   const router = useRouter()
   const supabase = createClient()
@@ -185,16 +189,30 @@ export default function DashboardPage() {
   }
 
   const handleCreatePortfolio = async () => {
-    if (!newPortfolioName.trim()) {
-      setError('Please enter a portfolio name')
-      setTimeout(() => setError(null), 3000)
-      return
-    }
+    // Clear previous validation errors
+    setValidationErrors({
+      portfolioName: false,
+      aiPrompt: false
+    });
 
-    if (!aiPrompt.trim()) {
-      setError('Please enter an AI description')
-      setTimeout(() => setError(null), 3000)
-      return
+    // Validate fields
+    const hasPortfolioNameError = !newPortfolioName.trim();
+    const hasAiPromptError = !aiPrompt.trim();
+
+    if (hasPortfolioNameError || hasAiPromptError) {
+      setValidationErrors({
+        portfolioName: hasPortfolioNameError,
+        aiPrompt: hasAiPromptError
+      });
+      
+      // Show error message
+      const errorMessages = [];
+      if (hasPortfolioNameError) errorMessages.push('portfolio name');
+      if (hasAiPromptError) errorMessages.push('AI description');
+      
+      setError(`Please enter your ${errorMessages.join(' and ')}`);
+      setTimeout(() => setError(null), 3000);
+      return;
     }
 
     // Ensure Basic Template is selected by default if no template is selected
@@ -698,8 +716,8 @@ export default function DashboardPage() {
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl"></div>
                 
                 <div className="relative z-10">
-                  <div className="mb-4">
-                                            <h2 className="text-base font-bold text-white">Create Portfolio</h2>
+                                    <div className="mb-4">
+                    <h2 className="text-base font-bold text-white">Create Portfolio</h2>
                   </div>
                   
                   {/* Modern AI-First Create Portfolio form */}
@@ -736,15 +754,23 @@ export default function DashboardPage() {
                         onChange={e => {
                           setAiPrompt(e.target.value);
                           if (e.target.value) setSelectedTemplate('');
+                          // Clear validation error when user starts typing
+                          if (validationErrors.aiPrompt) {
+                            setValidationErrors(prev => ({ ...prev, aiPrompt: false }));
+                          }
                         }}
-                        className="w-full px-4 py-3 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm resize-none"
+                        className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm resize-none ${
+                          validationErrors.aiPrompt 
+                            ? 'border-red-400/60 bg-red-500/5' 
+                            : 'border-purple-400/30'
+                        }`}
                         placeholder="Tell us about your portfolio... (e.g., 'A jazz musician with 10 years of experience performing in clubs and festivals')"
                         rows={3}
                       />
                     </div>
 
                     {/* Portfolio Name - Username Style */}
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-center space-x-3">
                       <input
                         type="text"
                         value={newPortfolioName}
@@ -754,8 +780,16 @@ export default function DashboardPage() {
                           // Only allow letters, numbers, underscores, and hyphens
                           const sanitizedValue = value.replace(/[^a-zA-Z0-9_-]/g, '');
                           setNewPortfolioName(sanitizedValue);
+                          // Clear validation error when user starts typing
+                          if (validationErrors.portfolioName) {
+                            setValidationErrors(prev => ({ ...prev, portfolioName: false }));
+                          }
                         }}
-                        className="w-48 px-3 py-2 bg-white/10 border border-purple-400/30 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm text-sm"
+                        className={`w-48 px-3 py-2 bg-white/10 border rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm text-sm ${
+                          validationErrors.portfolioName 
+                            ? 'border-red-400/60 bg-red-500/5' 
+                            : 'border-purple-400/30'
+                        }`}
                         placeholder="My Hero Portfolio Name"
                         maxLength={30}
                       />
@@ -764,17 +798,18 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    {/* Templates section - Compact */}
-                    <div className="flex items-center justify-between">
+                    {/* Templates section - Improved Design */}
+                    <div className="flex items-center justify-center space-x-3">
                       <button
                         type="button"
                         onClick={() => setShowTemplates((prev) => !prev)}
-                        className="px-3 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium"
+                        className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium shadow-sm"
                       >
                         {showTemplates ? 'Hide Templates' : 'Show Templates'}
                       </button>
                       {selectedTemplate && (
-                        <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-100 rounded-full text-xs font-medium border border-purple-400/30">
+                        <div className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 rounded-lg text-xs font-medium border border-green-400/30 shadow-sm">
+                          <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
                           {templates.find(t => t.id === selectedTemplate)?.name || 'Template selected'}
                         </div>
                       )}
@@ -782,7 +817,7 @@ export default function DashboardPage() {
 
                     {/* Template grid - Compact */}
                     {showTemplates && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-4xl mx-auto">
                         {templates.map((template) => (
                           <TemplatePreview
                             key={template.id}
@@ -822,8 +857,7 @@ export default function DashboardPage() {
                       </button>
                       <button
                         onClick={handleCreatePortfolio}
-                        disabled={!newPortfolioName.trim() || !aiPrompt.trim()}
-                        className="px-6 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 text-green-300 rounded-lg hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                        className="px-6 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 text-green-300 rounded-lg hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-300 font-medium text-sm"
                       >
                         Create Portfolio
                       </button>
