@@ -59,7 +59,7 @@ const PortfolioFontSelector: React.FC<PortfolioFontSelectorProps> = ({
         className="w-full flex justify-between items-center font-semibold text-sm text-white hover:text-gray-300 transition-colors"
       >
         Fonts
-        <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 transition-transform text-white ${isExpanded ? 'rotate-180' : ''}`} />
       </button>
       
       {isExpanded && (
@@ -72,7 +72,7 @@ const PortfolioFontSelector: React.FC<PortfolioFontSelectorProps> = ({
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <div className="font-medium text-sm">{fontPair.name}</div>
+                  <div className="font-medium text-sm text-white">{fontPair.name}</div>
                   <div className="text-xs text-gray-500 mt-1">{fontPair.description}</div>
                 </div>
                 {selectedFontPair === fontPair.id && (

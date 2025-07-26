@@ -114,7 +114,8 @@ function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onN
         </span>
         <span style={{ 
           fontWeight: enabled ? 500 : 400, 
-          color: enabled ? '#fff' : '#888'
+          color: enabled ? '#fff' : '#888',
+          opacity: enabled ? 1 : 0.6
         }}>
           {name}
         </span>
@@ -148,7 +149,7 @@ export default function PortfolioSectionManager({
         className="w-full flex justify-between items-center font-semibold text-sm text-white"
       >
         Sections
-        <ChevronDown className={`w-4 h-4 transition-transform ${sectionsOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 transition-transform text-white ${sectionsOpen ? 'rotate-180' : ''}`} />
       </button>
       {sectionsOpen && (
         <div className="space-y-2">

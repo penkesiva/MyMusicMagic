@@ -848,19 +848,19 @@ const PortfolioEditorPage = () => {
                         </h2>
                       </div>
                       {!isEnabled && (
-                        <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded-full">
+                        <span className="text-xs bg-red-500/20 text-red-700 dark:text-red-300 px-2 py-1 rounded-full border border-red-500/40 font-medium">
                           Disabled
                         </span>
                       )}
                     </div>
-                    <ChevronDown className={`w-5 h-5 transform transition-transform text-white ${openSections[key] ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 transform transition-transform ${selectedTheme.colors.text} ${openSections[key] ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {openSections[key] && (
                     <div className="p-6">
                       {!isEnabled && (
-                        <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                          <p className="text-yellow-300 text-sm">
+                        <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                          <p className="text-yellow-700 dark:text-yellow-300 text-sm font-medium">
                             This section is currently disabled. Enable it in the Sections panel to the left to start editing.
                           </p>
                         </div>
@@ -1566,7 +1566,7 @@ const PortfolioEditorPage = () => {
                       )}
 
                       {key === 'subscribe' && (
-                        <SubscribeForm portfolio={portfolio} onFieldChange={handleFieldChange} />
+                        <SubscribeForm portfolio={portfolio} onFieldChange={handleFieldChange} theme={selectedTheme} />
                       )}
 
                       {key === 'post_me' && (

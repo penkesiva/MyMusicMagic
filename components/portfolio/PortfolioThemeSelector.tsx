@@ -33,7 +33,7 @@ export default function PortfolioThemeSelector({
         className="w-full flex justify-between items-center font-semibold text-sm text-white"
       >
         Color Theme
-        <ChevronDown className={`w-4 h-4 transition-transform ${colorThemeOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 transition-transform text-white ${colorThemeOpen ? 'rotate-180' : ''}`} />
       </button>
       {colorThemeOpen && (
         <div className="space-y-3">

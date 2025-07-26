@@ -24,7 +24,7 @@ const PortfolioStylingSelector: React.FC<PortfolioStylingSelectorProps> = ({
         className="w-full flex justify-between items-center font-semibold text-sm text-white hover:text-gray-300 transition-colors"
       >
         Styling
-        <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 transition-transform text-white ${isExpanded ? 'rotate-180' : ''}`} />
       </button>
       
       {isExpanded && (
