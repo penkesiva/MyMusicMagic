@@ -286,7 +286,6 @@ export interface Database {
           footer_links_json: Json | null
           footer_about_summary: string | null
           footer_social_links_json: Json | null
-          footer_copyright_text: string | null
           footer_show_social_links: boolean | null
           footer_show_about_summary: boolean | null
           footer_show_links: boolean | null

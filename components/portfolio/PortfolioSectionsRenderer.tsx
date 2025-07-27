@@ -18,7 +18,8 @@ import PortfolioTestimonialsDisplay from './PortfolioTestimonialsDisplay';
 import SponsorsDisplay from './SponsorsDisplay';
 import SubscribeDisplay from './SubscribeDisplay';
 import PostMeDisplay from './PostMeDisplay';
-import { getFontClasses } from '@/lib/portfolioEditorUtils';
+import { getFontClasses, getSortedRenderSections } from '@/lib/portfolioEditorUtils';
+import HeroPortfolioCopyright from './HeroPortfolioCopyright';
 
 // Add other imports as needed (skills, hobbies, etc.)
 
@@ -67,31 +68,8 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
   }, [portfolio?.sections_config?.tracks?.audio_player_mode])
 
   let sortedSections: string[] = [];
-  if (portfolio.sections_config) {
-    let sectionsArray: string[] = [];
-    if (Array.isArray(portfolio.sections_config)) {
-      sectionsArray = portfolio.sections_config;
-    } else if (typeof portfolio.sections_config === 'object') {
-      sectionsArray = Object.keys(portfolio.sections_config).filter(key => (portfolio.sections_config as any)[key]?.enabled === true);
-    } else if (typeof portfolio.sections_config === 'string') {
-      try {
-        const parsed = JSON.parse(portfolio.sections_config);
-        if (Array.isArray(parsed)) {
-          sectionsArray = parsed;
-        } else if (typeof parsed === 'object') {
-          sectionsArray = Object.keys(parsed).filter(key => parsed[key]?.enabled === true);
-        }
-      } catch (e) {
-        sectionsArray = [];
-      }
-    }
-    const validSections = sectionsArray.filter(key => SECTIONS_CONFIG[key]) || [];
-    sortedSections = validSections.sort((a, b) => {
-      const orderA = (portfolio.sections_config as any)?.[a]?.order ?? SECTIONS_CONFIG[a]?.defaultOrder ?? 999;
-      const orderB = (portfolio.sections_config as any)?.[b]?.order ?? SECTIONS_CONFIG[b]?.defaultOrder ?? 999;
-      return orderA - orderB;
-    });
-  }
+  // Get sections in the correct order for rendering (including footer)
+  sortedSections = getSortedRenderSections(portfolio);
 
   const safeGetArray = (field: any): any[] => {
     if (!field) return [];
@@ -139,7 +117,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
         </div>
       )}
       <main className="relative">
-        {sortedSections.filter(key => key !== 'footer').map((key, index) => (
+        {sortedSections.map((key, index) => (
           <section key={key} id={key} className="scroll-mt-20">
             {/* Example: Hero Section */}
             {key === 'hero' && (
@@ -366,21 +344,80 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                 </div>
               </section>
             )}
-            {/* ...repeat for all other sections, using the same logic as before... */}
+            {key === 'footer' && (
+              <footer className={`${theme.colors.text} py-16 px-4 md:px-8 border-t ${imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
+                <div className="container mx-auto">
+                  {/* Footer content */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* About Summary */}
+                    {portfolio.footer_show_about_summary && (
+                      <div className="text-left">
+                        <h3 className={`text-lg font-semibold mb-4 ${theme.colors.heading}`}>About</h3>
+                        {portfolio.footer_about_summary ? (
+                          <p className={`${theme.colors.text} opacity-80 text-sm leading-relaxed`}>
+                            {portfolio.footer_about_summary}
+                          </p>
+                        ) : (
+                          <p className={`${theme.colors.text} opacity-60 text-sm leading-relaxed`}>
+                            {portfolio.about_text ? 
+                              `${portfolio.about_text.substring(0, 150)}${portfolio.about_text.length > 150 ? '...' : ''}` : 
+                              'Professional portfolio showcasing work and achievements.'
+                            }
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Quick Links */}
+                    {portfolio.footer_show_links && portfolio.footer_links_json && (
+                      <div className="text-left">
+                        <h3 className={`text-lg font-semibold mb-4 ${theme.colors.heading}`}>Quick Links</h3>
+                        <nav className="space-y-2">
+                          {safeGetArray(portfolio.footer_links_json).map((link: any, index: number) => {
+                            // Handle internal links (starting with #) vs external links
+                            const isInternal = link.url?.startsWith('#');
+                            const linkProps = isInternal 
+                              ? { href: link.url }
+                              : { href: link.url, target: "_blank", rel: "noopener noreferrer" };
+                            
+                            return (
+                              <a
+                                key={index}
+                                {...linkProps}
+                                className={`block ${theme.colors.text} opacity-70 hover:opacity-100 transition-colors text-sm`}
+                              >
+                                {link.title}
+                              </a>
+                            );
+                          })}
+                        </nav>
+                      </div>
+                    )}
+                    
+                    {/* Social Links */}
+                    {portfolio.footer_show_social_links && (
+                      <div className="text-left">
+                        <h3 className={`text-lg font-semibold mb-4 ${theme.colors.heading}`}>Connect</h3>
+                        <div className="flex gap-4">
+                          {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaTwitter className="w-6 h-6" /></a>}
+                          {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaInstagram className="w-6 h-6" /></a>}
+                          {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaLinkedin className="w-6 h-6" /></a>}
+                          {portfolio.github_url && <a href={portfolio.github_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaGithub className="w-6 h-6" /></a>}
+                          {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaYoutube className="w-6 h-6" /></a>}
+                          {portfolio.website_url && <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><Globe className="w-6 h-6" /></a>}
+                        </div>
+                      </div>
+                    )}
+                                     </div>
+                 </div>
+               </footer>
+            )}
           </section>
         ))}
-        {/* Footer */}
-        {sortedSections.includes('footer') && (
-          <footer className={`${theme.colors.text} py-16 px-4 md:px-8 border-t ${imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
-            <div className="container mx-auto text-center">
-              {/* Footer content here */}
-              <div className={`mt-12 pt-8 border-t ${imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
-                <p className={`${theme.colors.text} opacity-60`}>© 2024 {portfolio.artist_name}. All rights reserved.</p>
-              </div>
-            </div>
-          </footer>
-        )}
       </main>
+
+      {/* HeroPortfolio Copyright */}
+      <HeroPortfolioCopyright theme={{ ...theme, imageFrames }} />
 
       {/* Bottom Audio Player */}
       <PortfolioBottomAudioPlayer

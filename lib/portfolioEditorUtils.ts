@@ -77,9 +77,7 @@ export const getSortedEditorSections = (portfolio: Portfolio | null): string[] =
   if (!portfolio?.sections_config) return [];
   
   // Get all sections that should be shown in editor
-  const editorSections = Object.keys(SECTIONS_CONFIG).filter(key => 
-    key !== 'footer' // Exclude footer from editor sections
-  );
+  const editorSections = Object.keys(SECTIONS_CONFIG);
   
   // Separate enabled and disabled sections
   const enabledSections: string[] = [];
@@ -115,6 +113,51 @@ export const getSortedEditorSections = (portfolio: Portfolio | null): string[] =
     return orderA - orderB;
   });
   
-  // Return enabled sections first, then disabled sections
-  return [...enabledSections, ...disabledSections];
+  // Ensure footer is always at the very end in both enabled and disabled sections
+  const enabledWithoutFooter = enabledSections.filter(section => section !== 'footer');
+  const disabledWithoutFooter = disabledSections.filter(section => section !== 'footer');
+  const footerSection = (enabledSections.includes('footer') || disabledSections.includes('footer')) ? ['footer'] : [];
+  
+  // Return enabled sections first, then disabled sections, with footer always at the end
+  return [...enabledWithoutFooter, ...disabledWithoutFooter, ...footerSection];
+};
+
+export const getSortedRenderSections = (portfolio: Portfolio | null): string[] => {
+  if (!portfolio?.sections_config) return [];
+  
+  // Get all sections including footer for rendering
+  const allSections = Object.keys(SECTIONS_CONFIG);
+  
+  // Only include enabled sections for rendering
+  const enabledSections: string[] = [];
+  
+  allSections.forEach(sectionKey => {
+    const isEnabled = (portfolio.sections_config as any)?.[sectionKey]?.enabled ?? SECTIONS_CONFIG[sectionKey]?.defaultEnabled ?? false;
+    
+    if (isEnabled) {
+      enabledSections.push(sectionKey);
+    }
+  });
+  
+  // Sort enabled sections by order (Hero always first)
+  enabledSections.sort((a, b) => {
+    if (a === 'hero') return -1;
+    if (b === 'hero') return 1;
+    
+    const orderA = (portfolio.sections_config as any)?.[a]?.order ?? SECTIONS_CONFIG[a]?.defaultOrder ?? 999;
+    const orderB = (portfolio.sections_config as any)?.[b]?.order ?? SECTIONS_CONFIG[b]?.defaultOrder ?? 999;
+    return orderA - orderB;
+  });
+  
+  // Always include footer if it's not already in the enabled sections
+  if (!enabledSections.includes('footer')) {
+    enabledSections.push('footer');
+  }
+  
+  // Ensure footer is always at the very end
+  const sectionsWithoutFooter = enabledSections.filter(section => section !== 'footer');
+  const footerSection = enabledSections.includes('footer') ? ['footer'] : [];
+  
+  // Return enabled sections with footer always at the end
+  return [...sectionsWithoutFooter, ...footerSection];
 }; 

@@ -188,7 +188,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     subscribe: {
         key: 'subscribe',
         defaultName: 'Subscribe',
-        defaultOrder: 14,
+        defaultOrder: 15,
         enabled: false,
         defaultEnabled: false,
         hasCustomTitle: true,
@@ -200,7 +200,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     post_me: {
         key: 'post_me',
         defaultName: 'Post Me',
-        defaultOrder: 15,
+        defaultOrder: 17,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -219,7 +219,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     footer: {
         key: 'footer',
         defaultName: 'Footer',
-        defaultOrder: 14,
+        defaultOrder: 99, // Always at the bottom
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: false,
@@ -227,7 +227,6 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
             footer_about_summary: 'textarea',
             footer_links_json: 'json',
             footer_social_links_json: 'json',
-            footer_copyright_text: 'text',
             footer_show_social_links: 'boolean',
             footer_show_about_summary: 'boolean',
             footer_show_links: 'boolean'

@@ -37,6 +37,7 @@ import { Switch } from '@/components/ui/switch';
 import SponsorsForm from '@/components/portfolio/SponsorsForm';
 import SubscribeForm from '@/components/portfolio/SubscribeForm';
 import PostMeForm from '@/components/portfolio/PostMeForm';
+import PortfolioFooterForm from '@/components/portfolio/PortfolioFooterForm';
 import { Avatar } from '@/components/ui/avatar';
 
 const NAVBAR_HEIGHT = 56;
@@ -1211,6 +1212,18 @@ const PortfolioEditorPage = () => {
                             </div>
                           </div>
                         </div>
+                      )}
+
+                      {key === 'footer' && (
+                        <PortfolioFooterForm
+                          portfolio={portfolio}
+                          onUpdate={(updates) => {
+                            Object.entries(updates).forEach(([field, value]) => {
+                              handleFieldChange(field as keyof Portfolio, value);
+                            });
+                          }}
+                          theme={selectedTheme}
+                        />
                       )}
 
                       {key === 'tracks' && (
