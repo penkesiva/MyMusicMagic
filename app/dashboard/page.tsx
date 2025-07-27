@@ -71,6 +71,10 @@ export default function DashboardPage() {
     portfolioName: false,
     aiPrompt: false
   });
+  
+  // Portfolio name validation state
+  const [isCheckingName, setIsCheckingName] = useState(false);
+  const [nameExists, setNameExists] = useState(false);
 
   const router = useRouter()
   const supabase = createClient()
@@ -170,7 +174,45 @@ export default function DashboardPage() {
     checkUser()
   }, [supabase, router])
 
+  // Portfolio name validation function
+  const checkPortfolioName = async (name: string) => {
+    if (!name.trim() || !user) return;
 
+    setIsCheckingName(true);
+    try {
+      const { data: existingPortfolio, error } = await supabase
+        .from('user_portfolios')
+        .select('id, name')
+        .eq('user_id', user.id)
+        .eq('name', name.trim())
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking portfolio name:', error);
+        return;
+      }
+
+      setNameExists(!!existingPortfolio);
+    } catch (err) {
+      console.error('Error checking portfolio name:', err);
+    } finally {
+      setIsCheckingName(false);
+    }
+  };
+
+  // Debounced portfolio name check
+  useEffect(() => {
+    if (!newPortfolioName.trim()) {
+      setNameExists(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      checkPortfolioName(newPortfolioName);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [newPortfolioName, user]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -208,10 +250,11 @@ export default function DashboardPage() {
     // Validate fields
     const hasPortfolioNameError = !newPortfolioName.trim();
     const hasAiPromptError = !aiPrompt.trim();
+    const hasDuplicateNameError = nameExists;
 
-    if (hasPortfolioNameError || hasAiPromptError) {
+    if (hasPortfolioNameError || hasAiPromptError || hasDuplicateNameError) {
       setValidationErrors({
-        portfolioName: hasPortfolioNameError,
+        portfolioName: hasPortfolioNameError || hasDuplicateNameError,
         aiPrompt: hasAiPromptError
       });
       
@@ -219,6 +262,11 @@ export default function DashboardPage() {
       const errorMessages = [];
       if (hasPortfolioNameError) errorMessages.push('portfolio name');
       if (hasAiPromptError) errorMessages.push('AI description');
+      if (hasDuplicateNameError) {
+        setError(`Portfolio name "${newPortfolioName}" already exists. Please choose a different name.`);
+        setTimeout(() => setError(null), 5000);
+        return;
+      }
       
       setError(`Please enter your ${errorMessages.join(' and ')}`);
       setTimeout(() => setError(null), 3000);
@@ -846,6 +894,8 @@ export default function DashboardPage() {
                           className={`w-64 px-3 py-2 pr-8 bg-white/10 border rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm text-sm ${
                             validationErrors.portfolioName 
                               ? 'border-red-400/60 bg-red-500/5' 
+                              : nameExists
+                              ? 'border-red-400/60 bg-red-500/5'
                               : 'border-purple-400/30'
                           }`}
                           placeholder="My Hero Portfolio Name"
@@ -856,6 +906,34 @@ export default function DashboardPage() {
                         </span>
                       </div>
                     </div>
+                    
+                    {/* Name availability indicator - separate section with proper spacing */}
+                    {newPortfolioName.trim() && (
+                      <div className="flex justify-center">
+                        <div className="flex items-center space-x-2 text-sm">
+                          {isCheckingName ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+                              <span className="text-yellow-400">Checking availability...</span>
+                            </>
+                          ) : nameExists ? (
+                            <>
+                              <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-orange-400">Portfolio name already exists</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span className="text-green-400">Portfolio name available</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Templates section - Modal Trigger */}
                     <div className="flex items-center justify-center space-x-3">
@@ -894,9 +972,14 @@ export default function DashboardPage() {
                       </button>
                       <button
                         onClick={handleCreatePortfolio}
-                        className="px-6 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 font-medium text-sm"
+                        disabled={nameExists || isCheckingName}
+                        className={`px-6 py-2 border transition-all duration-300 font-medium text-sm ${
+                          nameExists || isCheckingName
+                            ? 'bg-gray-500/20 border-gray-400/30 text-gray-400 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/30 text-purple-200 hover:from-purple-500/30 hover:to-pink-500/30'
+                        }`}
                       >
-                        Create Portfolio
+                        {isCheckingName ? 'Checking...' : 'Create Portfolio'}
                       </button>
                     </div>
                   </div>
