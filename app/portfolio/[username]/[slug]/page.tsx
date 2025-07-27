@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Database } from '@/types/database';
 import Image from 'next/image';
 import {
-  Play, Mail, Music, Image as ImageIcon, User, ArrowRight, ExternalLink, Globe, FileText, Briefcase, Award, Star, Phone, MapPin, Calendar, Pause
+  Play, Mail, Music, Image as ImageIcon, User, ArrowRight, ExternalLink, Globe, FileText, Briefcase, Award, Star, Phone, MapPin, Calendar, Pause, X
 } from 'lucide-react'
 import { Portfolio } from '@/types/portfolio'
 import { notFound } from 'next/navigation'
@@ -43,6 +43,9 @@ export default function PortfolioPage({ params }: PageProps) {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showPlayer, setShowPlayer] = useState(false);
+  
+  // Video modal state
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   // Fetch data on component mount
   useEffect(() => {
@@ -556,6 +559,18 @@ export default function PortfolioPage({ params }: PageProps) {
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     
+                    {/* Video play button overlay */}
+                    {item.media_type === 'video' && (
+                      <div 
+                        className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer hover:bg-black/50 transition-colors"
+                        onClick={() => item.video_url && openVideoModal(item.video_url)}
+                      >
+                        <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
+                          <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                      </div>
+                    )}
+                    
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
@@ -911,6 +926,24 @@ export default function PortfolioPage({ params }: PageProps) {
     setCurrentTrack(null);
   };
 
+  // YouTube URL parsing function
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1]
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null
+  }
+
+  // Video modal handlers
+  const openVideoModal = (videoUrl: string) => {
+    const embedUrl = getYouTubeEmbedUrl(videoUrl)
+    if (embedUrl) {
+      setSelectedVideo(embedUrl)
+    }
+  }
+
+  const closeVideoModal = () => {
+    setSelectedVideo(null)
+  }
+
   // After fetching portfolio:
   console.log('✅ Portfolio found:', portfolio.name);
   console.log('📊 Portfolio data:', portfolio);
@@ -922,12 +955,35 @@ export default function PortfolioPage({ params }: PageProps) {
   console.log('Gallery items:', galleryItems, 'Error:', error);
 
   return (
-    <PortfolioSectionsRenderer
-      portfolio={portfolio}
-      tracks={tracks}
-      galleryItems={galleryItems}
-      theme={theme}
-      isEditMode={false}
-    />
+    <>
+      <PortfolioSectionsRenderer
+        portfolio={portfolio}
+        tracks={tracks}
+        galleryItems={galleryItems}
+        theme={theme}
+        isEditMode={false}
+      />
+
+      {/* YouTube Video Modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="relative w-full max-w-4xl aspect-video bg-dark-200 rounded-lg overflow-hidden">
+            <button
+              onClick={closeVideoModal}
+              className="absolute top-4 right-4 z-10 p-2 bg-dark-200/80 rounded-full text-white hover:bg-dark-300 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <iframe
+              src={selectedVideo}
+              title="YouTube video"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

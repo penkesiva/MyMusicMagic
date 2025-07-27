@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { PencilIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 type GalleryItem = Database['public']['Tables']['gallery']['Row']
 
@@ -26,6 +26,7 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
   const [error, setError] = useState<string | null>(null)
   const [deletingItem, setDeletingItem] = useState<string | null>(null)
   const [tab, setTab] = useState<'all' | 'photo' | 'video'>('all')
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
 
   const supabase = createClient()
 
@@ -103,6 +104,24 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
     return new Date(dateString).toLocaleDateString()
   }
 
+  // YouTube URL parsing function
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1]
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null
+  }
+
+  // Video modal handlers
+  const openVideoModal = (videoUrl: string) => {
+    const embedUrl = getYouTubeEmbedUrl(videoUrl)
+    if (embedUrl) {
+      setSelectedVideo(embedUrl)
+    }
+  }
+
+  const closeVideoModal = () => {
+    setSelectedVideo(null)
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -164,7 +183,10 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
               <div className="relative w-20 h-20 flex-shrink-0">
                 <img src={item.image_url} alt={item.title} className="w-full h-full object-cover rounded-md" />
                 {item.media_type === 'video' && (
-                  <div className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center">
+                  <div 
+                    className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center cursor-pointer hover:bg-black/50 transition-colors"
+                    onClick={() => item.video_url && openVideoModal(item.video_url)}
+                  >
                     <div className={`w-8 h-8 ${colors.primary.replace('text-', 'bg-')} rounded-full flex items-center justify-center shadow-lg`}>
                       <svg className="w-5 h-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </div>
@@ -198,7 +220,10 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
               <div className="relative aspect-square w-full min-h-[220px] max-h-[320px]">
                 <img src={item.image_url} alt={item.title} className={`w-full h-full object-cover ${imageFrames ? 'rounded-t-xl' : ''}`}/>
                 {item.media_type === 'video' && (
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div 
+                    className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer hover:bg-black/50 transition-colors"
+                    onClick={() => item.video_url && openVideoModal(item.video_url)}
+                  >
                     <div className={`w-14 h-14 ${colors.primary.replace('text-', 'bg-')} rounded-full flex items-center justify-center shadow-lg`}>
                       <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </div>
@@ -228,6 +253,27 @@ export default function PortfolioGalleryDisplay({ portfolioId, onEdit, onRefresh
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* YouTube Video Modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="relative w-full max-w-4xl aspect-video bg-dark-200 rounded-lg overflow-hidden">
+            <button
+              onClick={closeVideoModal}
+              className="absolute top-4 right-4 z-10 p-2 bg-dark-200/80 rounded-full text-white hover:bg-dark-300 transition-colors"
+            >
+              <XMarkIcon className="h-5 w-5" />
+            </button>
+            <iframe
+              src={selectedVideo}
+              title="YouTube video"
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
         </div>
       )}
     </div>

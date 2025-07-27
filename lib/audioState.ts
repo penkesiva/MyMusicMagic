@@ -71,23 +71,13 @@ export const useAudioStore = create<AudioState>((set: any, get: any) => ({
 
 // Helper function to play a track
 export const playTrack = (track: Track) => {
-  console.log('🎵 playTrack called:', {
-    trackId: track.id,
-    trackTitle: track.title,
-    audioUrl: track.audio_url,
-    currentTrackId: useAudioStore.getState().currentTrack?.id,
-    isPlaying: useAudioStore.getState().isPlaying
-  })
-  
   const store = useAudioStore.getState()
   
   if (store.currentTrack?.id === track.id) {
     // Same track - toggle play/pause
-    console.log('🎵 Same track, toggling play/pause')
     store.togglePlay()
   } else {
     // New track - start playing
-    console.log('🎵 New track, setting track and starting playback')
     store.setTrack(track)
     store.play()
   }

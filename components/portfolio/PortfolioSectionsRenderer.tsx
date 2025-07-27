@@ -52,15 +52,10 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
   // Add event listener for bottom audio player
   React.useEffect(() => {
     const handlePlayTrack = () => {
-      console.log('🎵 PortfolioSectionsRenderer: playTrack event received')
-      console.log('🎵 Audio player mode:', portfolio?.sections_config?.tracks?.audio_player_mode)
-      
       // Default to bottom mode if not specified
       const audioPlayerMode = portfolio?.sections_config?.tracks?.audio_player_mode || 'bottom'
-      console.log('🎵 Using audio player mode:', audioPlayerMode)
       
       if (audioPlayerMode === 'bottom') {
-        console.log('🎵 Setting bottom audio player to visible')
         setShowBottomAudioPlayer(true)
       }
     }
