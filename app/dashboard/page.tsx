@@ -57,6 +57,8 @@ export default function DashboardPage() {
   // Add state for AI prompt
   const [aiPrompt, setAiPrompt] = useState('');
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [originalTemplateSelection, setOriginalTemplateSelection] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState({
     portfolioName: false,
     aiPrompt: false
@@ -798,14 +800,17 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    {/* Templates section - Improved Design */}
+                    {/* Templates section - Modal Trigger */}
                     <div className="flex items-center justify-center space-x-3">
                       <button
                         type="button"
-                        onClick={() => setShowTemplates((prev) => !prev)}
+                        onClick={() => {
+                          setOriginalTemplateSelection(selectedTemplate);
+                          setShowTemplateModal(true);
+                        }}
                         className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium shadow-sm"
                       >
-                        {showTemplates ? 'Hide Templates' : 'Show Templates'}
+                        Choose Template
                       </button>
                       {selectedTemplate && (
                         <div className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 rounded-lg text-xs font-medium border border-green-400/30 shadow-sm">
@@ -814,31 +819,6 @@ export default function DashboardPage() {
                         </div>
                       )}
                     </div>
-
-                    {/* Template grid - Compact */}
-                    {showTemplates && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-4xl mx-auto">
-                        {templates.map((template) => (
-                          <TemplatePreview
-                            key={template.id}
-                            template={{
-                              ...template,
-                              description: template.description || 'No description available'
-                            }}
-                            isSelected={selectedTemplate === template.id}
-                            onSelect={id => {
-                              setSelectedTemplate(id);
-                              setAiPrompt('');
-                            }}
-                            onUpgrade={() => {
-                              // Redirect to billing page for upgrade
-                              router.push('/dashboard/billing');
-                            }}
-                            userSubscription={subscription ? { plan_type: subscription.plan_type } : undefined}
-                          />
-                        ))}
-                      </div>
-                    )}
 
 
 
@@ -972,6 +952,104 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Template Selection Modal */}
+      {showTemplateModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-6 border-b border-white/10 flex-shrink-0">
+              <h2 className="text-xl font-bold text-white">Choose Your Template</h2>
+              <button
+                onClick={() => setShowTemplateModal(false)}
+                className="p-2 text-gray-400 hover:text-white transition-colors"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {templates.map((template) => (
+                  <div
+                    key={template.id}
+                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+                      selectedTemplate === template.id
+                        ? 'border-purple-500 bg-purple-500/10'
+                        : 'border-white/10 bg-white/5 hover:border-purple-400/50 hover:bg-purple-500/5'
+                    }`}
+                    onClick={() => {
+                      setSelectedTemplate(template.id);
+                      setAiPrompt('');
+                    }}
+                  >
+                    {/* Template Preview */}
+                    <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg mb-3 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                          <Layout className="h-6 w-6 text-purple-400" />
+                        </div>
+                        <p className="text-sm text-gray-300">{template.name}</p>
+                      </div>
+                    </div>
+
+                    {/* Template Info */}
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-white text-sm">{template.name}</h3>
+                      <p className="text-xs text-gray-400 line-clamp-2">
+                        {template.description || 'No description available'}
+                      </p>
+                      
+                      {/* Template Features */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-1">
+                          <Star className="h-3 w-3 text-yellow-400" />
+                          <span className="text-xs text-gray-400">Free</span>
+                        </div>
+                        {selectedTemplate === template.id && (
+                          <div className="flex items-center space-x-1">
+                            <CheckIcon className="h-4 w-4 text-green-400" />
+                            <span className="text-xs text-green-400 font-medium">Selected</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Selection Indicator */}
+                    {selectedTemplate === template.id && (
+                      <div className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckIcon className="h-4 w-4 text-white" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end items-center p-6 border-t border-white/10 space-x-3 flex-shrink-0">
+              <button
+                onClick={() => {
+                  setSelectedTemplate(originalTemplateSelection);
+                  setShowTemplateModal(false);
+                }}
+                className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowTemplateModal(false);
+                }}
+                className="px-6 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 font-medium text-sm"
+              >
+                Confirm Selection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 
