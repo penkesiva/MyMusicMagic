@@ -183,6 +183,20 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
     setCurrentTime(0)
     setDuration(0)
     
+    // Add error handling for audio loading
+    const handleError = (e: Event) => {
+      console.error('Audio loading error:', e)
+      console.error('Audio error details:', audio.error)
+    }
+    
+    const handleCanPlay = () => {
+      console.log('Audio can play, starting playback')
+      play()
+    }
+    
+    audio.addEventListener('error', handleError)
+    audio.addEventListener('canplay', handleCanPlay)
+    
     // Ensure autoplay works by setting a small delay
     const timer = setTimeout(() => {
       if (audio.readyState >= 2) { // HAVE_CURRENT_DATA
@@ -191,7 +205,11 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
       }
     }, 100)
     
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      audio.removeEventListener('error', handleError)
+      audio.removeEventListener('canplay', handleCanPlay)
+    }
   }, [currentTrack, setCurrentTime, setDuration, play])
 
   // Control volume based on global state
@@ -247,7 +265,12 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
   }
 
   if (!isVisible || !currentTrack) {
-    console.log('PortfolioBottomAudioPlayer hidden:', { isVisible, hasTrack: !!currentTrack })
+    console.log('PortfolioBottomAudioPlayer hidden:', { 
+      isVisible, 
+      hasTrack: !!currentTrack,
+      currentTrackTitle: currentTrack?.title,
+      currentTrackId: currentTrack?.id
+    })
     return null
   }
 
@@ -259,6 +282,11 @@ export default function PortfolioBottomAudioPlayer({ isVisible, onClose, theme }
       <audio 
         ref={audioRef} 
         preload="metadata"
+        crossOrigin="anonymous"
+        onError={(e) => console.error('Audio element error:', e)}
+        onLoadStart={() => console.log('Audio loading started')}
+        onCanPlay={() => console.log('Audio can play')}
+        onCanPlayThrough={() => console.log('Audio can play through')}
       />
       
       {/* Main Player Bar */}

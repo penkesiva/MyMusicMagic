@@ -76,18 +76,31 @@ export default function PortfolioTracksDisplay({ portfolioId, onEdit, onRefresh,
   }, [portfolioId, refreshKey])
 
   const handlePlayPause = (track: Track) => {
+    console.log('🎵 Track play/pause clicked:', {
+      trackId: track.id,
+      trackTitle: track.title,
+      audioUrl: track.audio_url,
+      audioPlayerMode,
+      currentTrackId: currentTrack?.id,
+      isPlaying
+    })
+    
     if (audioPlayerMode === 'inline') {
       // Inline mode - use global state
+      console.log('🎵 Using inline mode, calling playTrack')
       playTrack(track)
     } else {
       // Bottom player mode - dispatch custom event for bottom player
+      console.log('🎵 Using bottom player mode, dispatching playTrack event')
       const playEvent = new CustomEvent('playTrack', {
         detail: { 
           track, 
           isPlaying: currentTrack?.id === track.id && isPlaying 
         }
       })
+      console.log('🎵 Dispatching event:', playEvent)
       window.dispatchEvent(playEvent)
+      console.log('🎵 Event dispatched')
     }
   }
 
