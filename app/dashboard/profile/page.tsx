@@ -417,8 +417,8 @@ export default function ProfilePage() {
                       </>
                     ) : (
                       <>
-                        <Camera className="w-4 h-4" />
-                        <span>Upload Photo</span>
+                    <Camera className="w-4 h-4" />
+                    <span>Upload Photo</span>
                       </>
                     )}
                   </button>
