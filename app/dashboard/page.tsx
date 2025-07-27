@@ -59,6 +59,12 @@ export default function DashboardPage() {
   const [showTemplates, setShowTemplates] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [originalTemplateSelection, setOriginalTemplateSelection] = useState<string>('');
+  const [isCreatingPortfolio, setIsCreatingPortfolio] = useState(false);
+  const [creatingPortfolioData, setCreatingPortfolioData] = useState<{
+    name: string;
+    template: string;
+    aiPrompt: string;
+  } | null>(null);
   const [validationErrors, setValidationErrors] = useState({
     portfolioName: false,
     aiPrompt: false
@@ -224,6 +230,14 @@ export default function DashboardPage() {
         setSelectedTemplate(basicTemplate.id);
       }
     }
+
+    // Set creating state and show cooking card
+    setIsCreatingPortfolio(true);
+    setCreatingPortfolioData({
+      name: newPortfolioName,
+      template: templates.find(t => t.id === selectedTemplate)?.name || 'Basic Template',
+      aiPrompt: aiPrompt
+    });
 
     try {
       const slug = newPortfolioName.toLowerCase().replace(/[^a-z0-9]/g, '-')
@@ -590,10 +604,14 @@ export default function DashboardPage() {
       setSelectedTemplate('')
       setAiPrompt('')
       setShowTemplates(false)
+      setIsCreatingPortfolio(false)
+      setCreatingPortfolioData(null)
       setSuccess(aiPrompt.trim() ? '✨ AI-generated portfolio created successfully!' : 'Portfolio created successfully!')
       setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
       console.error('Portfolio creation error:', err)
+      setIsCreatingPortfolio(false)
+      setCreatingPortfolioData(null)
       setError('Failed to create portfolio')
       setTimeout(() => setError(null), 3000)
     }
@@ -865,6 +883,56 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Cooking Animation Card */}
+                    {isCreatingPortfolio && creatingPortfolioData && (
+                      <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-xl p-5 animate-pulse">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-spin">
+                              <Sparkles className="h-4 w-4 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-semibold text-white truncate">
+                                {creatingPortfolioData.name}
+                              </h3>
+                              <p className="text-sm text-purple-300">
+                                {creatingPortfolioData.template}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="px-3 py-1 text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-full animate-pulse">
+                              Cooking...
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Cooking Animation */}
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+                            <span className="text-sm text-gray-300">🤖 AI is analyzing your description...</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            <span className="text-sm text-gray-300">🎨 Generating personalized content...</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                            <span className="text-sm text-gray-300">✨ Crafting your portfolio...</span>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="mt-4">
+                          <div className="w-full bg-gray-700/50 rounded-full h-2">
+                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Existing Portfolios */}
                     {portfolios.map((p) => (
                       <div key={p.id} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/10 transition-all duration-300 group">
                         {/* Portfolio Header */}
