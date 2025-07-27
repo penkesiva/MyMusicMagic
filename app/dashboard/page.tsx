@@ -591,7 +591,7 @@ export default function DashboardPage() {
           theme_name: defaultThemeName,
           sections_config: defaultSectionsConfig,
           ...defaultContent,
-          is_published: true, // Make portfolios published by default
+          is_published: false, // Start as draft, user publishes after editing
           is_default: portfolios.length === 0 // First portfolio is default
         })
         .select()
@@ -949,7 +949,7 @@ export default function DashboardPage() {
                               className={`px-3 py-1 text-xs rounded-full font-medium ${
                                 p.is_published
                                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                  : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                                  : 'bg-orange-500/20 text-orange-300 border border-orange-500/30'
                               } hover:opacity-80 transition-all duration-300`}
                             >
                               {p.is_published ? 'Published' : 'Draft'}
