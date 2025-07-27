@@ -400,9 +400,6 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
                     <p className={`text-xs mb-2 line-clamp-2 ${theme.colors.text} opacity-70`}>{item.description}</p>
                     <div className="flex justify-between items-center mt-auto">
                       <p className={`text-xs ${theme.colors.text} opacity-50`}>{new Date(item.created_at).toLocaleDateString()}</p>
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.media_type === 'video' ? 'bg-blue-900/20 text-blue-300 border border-blue-500/20' : 'bg-green-900/20 text-green-300 border border-green-500/20'
-                      }`}>{item.media_type === 'video' ? 'Video' : 'Image'}</span>
                     </div>
                   </div>
                 </div>

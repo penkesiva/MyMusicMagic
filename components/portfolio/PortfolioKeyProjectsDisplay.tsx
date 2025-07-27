@@ -35,25 +35,25 @@ export default function PortfolioKeyProjectsDisplay({
   const content = (
     <>
       <div className="mb-8">
-        <h2 className={`text-4xl font-bold mb-4 text-center ${colors.heading}`}>{title}</h2>
+        <h2 className={`text-4xl font-bold mb-4 text-center ${colors.heading} ${theme?.fontClasses?.heading || ''}`}>{title}</h2>
         {description && (
-          <p className={`text-sm ${colors.text} opacity-80 leading-relaxed text-center`}>{description}</p>
+          <p className={`text-sm ${colors.text} opacity-80 leading-relaxed text-center ${theme?.fontClasses?.body || ''}`}>{description}</p>
         )}
       </div>
 
       {projects.length === 0 ? (
         <div className={`text-center py-12 border-2 border-dashed rounded-lg ${colors.text} opacity-60 ${theme?.imageFrames ? 'border-white/20' : 'border-gray-300/20'}`}>
-          <p className="text-lg mb-2">No projects added yet</p>
-          <p className="text-sm">Showcase your key projects and achievements</p>
+          <p className={`text-lg mb-2 ${theme?.fontClasses?.body || ''}`}>No projects added yet</p>
+          <p className={`text-sm ${theme?.fontClasses?.body || ''}`}>Showcase your key projects and achievements</p>
         </div>
       ) : (
         <div className="space-y-6">
           {projects.map((project, index) => (
             <div key={project.id} className={`p-4 border rounded-lg ${colors.background} ${theme?.imageFrames ? 'border-white/10' : 'border-gray-300/10'}`}>
               <div className="mb-3">
-                <h4 className={`text-lg font-semibold ${colors.heading} mb-2`}>{project.title}</h4>
+                <h4 className={`text-lg font-semibold ${colors.heading} mb-2 ${theme?.fontClasses?.heading || ''}`}>{project.title}</h4>
                 {project.description && (
-                  <p className={`text-sm ${colors.text} opacity-80 leading-relaxed`}>
+                  <p className={`text-sm ${colors.text} opacity-80 leading-relaxed ${theme?.fontClasses?.body || ''}`}>
                     {project.description}
                   </p>
                 )}

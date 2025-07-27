@@ -55,15 +55,15 @@ export default function PostMeDisplay({ portfolio, theme, previewOnly }: PostMeD
   return (
     <section className="py-16 px-4 flex flex-col items-center justify-center min-h-[60vh]">
       <div className={`max-w-md w-full ${theme.colors?.card || 'bg-black/60'} rounded-xl shadow-lg p-8 border ${theme.colors?.cardBorder || 'border-gray-700'}`}>
-        <h2 className="text-4xl font-bold text-center mb-2" style={{ color: theme.colors?.heading || '#fff' }}>
+        <h2 className={`text-4xl font-bold text-center mb-2 ${theme.fontClasses?.heading || ''}`} style={{ color: theme.colors?.heading || '#fff' }}>
           {getSectionTitle()}
         </h2>
-        <p className={`text-center text-lg ${theme.colors?.text || 'text-gray-300'} mb-8`}>
+        <p className={`text-center text-lg ${theme.colors?.text || 'text-gray-300'} mb-8 ${theme.fontClasses?.body || ''}`}>
           {portfolio.post_me_subtitle || 'Share your musical thoughts'}
         </p>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="postme-email" className={`block text-sm font-medium ${theme.colors?.text || 'text-white'} mb-1`}>
+            <label htmlFor="postme-email" className={`block text-sm font-medium ${theme.colors?.text || 'text-white'} mb-1 ${theme.fontClasses?.body || ''}`}>
               Email *
             </label>
             <input
@@ -73,12 +73,12 @@ export default function PostMeDisplay({ portfolio, theme, previewOnly }: PostMeD
               onChange={e => setEmail(e.target.value)}
               required
               placeholder={portfolio.post_me_email_placeholder || 'your@email.com'}
-              className={`w-full px-4 py-3 rounded-lg border ${theme.colors?.inputBorder || 'border-gray-600'} ${theme.colors?.inputBg || 'bg-gray-800'} ${theme.colors?.text || 'text-white'} placeholder-gray-400 focus:outline-none focus:ring-2 ${theme.colors?.focusRing || 'focus:ring-purple-500'}`}
+              className={`w-full px-4 py-3 rounded-lg border ${theme.colors?.inputBorder || 'border-gray-600'} ${theme.colors?.inputBg || 'bg-gray-800'} ${theme.colors?.text || 'text-white'} placeholder-gray-400 focus:outline-none focus:ring-2 ${theme.colors?.focusRing || 'focus:ring-purple-500'} ${theme.fontClasses?.body || ''}`}
               disabled={isSubmitting || previewOnly}
             />
           </div>
           <div>
-            <label htmlFor="postme-message" className={`block text-sm font-medium ${theme.colors?.text || 'text-white'} mb-1`}>
+            <label htmlFor="postme-message" className={`block text-sm font-medium ${theme.colors?.text || 'text-white'} mb-1 ${theme.fontClasses?.body || ''}`}>
               Message (max 100 words) *
             </label>
             <textarea
@@ -88,17 +88,17 @@ export default function PostMeDisplay({ portfolio, theme, previewOnly }: PostMeD
               required
               maxLength={1000}
               placeholder={portfolio.post_me_message_placeholder || 'Your message here...'}
-              className={`w-full px-4 py-3 rounded-lg border ${theme.colors?.inputBorder || 'border-gray-600'} ${theme.colors?.inputBg || 'bg-gray-800'} ${theme.colors?.text || 'text-white'} placeholder-gray-400 focus:outline-none focus:ring-2 ${theme.colors?.focusRing || 'focus:ring-purple-500'} min-h-[100px]`}
+              className={`w-full px-4 py-3 rounded-lg border ${theme.colors?.inputBorder || 'border-gray-600'} ${theme.colors?.inputBg || 'bg-gray-800'} ${theme.colors?.text || 'text-white'} placeholder-gray-400 focus:outline-none focus:ring-2 ${theme.colors?.focusRing || 'focus:ring-purple-500'} min-h-[100px] ${theme.fontClasses?.body || ''}`}
               disabled={isSubmitting || previewOnly}
             />
-            <div className={`text-xs ${theme.colors?.textMuted || 'text-gray-400'} mt-1 text-right`}>
+            <div className={`text-xs ${theme.colors?.textMuted || 'text-gray-400'} mt-1 text-right ${theme.fontClasses?.body || ''}`}>
               {wordCount}/{maxWords} words
             </div>
           </div>
           <button
             type="submit"
             disabled={isSubmitting || !email.trim() || !message.trim() || wordCount > maxWords || previewOnly}
-            className={`w-full py-3 rounded-lg font-semibold text-lg ${theme.colors?.button || 'bg-purple-500'} ${theme.colors?.buttonHover || 'hover:bg-purple-600'} transition disabled:opacity-50 disabled:cursor-not-allowed ${theme.colors?.buttonText || 'text-white'}`}
+            className={`w-full py-3 rounded-lg font-semibold text-lg ${theme.colors?.button || 'bg-purple-500'} ${theme.colors?.buttonHover || 'hover:bg-purple-600'} transition disabled:opacity-50 disabled:cursor-not-allowed ${theme.colors?.buttonText || 'text-white'} ${theme.fontClasses?.body || ''}`}
           >
             {isSubmitting ? 'Sending...' : (portfolio.post_me_button_text || 'Send Message')}
           </button>

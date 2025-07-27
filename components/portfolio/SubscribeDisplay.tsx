@@ -58,13 +58,13 @@ export default function SubscribeDisplay({ portfolio, theme }: SubscribeDisplayP
     >
       <div className="max-w-4xl mx-auto text-center">
         <h2 
-          className="text-3xl md:text-4xl font-bold mb-6"
+          className={`text-3xl md:text-4xl font-bold mb-6 ${theme.fontClasses?.heading || ''}`}
           style={{ color: theme.colors?.primary || '#ffffff' }}
         >
           {getSectionTitle()}
         </h2>
         
-        <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
+        <p className={`text-lg mb-8 opacity-90 max-w-2xl mx-auto ${theme.fontClasses?.body || ''}`}>
           {getDescription()}
         </p>
 
@@ -76,13 +76,13 @@ export default function SubscribeDisplay({ portfolio, theme }: SubscribeDisplayP
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
               required
-              className="flex-1 px-4 py-3 rounded-lg border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`flex-1 px-4 py-3 rounded-lg border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme.fontClasses?.body || ''}`}
               disabled={isSubmitting}
             />
             <button
               type="submit"
               disabled={isSubmitting || !email.trim()}
-              className="px-6 py-3 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
+              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 ${theme.fontClasses?.body || ''}`}
               style={{
                 backgroundColor: theme.colors?.accent || '#3b82f6',
                 color: theme.colors?.accentText || '#ffffff'

@@ -302,10 +302,18 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
               </section>
             )}
             {key === 'subscribe' && (
-              <SubscribeDisplay portfolio={portfolio} theme={theme} />
+              <section className={`${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <SubscribeDisplay portfolio={portfolio} theme={{...theme, fontClasses}} />
+                </div>
+              </section>
             )}
             {key === 'post_me' && (
-              <PostMeDisplay portfolio={portfolio} theme={theme} />
+              <section className={`${theme.colors.text} py-20 px-4 md:px-8`}>
+                <div className="container mx-auto">
+                  <PostMeDisplay portfolio={portfolio} theme={{...theme, fontClasses}} />
+                </div>
+              </section>
             )}
             {/* Add other sections with custom titles */}
             {key === 'key_projects' && (
@@ -315,7 +323,7 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                     portfolioId={portfolio.id}
                     title={getSectionTitle('key_projects')}
                     projects={safeGetArray(portfolio.key_projects_json)}
-                    theme={theme}
+                    theme={{...theme, fontClasses}}
                   />
                 </div>
               </section>
