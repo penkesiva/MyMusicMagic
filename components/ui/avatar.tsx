@@ -99,17 +99,9 @@ export function Avatar({
     lg: 'w-12 h-12 text-lg'
   };
 
-  const statusSizeClasses = {
-    sm: 'w-2 h-2',
-    md: 'w-3 h-3',
-    lg: 'w-4 h-4'
-  };
 
-  const dropdownSizeClasses = {
-    sm: 'w-2 h-2',
-    md: 'w-2 h-2',
-    lg: 'w-3 h-3'
-  };
+
+
 
   const menuWidthClasses = {
     sm: 'w-56',
@@ -165,7 +157,7 @@ export function Avatar({
         <button
           ref={avatarRef}
           onClick={() => setMenuOpen((open) => !open)}
-          className={`group relative ${sizeClasses[size]} rounded-full bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 transition-all duration-200 border-2 border-purple-400/50 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-lg hover:shadow-xl z-[99998] ${className}`}
+          className={`group relative ${sizeClasses[size]} rounded-full bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-500 hover:to-purple-700 transition-all duration-200 border border-purple-400/50 hover:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-lg hover:shadow-xl z-[99998] ${className}`}
           aria-label="Open profile menu"
         >
           {getUserAvatar() ? (
@@ -180,17 +172,13 @@ export function Avatar({
             </div>
           )}
           
-          {/* Status indicator */}
-          <div className={`absolute -bottom-1 -right-1 ${statusSizeClasses[size]} bg-green-500 border-2 border-gray-900 rounded-full flex items-center justify-center`}>
-            <div className="w-1 h-1 bg-white rounded-full"></div>
-          </div>
+
           
           {/* Hover effect */}
           <div className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
         </button>
         
-        {/* Dropdown indicator */}
-        <ChevronDown className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 ${dropdownSizeClasses[size]} text-purple-300 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`} />
+
       </div>
       
               {/* Enhanced Dropdown Menu */}
