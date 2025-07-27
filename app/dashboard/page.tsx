@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
 import { SECTIONS_CONFIG } from '@/lib/sections'
+import { getSmartThemeSelection, getSmartFontSelection, getRotatedThemeSelection } from '@/lib/portfolioEditorUtils'
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -257,9 +258,15 @@ export default function DashboardPage() {
       // Prepare default sections config based on template
       let defaultSectionsConfig: Record<string, any> = {};
       let defaultThemeName = 'Midnight Dusk';
+      let defaultFontPair = 'sf-pro'; // Default font pair
       let defaultContent: any = {};
 
       // AI Generation Logic
+      console.log('=== PORTFOLIO CREATION DEBUG ===');
+      console.log('AI Prompt:', aiPrompt);
+      console.log('Selected Template ID:', selectedTemplate);
+      console.log('Template Data:', templateData);
+      
       if (aiPrompt.trim()) {
         setSuccess('🤖 AI is generating your portfolio... This may take a moment.');
         
@@ -279,6 +286,8 @@ export default function DashboardPage() {
           }
 
           const aiGeneratedData = await response.json();
+          console.log('AI Generated Data:', aiGeneratedData);
+          console.log('User Prompt:', aiPrompt);
           
           // Use AI-generated content
           defaultContent = {
@@ -330,16 +339,28 @@ export default function DashboardPage() {
             });
           }
 
-          // Set theme based on AI analysis or template
-          if (templateData) {
-            defaultThemeName = templateData.name;
-          } else if (aiGeneratedData.theme_name) {
-            // Use AI's theme suggestion
+          // Set theme and font based on AI analysis or template
+          console.log('--- THEME SELECTION DEBUG ---');
+          console.log('Template Data:', templateData?.name);
+          console.log('AI Prompt:', aiPrompt);
+          console.log('AI Suggested Theme:', aiGeneratedData.theme_name);
+          
+          // Always prioritize AI suggestion or smart selection over template name
+          if (aiGeneratedData.theme_name) {
+            console.log('Using AI suggested theme:', aiGeneratedData.theme_name);
             defaultThemeName = aiGeneratedData.theme_name;
           } else {
-            // Fallback to a default theme
-            defaultThemeName = 'Midnight Dusk';
+            // No AI suggestion, use smart selection
+            console.log('No AI theme suggestion, using smart theme selection');
+            defaultThemeName = getRotatedThemeSelection(aiPrompt);
           }
+          
+          console.log('Final theme selected:', defaultThemeName);
+          console.log('Final font pair selected:', defaultFontPair);
+          console.log('=== END DEBUG ===');
+
+          // Always use smart font selection based on theme and prompt
+          defaultFontPair = getSmartFontSelection(defaultThemeName, aiPrompt);
 
           setSuccess('✨ AI has generated your portfolio! Creating your masterpiece...');
         } catch (aiError) {
@@ -348,9 +369,12 @@ export default function DashboardPage() {
           // Fall back to template-based creation
         }
       } else if (templateData) {
+        console.log('--- TEMPLATE-ONLY CREATION DEBUG ---');
+        console.log('Template Data:', templateData?.name);
         // Apply template-specific settings
         if (templateData.name === 'Basic Template') {
           defaultThemeName = 'Midnight Dusk-light';
+          defaultFontPair = getSmartFontSelection(defaultThemeName, 'professional portfolio');
           defaultSectionsConfig = {
             hero: { enabled: true, name: 'Welcome', order: 1 },
             about: { enabled: true, name: 'About Me', order: 2 },
@@ -387,6 +411,7 @@ export default function DashboardPage() {
           };
         } else if (templateData.name === 'Royal Purple') {
           defaultThemeName = 'Royal Purple';
+          defaultFontPair = getSmartFontSelection(defaultThemeName, 'music musician composer');
           defaultSectionsConfig = {
             hero: { enabled: true, name: 'Welcome', order: 1 },
             about: { enabled: true, name: 'About My Music', order: 2 },
@@ -426,6 +451,7 @@ export default function DashboardPage() {
           };
         } else if (templateData.name === 'Crimson Sunset') {
           defaultThemeName = 'Crimson Sunset';
+          defaultFontPair = getSmartFontSelection(defaultThemeName, 'photography photographer visual artist');
           defaultSectionsConfig = {
             hero: { enabled: true, name: 'Welcome', order: 1 },
             about: { enabled: true, name: 'About My Photography', order: 2 },
@@ -511,7 +537,7 @@ export default function DashboardPage() {
             blog_description: 'Share your academic thoughts and research insights',
             status_title: 'What I\'m working on',
             footer_about_summary: 'Committed to academic excellence and contributing to the advancement of knowledge through rigorous research and scholarly work.',
-            font_pair: 'SF-Pro-Display',
+            font_pair: 'lato-open-sans',
             card_shadows: true,
             section_blending: true,
             image_frames: true,
@@ -561,7 +587,7 @@ export default function DashboardPage() {
             contact_title: 'Let\'s Create Together',
             contact_description: 'Interested in commissioning artwork, collaborating on creative projects, or discussing potential opportunities? I\'m always excited to connect with fellow artists and art enthusiasts.',
             footer_about_summary: 'Dedicated to creating beautiful artwork that inspires, connects, and brings joy to people\'s lives through the power of visual expression.',
-            font_pair: 'SF-Pro-Display',
+            font_pair: 'playfair-source',
             card_shadows: true,
             section_blending: true,
             image_frames: true,
@@ -578,9 +604,10 @@ export default function DashboardPage() {
             footer: { enabled: true, name: 'Footer', order: 6 }
           };
         }
-      } else {
-        // Default sections if no template selected
-        defaultSectionsConfig = {
+              } else {
+          console.log('--- NO TEMPLATE DEBUG ---');
+          // Default sections if no template selected
+          defaultSectionsConfig = {
           hero: { enabled: true, name: 'Hero', order: 1 },
           about: { enabled: true, name: 'About', order: 2 },
           tracks: { enabled: true, name: 'Tracks', order: 3 },
@@ -598,6 +625,7 @@ export default function DashboardPage() {
           slug: slug,
           template_id: selectedTemplate || null,
           theme_name: defaultThemeName,
+          font_pair: defaultFontPair,
           sections_config: defaultSectionsConfig,
           ...defaultContent,
           is_published: false, // Start as draft, user publishes after editing

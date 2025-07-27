@@ -28,9 +28,12 @@ function getPrompt(prompt: string, templateName?: string) {
     ${templateSpecificInstructions}
 
     Generate a JSON object with the following structure. Do NOT include any markdown or explanatory text around the JSON object.
+    
+    CRITICAL: DO NOT choose "Royal Purple" unless the user specifically requests it. The AI must choose from the first 15 themes in the list (Deep Ocean through Cream & Blush) for most users. Only use Royal Purple variants if the user explicitly mentions purple or music. Choose themes that best match the user's profession and style from the diverse options available.
 
     {
-      "theme_name": "Choose the most appropriate theme name from: Royal Purple, Crimson Sunset, Deep Ocean, Midnight Dusk-light, Midnight Dusk-dark, Sunset Rose-light, Sunset Rose-dark, Royal Purple-light, Royal Purple-dark, Golden Hour-light, Golden Hour-dark, Emerald Forest-light, Emerald Forest-dark, Lime Fresh-light, Lime Fresh-dark, Classic Gray-light, Classic Gray-dark, Stone Elegance-light, Stone Elegance-dark, Navy & Coral, White & Teal, Light Gray & Mustard, Black & Lime, White & Electric Blue, Midnight & Gold, Cream & Blush, Teal & Salmon, Mint & Coral, White & Vibrant Purple (string)",
+      "theme_name": "Choose the most appropriate theme name from the available themes. Consider the user's profession, style, and content. Available themes: Deep Ocean, Crimson Sunset, White & Teal, Black & Lime, Classic Gray-dark, Midnight Dusk, Lime Fresh-light, Golden Hour-light, Stone Elegance-dark, White & Electric Blue, Navy & Coral, White & Vibrant Purple, Mint & Coral, Teal & Salmon, Cream & Blush, Midnight & Gold, Emerald Forest-light, Classic Gray-light, Stone Elegance-light, Sunset Rose-light, Sunset Rose-dark, Golden Hour-dark, Emerald Forest-dark, Lime Fresh-dark, Royal Purple, Royal Purple-light, Royal Purple-dark, Midnight Dusk-light, Midnight Dusk-dark, Light Gray & Mustard (string)",
+      "font_pair": "Choose the most appropriate font pair from: sf-pro, montserrat-merriweather, playfair-source, poppins-roboto, lato-open-sans, raleway-roboto-slab, raleway-thin-nunito. Consider the theme and profession (string)",
       "subtitle": "An engaging one-sentence subtitle or tagline. (string)",
       "hero_title": "A compelling hero section title. (string)",
       "hero_subtitle": "A brief hero section subtitle or tagline. (string)",
@@ -87,17 +90,28 @@ function getPrompt(prompt: string, templateName?: string) {
 
     Instructions:
     - Generate creative content directly inspired by the user's prompt
-    - For theme_name, choose the most appropriate theme based on the user's profession and style:
-      * For musicians, artists, creative professionals: choose "Royal Purple" or "Deep Ocean"
-      * For photographers, visual artists: choose "Crimson Sunset" or "Deep Ocean"
-      * For developers, tech professionals: choose "Deep Ocean" or "Black & Lime"
-      * For designers, creative professionals: choose "Royal Purple" or "Crimson Sunset"
-      * For writers, content creators: choose "Midnight Dusk-dark" or "Classic Gray-dark"
-      * For educators, academics: choose "Deep Ocean" or "Classic Gray-light"
-      * For students: choose "Lime Fresh-light" or "White & Electric Blue"
-      * For corporate professionals: choose "Classic Gray-dark" or "Midnight Dusk-dark"
-      * For warm, friendly professions: choose "Sunset Rose-light" or "Golden Hour-light"
-      * For modern, minimalist styles: choose "White & Teal" or "White & Electric Blue"
+    - For theme_name, choose the most appropriate theme based on the user's profession and style. CRITICAL: DO NOT choose Royal Purple unless user specifically requests purple or music. Choose from these options:
+      * For musicians, artists, creative professionals: choose "Deep Ocean", "Crimson Sunset", "White & Vibrant Purple", or "Navy & Coral"
+      * For photographers, visual artists: choose "Crimson Sunset", "Golden Hour-dark", "Deep Ocean", or "Midnight & Gold"
+      * For developers, tech professionals: choose "Deep Ocean", "Black & Lime", "White & Electric Blue", or "Classic Gray-dark"
+      * For designers, creative professionals: choose "White & Vibrant Purple", "Crimson Sunset", "Deep Ocean", or "Mint & Coral"
+      * For writers, content creators: choose "Midnight Dusk-dark", "Classic Gray-dark", "Stone Elegance-dark", or "Deep Ocean"
+      * For educators, academics: choose "Emerald Forest-light", "Classic Gray-light", "Deep Ocean", or "White & Teal"
+      * For students: choose "Lime Fresh-light", "White & Electric Blue", "Cream & Blush", or "Mint & Coral"
+      * For corporate professionals: choose "Classic Gray-dark", "Stone Elegance-dark", "Midnight Dusk-dark", or "White & Teal"
+      * For warm, friendly professions: choose "Sunset Rose-light", "Golden Hour-light", "Cream & Blush", or "Teal & Salmon"
+      * For modern, minimalist styles: choose "White & Teal", "Classic Gray-light", "White & Electric Blue", or "Stone Elegance-light"
+      * For bold, energetic personalities: choose "Black & Lime", "White & Vibrant Purple", "Navy & Coral", or "Lime Fresh-dark"
+      * For elegant, sophisticated styles: choose "Midnight & Gold", "Stone Elegance-dark", "Deep Ocean", or "Classic Gray-dark"
+      * For fresh, vibrant styles: choose "Lime Fresh-light", "Mint & Coral", "Teal & Salmon", or "White & Vibrant Purple"
+    
+    - For font_pair, choose based on the theme and profession:
+      * For modern, tech-focused: choose "sf-pro" or "poppins-roboto"
+      * For creative, artistic: choose "playfair-source" or "montserrat-merriweather"
+      * For professional, corporate: choose "lato-open-sans" or "raleway-roboto-slab"
+      * For elegant, sophisticated: choose "raleway-thin-nunito" or "playfair-source"
+      * For clean, readable: choose "sf-pro" or "lato-open-sans"
+      * For bold, impactful: choose "montserrat-merriweather" or "poppins-roboto"
       * For bold, dramatic styles: choose "Crimson Sunset" or "Black & Lime"
       * For elegant, sophisticated styles: choose "Royal Purple" or "Midnight & Gold"
       * For natural, organic styles: choose "Emerald Forest-light" or "Teal & Salmon"
