@@ -81,10 +81,40 @@ export const getSortedEditorSections = (portfolio: Portfolio | null): string[] =
     key !== 'footer' // Exclude footer from editor sections
   );
   
-  // Sort by order from sections_config
-  return editorSections.sort((a, b) => {
+  // Separate enabled and disabled sections
+  const enabledSections: string[] = [];
+  const disabledSections: string[] = [];
+  
+  editorSections.forEach(sectionKey => {
+    const isEnabled = (portfolio.sections_config as any)?.[sectionKey]?.enabled ?? SECTIONS_CONFIG[sectionKey]?.defaultEnabled ?? false;
+    const order = (portfolio.sections_config as any)?.[sectionKey]?.order ?? SECTIONS_CONFIG[sectionKey]?.defaultOrder ?? 999;
+    
+    const sectionInfo = { key: sectionKey, order };
+    
+    if (isEnabled) {
+      enabledSections.push(sectionKey);
+    } else {
+      disabledSections.push(sectionKey);
+    }
+  });
+  
+  // Sort enabled sections by order (Hero always first)
+  enabledSections.sort((a, b) => {
+    if (a === 'hero') return -1;
+    if (b === 'hero') return 1;
+    
     const orderA = (portfolio.sections_config as any)?.[a]?.order ?? SECTIONS_CONFIG[a]?.defaultOrder ?? 999;
     const orderB = (portfolio.sections_config as any)?.[b]?.order ?? SECTIONS_CONFIG[b]?.defaultOrder ?? 999;
     return orderA - orderB;
   });
+  
+  // Sort disabled sections by order
+  disabledSections.sort((a, b) => {
+    const orderA = (portfolio.sections_config as any)?.[a]?.order ?? SECTIONS_CONFIG[a]?.defaultOrder ?? 999;
+    const orderB = (portfolio.sections_config as any)?.[b]?.order ?? SECTIONS_CONFIG[b]?.defaultOrder ?? 999;
+    return orderA - orderB;
+  });
+  
+  // Return enabled sections first, then disabled sections
+  return [...enabledSections, ...disabledSections];
 }; 

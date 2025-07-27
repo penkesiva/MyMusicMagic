@@ -169,13 +169,7 @@ export default function PortfolioSectionManager({
                   };
                 })
                 .filter((item): item is { key: string; sectionConfig: any; isEnabled: any } => item !== null)
-                .sort((a, b) => {
-                  // Sort enabled sections first, then disabled sections
-                  if (a.isEnabled && !b.isEnabled) return -1;
-                  if (!a.isEnabled && b.isEnabled) return 1;
-                  // If both have same enabled status, maintain original order
-                  return sectionOrder.indexOf(a.key) - sectionOrder.indexOf(b.key);
-                })
+
                 .map(({ key, sectionConfig, isEnabled }) => (
                   <SortableSectionItem
                     key={key}

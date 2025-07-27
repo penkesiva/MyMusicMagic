@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
+import { SECTIONS_CONFIG } from '@/lib/sections'
 import { 
   PlusIcon, 
   PencilIcon, 
@@ -319,6 +320,14 @@ export default function DashboardPage() {
                 }
               });
             }
+            
+            // Preserve original order from sections configuration - AI should only enable/disable, not reorder
+            Object.keys(defaultSectionsConfig).forEach(sectionKey => {
+              if (defaultSectionsConfig[sectionKey]) {
+                // Use the default order from SECTIONS_CONFIG
+                defaultSectionsConfig[sectionKey].order = SECTIONS_CONFIG[sectionKey]?.defaultOrder ?? 999;
+              }
+            });
           }
 
           // Set theme based on AI analysis or template

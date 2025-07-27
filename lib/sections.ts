@@ -41,7 +41,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     tracks: {
         key: 'tracks',
         defaultName: 'Tracks',
-        defaultOrder: 2,
+        defaultOrder: 3,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -53,7 +53,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     gallery: {
         key: 'gallery',
         defaultName: 'Photo Gallery',
-        defaultOrder: 3,
+        defaultOrder: 4,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -64,7 +64,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     key_projects: {
         key: 'key_projects',
         defaultName: 'Key Projects',
-        defaultOrder: 5,
+        defaultOrder: 6,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -76,7 +76,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     testimonials: {
         key: 'testimonials',
         defaultName: 'Testimonials',
-        defaultOrder: 6,
+        defaultOrder: 7,
         enabled: false,
         defaultEnabled: false,
         hasCustomTitle: true,
@@ -87,7 +87,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     press: {
         key: 'press',
         defaultName: 'Press & Media',
-        defaultOrder: 4,
+        defaultOrder: 5,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -99,7 +99,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     blog: {
         key: 'blog',
         defaultName: 'Blog',
-        defaultOrder: 8,
+        defaultOrder: 10,
         enabled: false,
         defaultEnabled: false,
         hasCustomTitle: true,
@@ -110,7 +110,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     status: {
         key: 'status',
         defaultName: 'What I\'m Working On',
-        defaultOrder: 9,
+        defaultOrder: 2,
         enabled: false,
         defaultEnabled: false,
         hasCustomTitle: true,
@@ -121,7 +121,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     skills: {
         key: 'skills',
         defaultName: 'Skills & Tools',
-        defaultOrder: 6,
+        defaultOrder: 8,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -133,7 +133,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     resume: {
         key: 'resume',
         defaultName: 'Resume',
-        defaultOrder: 9,
+        defaultOrder: 11,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -145,7 +145,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     hobbies: {
         key: 'hobbies',
         defaultName: 'Hobbies',
-        defaultOrder: 7,
+        defaultOrder: 9,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -157,7 +157,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     contact: {
         key: 'contact',
         defaultName: 'Contact Me',
-        defaultOrder: 9,
+        defaultOrder: 12,
         enabled: true,
         defaultEnabled: true,
         hasCustomTitle: true,
@@ -176,7 +176,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     sponsors: {
         key: 'sponsors',
         defaultName: 'Sponsors & Partners',
-        defaultOrder: 8,
+        defaultOrder: 13,
         enabled: false,
         defaultEnabled: false,
         hasCustomTitle: true,
@@ -188,7 +188,7 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     subscribe: {
         key: 'subscribe',
         defaultName: 'Subscribe',
-        defaultOrder: 10,
+        defaultOrder: 14,
         enabled: false,
         defaultEnabled: false,
         hasCustomTitle: true,
@@ -200,9 +200,9 @@ export const SECTIONS_CONFIG: { [key: string]: Section } = {
     post_me: {
         key: 'post_me',
         defaultName: 'Post Me',
-        defaultOrder: 11,
-        enabled: false,
-        defaultEnabled: false,
+        defaultOrder: 15,
+        enabled: true,
+        defaultEnabled: true,
         hasCustomTitle: true,
         fields: {
             post_me_title: 'text',
