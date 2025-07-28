@@ -25,7 +25,7 @@ import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import PressMentionsForm from '@/components/portfolio/PressMentionsForm';
-import { generateEnhancedAITitle } from '@/lib/utils';
+import { generateEnhancedAITitle, formatUrl } from '@/lib/utils';
 import PortfolioThemeSelector from '@/components/portfolio/PortfolioThemeSelector';
 import PortfolioFontSelector from '@/components/portfolio/PortfolioFontSelector';
 import PortfolioStylingSelector from '@/components/portfolio/PortfolioStylingSelector';
@@ -164,6 +164,7 @@ const PortfolioEditorPage = () => {
   const saveChanges = useDebouncedCallback(async (fields: Partial<Portfolio>) => {
     if (!portfolio) return;
     
+    console.log('Saving fields:', fields);
     setSavingStatus("saving");
     setSaveError(null);
     
@@ -181,6 +182,7 @@ const PortfolioEditorPage = () => {
       } else {
         setSavingStatus("saved");
         setHasUnpublishedChanges(true);
+        console.log('Save successful:', fields);
       }
     } catch (error: any) {
       setSavingStatus("error");
@@ -243,9 +245,24 @@ const PortfolioEditorPage = () => {
   // Handle field changes
   const handleFieldChange = (field: keyof Portfolio, value: any) => {
     setSavingStatus("unsaved");
-    setPortfolio(prev => ({ ...prev!, [field]: value }));
+    
+    // Auto-format URLs for URL fields
+    let formattedValue = value;
+    const urlFields = ['website_url', 'linkedin_url', 'twitter_url', 'instagram_url', 'github_url', 'youtube_url'];
+    if (urlFields.includes(field) && typeof value === 'string' && value.trim()) {
+      formattedValue = formatUrl(value);
+      console.log(`URL formatting: "${value}" -> "${formattedValue}"`);
+      
+      // For URL fields, save immediately to ensure formatting is preserved
+      setPortfolio(prev => ({ ...prev!, [field]: formattedValue }));
+      saveChanges.flush(); // Flush any pending saves
+      saveChanges({ [field]: formattedValue });
+      return;
+    }
+    
+    setPortfolio(prev => ({ ...prev!, [field]: formattedValue }));
     // Always auto-save
-    saveChanges({ [field]: value });
+    saveChanges({ [field]: formattedValue });
   };
 
   // Handle section config changes

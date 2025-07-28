@@ -760,7 +760,7 @@ export default function PortfolioPage({ params }: PageProps) {
                 
                 {portfolio.website_url && (
                   <a 
-                    href={portfolio.website_url} 
+                    href={formatUrl(portfolio.website_url)} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className={`group flex items-center gap-4 p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
@@ -771,7 +771,7 @@ export default function PortfolioPage({ params }: PageProps) {
                     <div>
                       <div className="text-sm text-white/60 font-medium">Website</div>
                       <div className={`text-lg font-semibold ${theme.colors.primaryStrong} group-hover:${theme.colors.primary} transition-colors`}>
-                        {portfolio.website_url}
+                        {formatUrl(portfolio.website_url)}
                       </div>
                     </div>
                   </a>
@@ -792,7 +792,7 @@ export default function PortfolioPage({ params }: PageProps) {
               <div className="grid grid-cols-2 gap-4">
                 {portfolio.linkedin_url && (
                   <a 
-                    href={portfolio.linkedin_url} 
+                    href={formatUrl(portfolio.linkedin_url)} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className={`group p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center`}
@@ -804,7 +804,7 @@ export default function PortfolioPage({ params }: PageProps) {
                 
                 {portfolio.twitter_url && (
                   <a 
-                    href={portfolio.twitter_url} 
+                    href={formatUrl(portfolio.twitter_url)} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className={`group p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center`}
@@ -816,7 +816,7 @@ export default function PortfolioPage({ params }: PageProps) {
                 
                 {portfolio.instagram_url && (
                   <a 
-                    href={portfolio.instagram_url} 
+                    href={formatUrl(portfolio.instagram_url)} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className={`group p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center`}
@@ -828,7 +828,7 @@ export default function PortfolioPage({ params }: PageProps) {
                 
                 {portfolio.github_url && (
                   <a 
-                    href={portfolio.github_url} 
+                    href={formatUrl(portfolio.github_url)} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className={`group p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center`}
@@ -840,7 +840,7 @@ export default function PortfolioPage({ params }: PageProps) {
                 
                 {portfolio.youtube_url && (
                   <a 
-                    href={portfolio.youtube_url} 
+                    href={formatUrl(portfolio.youtube_url)} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className={`group p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-center`}
@@ -930,6 +930,24 @@ export default function PortfolioPage({ params }: PageProps) {
   const getYouTubeEmbedUrl = (url: string) => {
     const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1]
     return videoId ? `https://www.youtube.com/embed/${videoId}` : null
+  }
+
+  // URL formatting function to ensure proper protocol
+  const formatUrl = (url: string): string => {
+    if (!url) return '';
+    
+    // If URL already has protocol, return as is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    
+    // If URL starts with www., add https://
+    if (url.startsWith('www.')) {
+      return `https://${url}`;
+    }
+    
+    // For other cases, add https://
+    return `https://${url}`;
   }
 
   // Video modal handlers

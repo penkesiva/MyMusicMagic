@@ -23,7 +23,7 @@ import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import PressMentionsForm from '@/components/portfolio/PressMentionsForm';
-import { generateEnhancedAITitle } from '@/lib/utils';
+import { generateEnhancedAITitle, formatUrl } from '@/lib/utils';
 import PortfolioAIAssistant from '@/components/portfolio/PortfolioAIAssistant';
 import PortfolioThemeSelector from '@/components/portfolio/PortfolioThemeSelector';
 import PortfolioSectionManager from '@/components/portfolio/PortfolioSectionManager';
@@ -119,8 +119,16 @@ const PortfolioEditorPage = () => {
   // Handle field changes
   const handleFieldChange = (field: keyof Portfolio, value: any) => {
     setSavingStatus("saving");
-    setPortfolio(prev => ({ ...prev!, [field]: value }));
-    saveChanges({ [field]: value });
+    
+    // Auto-format URLs for URL fields
+    let formattedValue = value;
+    const urlFields = ['website_url', 'linkedin_url', 'twitter_url', 'instagram_url', 'github_url', 'youtube_url'];
+    if (urlFields.includes(field) && typeof value === 'string' && value.trim()) {
+      formattedValue = formatUrl(value);
+    }
+    
+    setPortfolio(prev => ({ ...prev!, [field]: formattedValue }));
+    saveChanges({ [field]: formattedValue });
   };
 
   // Handle section config changes

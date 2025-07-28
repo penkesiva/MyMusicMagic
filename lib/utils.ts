@@ -159,4 +159,26 @@ export function getRandomDefaultTrackThumbnail(): string {
   // Randomly select one of the default thumbnails
   const randomIndex = Math.floor(Math.random() * defaultThumbnails.length)
   return defaultThumbnails[randomIndex]
+}
+
+/**
+ * Format URL to ensure proper protocol
+ * @param url The URL to format
+ * @returns Properly formatted URL with protocol
+ */
+export function formatUrl(url: string): string {
+  if (!url) return '';
+  
+  // If URL already has protocol, return as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If URL starts with www., add https://
+  if (url.startsWith('www.')) {
+    return `https://${url}`;
+  }
+  
+  // For other cases, add https://
+  return `https://${url}`;
 } 

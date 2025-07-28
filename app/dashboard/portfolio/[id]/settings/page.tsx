@@ -37,6 +37,7 @@ import {
 } from '@chakra-ui/react';
 import { ArrowLeft, Save, Eye, Upload, Trash2, Settings, Palette, Globe, User } from 'lucide-react';
 import { Portfolio } from '@/types/portfolio';
+import { formatUrl } from '@/lib/utils';
 
 const PortfolioSettingsPage = () => {
   const router = useRouter();
@@ -90,9 +91,21 @@ const PortfolioSettingsPage = () => {
     if (!portfolio) return;
     
     setSaving(true);
+    
+    // Format URLs before saving
+    const updatedPortfolio = {
+      ...portfolio,
+      website_url: formatUrl(portfolio.website_url || ''),
+      linkedin_url: formatUrl(portfolio.linkedin_url || ''),
+      twitter_url: formatUrl(portfolio.twitter_url || ''),
+      instagram_url: formatUrl(portfolio.instagram_url || ''),
+      github_url: formatUrl(portfolio.github_url || ''),
+      youtube_url: formatUrl(portfolio.youtube_url || '')
+    };
+    
     const { error } = await supabase
       .from('user_portfolios')
-      .update(portfolio)
+      .update(updatedPortfolio)
       .eq('id', portfolio.id);
 
     if (error) {

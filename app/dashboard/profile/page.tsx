@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Avatar } from '@/components/ui/avatar';
 import { Database } from '@/types/database';
 import { ArrowLeft, Save, User, Mail, Globe, FileText, Camera, Lock, Eye, EyeOff, Bell, Shield, Key } from 'lucide-react';
+import { formatUrl } from '@/lib/utils';
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
 
@@ -99,7 +100,7 @@ export default function ProfilePage() {
         .update({
           username: formData.username,
           full_name: formData.full_name,
-          website_url: formData.website_url,
+          website_url: formatUrl(formData.website_url),
           avatar_url: formData.avatar_url,
           updated_at: new Date().toISOString()
         })

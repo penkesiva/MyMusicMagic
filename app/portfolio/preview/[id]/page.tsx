@@ -485,15 +485,16 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
               <div className={`flex items-center gap-2 text-lg ${colors.text}`}><MapPin className="w-5 h-5" />{portfolio.contact_location}</div>
             )}
             {portfolio.website_url && (
-              <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-lg ${colors.text} hover:${colors.primaryStrong}`}><Globe className="w-5 h-5" />{portfolio.website_url}</a>
+              <a href={formatUrl(portfolio.website_url)} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-lg ${colors.text} hover:${colors.primaryStrong}`}><Globe className="w-5 h-5" />{formatUrl(portfolio.website_url)}</a>
             )}
+
           </div>
           <div className="flex justify-center gap-6 mt-4">
-            {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="LinkedIn"><FaLinkedin className="w-6 h-6"/></a>}
-            {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="Twitter"><FaTwitter className="w-6 h-6"/></a>}
-            {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="Instagram"><FaInstagram className="w-6 h-6"/></a>}
-            {portfolio.github_url && <a href={portfolio.github_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="GitHub"><FaGithub className="w-6 h-6"/></a>}
-            {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="YouTube"><FaYoutube className="w-6 h-6"/></a>}
+            {portfolio.linkedin_url && <a href={formatUrl(portfolio.linkedin_url)} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="LinkedIn"><FaLinkedin className="w-6 h-6"/></a>}
+            {portfolio.twitter_url && <a href={formatUrl(portfolio.twitter_url)} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="Twitter"><FaTwitter className="w-6 h-6"/></a>}
+            {portfolio.instagram_url && <a href={formatUrl(portfolio.instagram_url)} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="Instagram"><FaInstagram className="w-6 h-6"/></a>}
+            {portfolio.github_url && <a href={formatUrl(portfolio.github_url)} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="GitHub"><FaGithub className="w-6 h-6"/></a>}
+            {portfolio.youtube_url && <a href={formatUrl(portfolio.youtube_url)} target="_blank" rel="noopener noreferrer" className={`${colors.text} hover:${colors.primary}`} title="YouTube"><FaYoutube className="w-6 h-6"/></a>}
           </div>
         </div>
       </section>
@@ -565,6 +566,24 @@ export default function PortfolioPreviewPage({ params }: PageProps) {
   const getYouTubeEmbedUrl = (url: string) => {
     const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1]
     return videoId ? `https://www.youtube.com/embed/${videoId}` : null
+  }
+
+  // URL formatting function to ensure proper protocol
+  const formatUrl = (url: string): string => {
+    if (!url) return '';
+    
+    // If URL already has protocol, return as is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    
+    // If URL starts with www., add https://
+    if (url.startsWith('www.')) {
+      return `https://${url}`;
+    }
+    
+    // For other cases, add https://
+    return `https://${url}`;
   }
 
   // Video modal handlers

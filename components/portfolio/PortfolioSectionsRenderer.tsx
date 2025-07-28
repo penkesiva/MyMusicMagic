@@ -21,6 +21,24 @@ import PostMeDisplay from './PostMeDisplay';
 import { getFontClasses, getSortedRenderSections } from '@/lib/portfolioEditorUtils';
 import HeroPortfolioCopyright from './HeroPortfolioCopyright';
 
+// URL formatting function to ensure proper protocol
+const formatUrl = (url: string): string => {
+  if (!url) return '';
+  
+  // If URL already has protocol, return as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If URL starts with www., add https://
+  if (url.startsWith('www.')) {
+    return `https://${url}`;
+  }
+  
+  // For other cases, add https://
+  return `https://${url}`;
+};
+
 // Add other imports as needed (skills, hobbies, etc.)
 
 interface PortfolioSectionsRendererProps {
@@ -271,12 +289,12 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                     {portfolio.contact_phone && <span className={theme.colors.text}>{portfolio.contact_phone}</span>}
                     {portfolio.contact_location && <span className={theme.colors.text}>{portfolio.contact_location}</span>}
                     <div className="flex gap-4 mt-4">
-                      {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaTwitter className="w-6 h-6" /></a>}
-                      {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaInstagram className="w-6 h-6" /></a>}
-                      {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaLinkedin className="w-6 h-6" /></a>}
-                      {portfolio.github_url && <a href={portfolio.github_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaGithub className="w-6 h-6" /></a>}
-                      {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaYoutube className="w-6 h-6" /></a>}
-                      {portfolio.website_url && <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><Globe className="w-6 h-6" /></a>}
+                      {portfolio.twitter_url && <a href={formatUrl(portfolio.twitter_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaTwitter className="w-6 h-6" /></a>}
+                      {portfolio.instagram_url && <a href={formatUrl(portfolio.instagram_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaInstagram className="w-6 h-6" /></a>}
+                      {portfolio.linkedin_url && <a href={formatUrl(portfolio.linkedin_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaLinkedin className="w-6 h-6" /></a>}
+                      {portfolio.github_url && <a href={formatUrl(portfolio.github_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaGithub className="w-6 h-6" /></a>}
+                      {portfolio.youtube_url && <a href={formatUrl(portfolio.youtube_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaYoutube className="w-6 h-6" /></a>}
+                      {portfolio.website_url && <a href={formatUrl(portfolio.website_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><Globe className="w-6 h-6" /></a>}
                     </div>
                   </div>
                 </div>
@@ -399,12 +417,12 @@ const PortfolioSectionsRenderer: React.FC<PortfolioSectionsRendererProps> = ({
                       <div className="text-left">
                         <h3 className={`text-lg font-semibold mb-4 ${theme.colors.heading}`}>Connect</h3>
                         <div className="flex gap-4">
-                          {portfolio.twitter_url && <a href={portfolio.twitter_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaTwitter className="w-6 h-6" /></a>}
-                          {portfolio.instagram_url && <a href={portfolio.instagram_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaInstagram className="w-6 h-6" /></a>}
-                          {portfolio.linkedin_url && <a href={portfolio.linkedin_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaLinkedin className="w-6 h-6" /></a>}
-                          {portfolio.github_url && <a href={portfolio.github_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaGithub className="w-6 h-6" /></a>}
-                          {portfolio.youtube_url && <a href={portfolio.youtube_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaYoutube className="w-6 h-6" /></a>}
-                          {portfolio.website_url && <a href={portfolio.website_url} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><Globe className="w-6 h-6" /></a>}
+                          {portfolio.twitter_url && <a href={formatUrl(portfolio.twitter_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaTwitter className="w-6 h-6" /></a>}
+                          {portfolio.instagram_url && <a href={formatUrl(portfolio.instagram_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaInstagram className="w-6 h-6" /></a>}
+                          {portfolio.linkedin_url && <a href={formatUrl(portfolio.linkedin_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaLinkedin className="w-6 h-6" /></a>}
+                          {portfolio.github_url && <a href={formatUrl(portfolio.github_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaGithub className="w-6 h-6" /></a>}
+                          {portfolio.youtube_url && <a href={formatUrl(portfolio.youtube_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><FaYoutube className="w-6 h-6" /></a>}
+                          {portfolio.website_url && <a href={formatUrl(portfolio.website_url)} target="_blank" rel="noopener noreferrer" className={`${theme.colors.accent} hover:opacity-80`}><Globe className="w-6 h-6" /></a>}
                         </div>
                       </div>
                     )}
