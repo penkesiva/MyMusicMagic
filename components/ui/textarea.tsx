@@ -50,6 +50,24 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, ThemedTextareaProps>(
       return `${baseColor}${Math.round(cssOpacity * 255).toString(16).padStart(2, '0')}`;
     };
     
+    // Extract font size from className
+    const fontSizeMatch = cleanClassName.match(/text-(xs|sm|base|lg|xl|2xl|3xl)/);
+    const fontSize = fontSizeMatch ? fontSizeMatch[1] : undefined;
+    
+    // Convert Tailwind font size to Chakra font size
+    const getChakraFontSize = () => {
+      switch (fontSize) {
+        case 'xs': return '0.75rem';
+        case 'sm': return '0.875rem';
+        case 'base': return '1rem';
+        case 'lg': return '1.125rem';
+        case 'xl': return '1.25rem';
+        case '2xl': return '1.5rem';
+        case '3xl': return '1.875rem';
+        default: return undefined;
+      }
+    };
+    
     return (
       <ChakraTextarea
         ref={ref}
@@ -58,6 +76,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, ThemedTextareaProps>(
         color={textColor}
         borderColor={borderColor}
         border="1px solid"
+        fontSize={getChakraFontSize()}
         _placeholder={{ color: textColor ? textColor + '99' : undefined }}
         _focus={{ borderColor: borderColor || 'purple.400', boxShadow: borderColor ? `0 0 0 2px ${borderColor}` : undefined }}
         _hover={{ borderColor: borderColor }}
