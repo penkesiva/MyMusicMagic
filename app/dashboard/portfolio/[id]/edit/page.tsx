@@ -889,12 +889,10 @@ const PortfolioEditorPage = () => {
 
                       {/* Section Title Editor */}
                       {sectionConfig.hasCustomTitle && (
-                        <div className="mb-6 p-4 bg-white/5 rounded-lg border border-gray-500/30">
-                          <div className="flex items-center justify-between mb-3">
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
-                              Section Title
-                            </label>
-                          </div>
+                        <div className="mb-6">
+                          <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            Section Title
+                          </label>
                           <Input
                             type="text"
                             value={getSectionTitle(key, portfolio)}
@@ -902,9 +900,6 @@ const PortfolioEditorPage = () => {
                             placeholder={`Enter title for ${sectionConfig.defaultName} section`}
                             className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
                           />
-                          <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
-                            This title will be displayed at the top of the {sectionConfig.defaultName} section on your portfolio. Use the AI Assistant to generate creative titles.
-                          </p>
                         </div>
                       )}
                       
