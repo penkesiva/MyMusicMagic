@@ -78,7 +78,7 @@ const Input = React.forwardRef<HTMLInputElement, ThemedInputProps>(
         border="1px solid"
         fontSize={getChakraFontSize()}
         _placeholder={{ color: textColor ? textColor + '99' : undefined }}
-        _focus={{ borderColor: borderColor || 'purple.400', boxShadow: borderColor ? `0 0 0 2px ${borderColor}` : undefined }}
+        _focus={{ borderColor: borderColor || 'purple.400', boxShadow: borderColor ? `0 0 0 1px ${borderColor}` : undefined }}
         _hover={{ borderColor: borderColor }}
         sx={{
           borderColor: getBorderColorWithOpacity(),

@@ -122,7 +122,7 @@
 
 /* Custom focus styles */
 *:focus-visible {
-  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  @apply outline-none ring-1 ring-ring ring-offset-1 ring-offset-background;
 }
 
 /* Custom selection styles */

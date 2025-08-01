@@ -900,7 +900,7 @@ const PortfolioEditorPage = () => {
                             value={getSectionTitle(key, portfolio)}
                             onChange={(e) => handleSectionConfigChange(key as keyof typeof SECTIONS_CONFIG, 'title', e.target.value)}
                             placeholder={`Enter title for ${sectionConfig.defaultName} section`}
-                            className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                            className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
                           />
                           <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
                             This title will be displayed at the top of the {sectionConfig.defaultName} section on your portfolio. Use the AI Assistant to generate creative titles.
@@ -925,7 +925,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_title || ''}
                                   onChange={(e) => handleFieldChange('hero_title', e.target.value)}
                                   placeholder="Your main title"
-                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
                                 />
                               </div>
                               <div>
@@ -937,7 +937,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_subtitle || ''}
                                   onChange={(e) => handleFieldChange('hero_subtitle', e.target.value)}
                                   placeholder="Brief description or tagline"
-                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
                                 />
                               </div>
                             </div>
@@ -972,7 +972,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_image_url || ''}
                                   onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
                                   placeholder="Paste image URL"
-                                  className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                  className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
                                 />
                                 <input
                                   type="file" id="hero-upload" accept="image/*"
@@ -1066,7 +1066,7 @@ const PortfolioEditorPage = () => {
                                         handleFieldChange('hero_cta_buttons', buttons);
                                       }}
                                       placeholder="e.g., View Resume, Contact Me"
-                                      className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                      className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
                                     />
                                   </div>
                                   <div>
@@ -1083,7 +1083,7 @@ const PortfolioEditorPage = () => {
                                         onChange={(e) => handleUrlInput(index, e.target.value)}
                                         onFocus={() => setShowUrlSuggestions(prev => ({ ...prev, [index]: true }))}
                                         placeholder="e.g., #resume, https://..."
-                                        className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                        className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
                                       />
                                       {showUrlSuggestions[index] && (
                                         <div className={`absolute z-10 w-full border border-white/20 rounded-md shadow-lg max-h-60 overflow-y-auto ${selectedTheme.colors.card}`} data-suggestion-box>
@@ -1109,7 +1109,7 @@ const PortfolioEditorPage = () => {
                                         buttons[index] = { ...button, style: e.target.value };
                                         handleFieldChange('hero_cta_buttons', buttons);
                                       }}
-                                      className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400 rounded-md h-9 w-full`}
+                                      className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} rounded-md h-9 w-full`}
                                     >
                                       <option value="primary">Primary</option>
                                       <option value="secondary">Secondary</option>
@@ -1176,7 +1176,7 @@ const PortfolioEditorPage = () => {
                                   onChange={(e) => handleFieldChange('about_text', e.target.value)}
                                   placeholder="Tell your story..."
                                   rows={8}
-                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                                 />
                               </div>
                             </div>
@@ -1207,7 +1207,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.profile_photo_url || ''}
                                   onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
                                   placeholder="Paste photo URL"
-                                  className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                  className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                                 />
                                 <input
                                   type="file" id="profile-upload" accept="image/*"
@@ -1470,7 +1470,7 @@ const PortfolioEditorPage = () => {
                                 value={hobbySearch}
                                 onChange={(e) => setHobbySearch(e.target.value)}
                                 placeholder="Search hobbies..."
-                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
                               />
                             </div>
                             
@@ -1522,7 +1522,7 @@ const PortfolioEditorPage = () => {
                                 value={skillSearch}
                                 onChange={(e) => setSkillSearch(e.target.value)}
                                 placeholder="Search skills..."
-                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             
@@ -1573,7 +1573,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.resume_url || ''}
                                 onChange={(e) => handleFieldChange('resume_url', e.target.value)}
                                 placeholder="Paste resume URL"
-                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                               <input
                                 type="file" id="resume-upload" accept=".pdf,.doc,.docx"
@@ -1623,7 +1623,7 @@ const PortfolioEditorPage = () => {
                               onChange={(e) => handleFieldChange('contact_description', e.target.value)}
                               placeholder="Ready to work together? Let's talk!"
                               rows={3}
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1636,7 +1636,7 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_email || ''}
                               onChange={(e) => handleFieldChange('contact_email', e.target.value)}
                               placeholder="your.email@example.com"
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1649,7 +1649,7 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_phone || ''}
                               onChange={(e) => handleFieldChange('contact_phone', e.target.value)}
                               placeholder="e.g. +1 555-123-4567"
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1662,7 +1662,7 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_location || ''}
                               onChange={(e) => handleFieldChange('contact_location', e.target.value)}
                               placeholder="e.g. New York, NY"
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1675,7 +1675,7 @@ const PortfolioEditorPage = () => {
                               value={portfolio.website_url || ''}
                               onChange={(e) => handleFieldChange('website_url', e.target.value)}
                               placeholder="https://yourwebsite.com"
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
@@ -1689,7 +1689,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.linkedin_url || ''}
                                 onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
                                 placeholder="https://linkedin.com/in/yourprofile"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
@@ -1701,7 +1701,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.twitter_url || ''}
                                 onChange={(e) => handleFieldChange('twitter_url', e.target.value)}
                                 placeholder="https://twitter.com/yourhandle"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
@@ -1713,7 +1713,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.instagram_url || ''}
                                 onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
                                 placeholder="https://instagram.com/yourhandle"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
@@ -1725,7 +1725,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.github_url || ''}
                                 onChange={(e) => handleFieldChange('github_url', e.target.value)}
                                 placeholder="https://github.com/yourusername"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
@@ -1737,7 +1737,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.youtube_url || ''}
                                 onChange={(e) => handleFieldChange('youtube_url', e.target.value)}
                                 placeholder="https://youtube.com/@yourchannel"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-2 focus:ring-purple-400`}
+                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                           </div>
