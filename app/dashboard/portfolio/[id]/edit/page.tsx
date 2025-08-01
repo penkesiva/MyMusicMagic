@@ -68,7 +68,7 @@ const SECTION_ICONS: Record<string, React.ComponentType<any>> = {
 // Helper function to get section icon
 const getSectionIcon = (sectionKey: string) => {
   const IconComponent = SECTION_ICONS[sectionKey];
-  return IconComponent ? <IconComponent className="w-5 h-5" /> : <Settings className="w-5 h-5" />;
+  return IconComponent ? <IconComponent className="w-4 h-4" /> : <Settings className="w-4 h-4" />;
 };
 
 const PortfolioEditorPage = () => {
@@ -865,22 +865,22 @@ const PortfolioEditorPage = () => {
                 <section key={key} id={key} className={`bg-white/5 rounded-xl border border-gray-500/30 overflow-hidden transition-all duration-300 ${!isEnabled ? 'opacity-50' : ''}`}>
                   <button 
                     onClick={() => toggleSection(key)} 
-                    className={`w-full flex items-center justify-between p-4 ${selectedTheme.colors.card} hover:bg-opacity-80 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
+                    className={`w-full flex items-center justify-between p-2 ${selectedTheme.colors.card} hover:bg-opacity-80 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2 text-purple-400">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 text-purple-400">
                         {getSectionIcon(key)}
-                        <h2 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>
+                        <h2 className={`text-sm font-semibold ${selectedTheme.colors.heading}`}>
                           {sectionConfig.defaultName}
                         </h2>
                       </div>
                       {!isEnabled && (
-                        <span className="text-xs bg-red-500/20 text-red-700 dark:text-red-300 px-2 py-1 rounded-full border border-red-500/40 font-medium">
+                        <span className="text-xs bg-red-500/20 text-red-700 dark:text-red-300 px-1 py-0.5 rounded-full border border-red-500/40 font-medium">
                           Disabled
                         </span>
                       )}
                     </div>
-                    <ChevronDown className={`w-5 h-5 transform transition-transform ${selectedTheme.colors.text} ${openSections[key] ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 transform transition-transform ${selectedTheme.colors.text} ${openSections[key] ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {openSections[key] && (
