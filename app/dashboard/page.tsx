@@ -5,19 +5,14 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Database } from '@/types/database'
 import { SECTIONS_CONFIG } from '@/lib/sections'
-import { getSmartThemeSelection, getSmartFontSelection, getRotatedThemeSelection } from '@/lib/portfolioEditorUtils'
+import { getSmartFontSelection, getRotatedThemeSelection } from '@/lib/portfolioEditorUtils'
 import { 
-  PlusIcon, 
-  PencilIcon, 
-  EyeIcon, 
-  TrashIcon,
   CheckIcon,
   XMarkIcon,
-  EyeSlashIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { TemplatePreview } from '@/components/ui/template-preview'
-import { Sparkles, Layout, Edit, ExternalLink, Trash2, FileText, Star, Music, Image, Video, MessageSquare, Briefcase, Award, Heart, Palette } from 'lucide-react'
+import { Sparkles, Layout, Edit, ExternalLink, Trash2, Star, Briefcase } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { User as UserIcon, Settings, LogOut, User as UserIconSolid, Crown, Shield, HelpCircle, Bell, ChevronDown } from 'lucide-react';
 import Portal from '@/components/Portal'
@@ -71,6 +66,11 @@ export default function DashboardPage() {
     portfolioName: false,
     aiPrompt: false
   });
+  
+  // AI Project Generator state
+  const [projectGenerationPrompt, setProjectGenerationPrompt] = useState('');
+  const [isGeneratingProjects, setIsGeneratingProjects] = useState(false);
+  const [selectedPortfolioForProjects, setSelectedPortfolioForProjects] = useState<string>('');
   
   // Portfolio name validation state
   const [isCheckingName, setIsCheckingName] = useState(false);
@@ -744,6 +744,45 @@ export default function DashboardPage() {
     }
   }
 
+  const generateProjectsForPortfolio = async () => {
+    if (!selectedPortfolioForProjects || !projectGenerationPrompt.trim()) {
+      setError('Please select a portfolio and provide a description')
+      return
+    }
+
+    setIsGeneratingProjects(true)
+    try {
+      const response = await fetch('/api/generate-projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: projectGenerationPrompt,
+          portfolioId: selectedPortfolioForProjects
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate projects')
+      }
+
+      const result = await response.json()
+      
+      if (result.success) {
+        setSuccess('Projects generated successfully! Check your portfolio editor to see them.')
+        setProjectGenerationPrompt('')
+        setSelectedPortfolioForProjects('')
+      } else {
+        setError(result.error || 'Failed to generate projects')
+      }
+    } catch (error) {
+      setError('Failed to generate projects')
+    } finally {
+      setIsGeneratingProjects(false)
+    }
+  }
+
   const getPlanFeatures = (planType: string) => {
     switch (planType) {
       case 'free':
@@ -985,6 +1024,91 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
+
+              {/* AI Project Generator Section */}
+              {portfolios.length > 0 && (
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl relative z-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
+                        <Star className="h-4 w-4 text-white" />
+                      </div>
+                      <h2 className="text-base font-bold text-white">AI Project Generator</h2>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {/* Portfolio Selection */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Select Portfolio</label>
+                      <select
+                        value={selectedPortfolioForProjects}
+                        onChange={(e) => setSelectedPortfolioForProjects(e.target.value)}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all backdrop-blur-sm"
+                      >
+                        <option value="">Choose a portfolio...</option>
+                        {portfolios.map((portfolio) => (
+                          <option key={portfolio.id} value={portfolio.id}>
+                            {portfolio.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* AI Prompt */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-gray-300">Describe your background/skills</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const examples = [
+                              "Full-stack developer with 5 years of experience specializing in React, Node.js, and cloud architecture",
+                              "Jazz musician with 10+ years of experience performing at prestigious clubs and festivals",
+                              "UI/UX designer with 7 years of experience creating beautiful mobile apps and websites",
+                              "Freelance photographer with expertise in wedding photography and corporate events",
+                              "Classical pianist and music educator with a love for contemporary compositions"
+                            ];
+                            const randomExample = examples[Math.floor(Math.random() * examples.length)];
+                            setProjectGenerationPrompt(randomExample);
+                          }}
+                          className="text-xs text-yellow-300 hover:text-yellow-200 transition-colors underline"
+                        >
+                          Try Example
+                        </button>
+                      </div>
+                      <textarea
+                        value={projectGenerationPrompt}
+                        onChange={(e) => setProjectGenerationPrompt(e.target.value)}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all backdrop-blur-sm resize-none"
+                        placeholder="Describe your background, skills, or the type of projects you want to showcase..."
+                        rows={3}
+                      />
+                    </div>
+
+                    {/* Generate Button */}
+                    <div className="flex justify-end">
+                      <button
+                        onClick={generateProjectsForPortfolio}
+                        disabled={isGeneratingProjects || !selectedPortfolioForProjects || !projectGenerationPrompt.trim()}
+                        className="px-6 py-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-400/30 text-yellow-200 rounded-xl hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                      >
+                        {isGeneratingProjects ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-yellow-300/30 border-t-yellow-300 rounded-full animate-spin"></div>
+                            <span>Generating...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="h-4 w-4" />
+                            <span>Generate Projects</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* My Portfolios Card - remove Create Portfolio button */}
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl relative z-10">

@@ -19,7 +19,7 @@ import PortfolioGalleryForm from "@/components/portfolio/PortfolioGalleryForm";
 import { THEMES } from "@/lib/themes";
 import PortfolioTracksDisplay from "@/components/portfolio/PortfolioTracksDisplay";
 import PortfolioGalleryDisplay from "@/components/portfolio/PortfolioGalleryDisplay";
-import PortfolioKeyProjectsEditor from "@/components/portfolio/PortfolioKeyProjectsEditor";
+import PortfolioKeyProjectsInlineEditor from "@/components/portfolio/PortfolioKeyProjectsInlineEditor";
 import PortfolioTestimonialsEditor from "@/components/portfolio/PortfolioTestimonialsEditor";
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -1349,7 +1349,7 @@ const PortfolioEditorPage = () => {
 
                       {key === 'key_projects' && (
                         <div className="space-y-6">
-                          <PortfolioKeyProjectsEditor 
+                          <PortfolioKeyProjectsInlineEditor 
                             portfolioId={portfolio.id}
                             title={getSectionTitle(key, portfolio)}
                             projects={safeGetArray(portfolio.key_projects_json)}
