@@ -105,8 +105,26 @@ start_server() {
     print_status "Starting development server on port 3000..."
     echo ""
     print_success "🚀 Server starting at: http://localhost:3000"
+    print_success "📄 Welcome page: http://localhost:3000/welcome"
     print_status "Press Ctrl+C to stop the server"
     echo ""
+    
+    # Wait a moment for server to start, then open browser
+    sleep 3
+    
+    # Open the welcome page in the default browser
+    if command -v open &> /dev/null; then
+        # macOS
+        open "http://localhost:3000/welcome" &
+    elif command -v xdg-open &> /dev/null; then
+        # Linux
+        xdg-open "http://localhost:3000/welcome" &
+    elif command -v start &> /dev/null; then
+        # Windows (Git Bash)
+        start "http://localhost:3000/welcome" &
+    else
+        print_warning "Could not automatically open browser. Please navigate to: http://localhost:3000/welcome"
+    fi
     
     # Set the port explicitly and start the server
     PORT=3000 npm run dev

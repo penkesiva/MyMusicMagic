@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
-// Initialize the Google Generative AI client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+// Initialize the OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
+});
 
 // A helper function to construct the detailed prompt for the AI
 function getPrompt(prompt: string, templateName?: string) {
@@ -213,9 +215,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Prompt or type is required' }, { status: 400 });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      console.log('Configuration error: Missing GEMINI_API_KEY');
-      return NextResponse.json({ error: 'Gemini API key is not configured.' }, { status: 500 });
+    if (!process.env.OPENAI_API_KEY) {
+      console.log('Configuration error: Missing OPENAI_API_KEY');
+      return NextResponse.json({ error: 'OpenAI API key is not configured.' }, { status: 500 });
     }
 
     // Validate currentPortfolio for full generation
@@ -223,8 +225,6 @@ export async function POST(request: Request) {
       console.log('Validation error: Missing currentPortfolio for full generation');
       return NextResponse.json({ error: 'Current portfolio data is required for AI generation.' }, { status: 400 });
     }
-
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Using the specified model
     
     let fullPrompt: string;
     
@@ -256,13 +256,52 @@ export async function POST(request: Request) {
       fullPrompt = getPrompt(prompt, templateName);
     }
 
-    console.log('Sending request to Gemini API with prompt length:', fullPrompt.length);
+    console.log('Sending request to OpenAI with prompt length:', fullPrompt.length);
     
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-    const text = response.text();
+    let text: string;
+    try {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: fullPrompt
+          }
+        ],
+        temperature: 0.7,
+      });
+      
+      text = completion.choices[0]?.message?.content || '';
+      
+      if (!text) {
+        throw new Error('No response from OpenAI');
+      }
+    } catch (aiError: unknown) {
+      console.error('OpenAI API Error:', aiError);
+      const errorString = aiError instanceof Error ? aiError.message : String(aiError);
+      
+      // Check if it's an OpenAI API key error
+      if (errorString.includes('invalid_api_key') || errorString.includes('401') || errorString.includes('403')) {
+        console.error('OpenAI API key error');
+        return NextResponse.json({ error: 'Invalid or missing OpenAI API key.' }, { status: 500 });
+      }
+      
+      // Check for OpenAI API overload (503) or other service issues
+      if (errorString.includes('503') || errorString.includes('service_unavailable')) {
+        console.error('OpenAI API overload error');
+        return NextResponse.json({ error: 'OpenAI service is temporarily unavailable. Please try again later.' }, { status: 503 });
+      }
+      
+      // Check for rate limit/quota errors
+      if (errorString.includes('429') || errorString.includes('rate_limit') || errorString.includes('quota')) {
+        console.error('OpenAI API rate limit/quota error');
+        return NextResponse.json({ error: 'OpenAI API rate limit exceeded. Please try again later.' }, { status: 429 });
+      }
+      
+      throw aiError;
+    }
 
-    console.log('Received response from Gemini API, length:', text.length);
+    console.log('Received response from OpenAI, length:', text.length);
 
     if (type === 'footer_about_summary') {
       // For footer about summary, return the text directly
@@ -435,23 +474,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid JSON in request body.' }, { status: 400 });
     }
     
-    // Check if it's a Gemini API error
-    if ((error as Error).message?.includes('API_KEY')) {
-      console.error('Gemini API key error');
-      return NextResponse.json({ error: 'Invalid or missing Gemini API key.' }, { status: 500 });
+    // Check if it's an OpenAI API error
+    if ((error as Error).message?.includes('API_KEY') || (error as Error).message?.includes('invalid_api_key')) {
+      console.error('OpenAI API key error');
+      return NextResponse.json({ error: 'Invalid or missing OpenAI API key.' }, { status: 500 });
     }
     
-    // Check for Gemini API overload (503) or other service issues
-    if ((error as Error).message?.includes('503') || (error as Error).message?.includes('overloaded')) {
-      console.error('Gemini API overload error');
+    // Check for OpenAI API overload (503) or other service issues
+    if ((error as Error).message?.includes('503') || (error as Error).message?.includes('overloaded') || (error as Error).message?.includes('service_unavailable')) {
+      console.error('OpenAI API overload error');
       return NextResponse.json({ 
         error: 'The AI service is currently overloaded. Please try again in a few moments.' 
       }, { status: 503 });
     }
     
     // Check for rate limiting or quota exceeded
-    if ((error as Error).message?.includes('429') || (error as Error).message?.includes('quota')) {
-      console.error('Gemini API rate limit/quota error');
+    if ((error as Error).message?.includes('429') || (error as Error).message?.includes('quota') || (error as Error).message?.includes('rate_limit')) {
+      console.error('OpenAI API rate limit/quota error');
       return NextResponse.json({ 
         error: 'AI service rate limit exceeded. Please try again later.' 
       }, { status: 429 });

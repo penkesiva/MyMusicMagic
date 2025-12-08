@@ -296,6 +296,8 @@ export interface Database {
           hobbies_title: string | null
           hobbies_json: Json | null
           github_url: string | null
+          key_projects_title: string | null
+          key_projects_json: Json | null
         }
         Insert: {
           id?: string

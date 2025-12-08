@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
-// Initialize the Google Generative AI client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+// Initialize the OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
+});
 
 interface Project {
   id: string;
@@ -66,33 +68,46 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY not configured');
-      return NextResponse.json({ error: 'Gemini API key not configured' }, { status: 500 });
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY not configured');
+      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
     }
 
     console.log('Generating projects for prompt:', prompt);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const aiPrompt = getProjectsPrompt(prompt);
     
-    console.log('Sending request to Gemini AI...');
-    let result, response, text;
+    console.log('Sending request to OpenAI...');
+    let text;
     
     try {
-      result = await model.generateContent(aiPrompt);
-      response = await result.response;
-      text = response.text();
-    } catch (aiError) {
-      console.error('Gemini AI Error:', aiError);
-      if (aiError.toString().includes('429')) {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: aiPrompt
+          }
+        ],
+        temperature: 0.7,
+      });
+      
+      text = completion.choices[0]?.message?.content || '';
+      
+      if (!text) {
+        throw new Error('No response from OpenAI');
+      }
+    } catch (aiError: unknown) {
+      console.error('OpenAI Error:', aiError);
+      const errorString = aiError instanceof Error ? aiError.message : String(aiError);
+      if (errorString.includes('429') || errorString.includes('rate_limit')) {
         throw new Error('Rate limit exceeded. Please wait a moment and try again.');
-      } else if (aiError.toString().includes('404')) {
+      } else if (errorString.includes('404') || errorString.includes('model_not_found')) {
         throw new Error('AI model not found. Please check API configuration.');
-      } else if (aiError.toString().includes('401') || aiError.toString().includes('403')) {
-        throw new Error('Invalid API key. Please check your Gemini API configuration.');
+      } else if (errorString.includes('401') || errorString.includes('403') || errorString.includes('invalid_api_key')) {
+        throw new Error('Invalid API key. Please check your OpenAI API configuration.');
       } else {
-        throw new Error(`AI service error: ${aiError.toString()}`);
+        throw new Error(`AI service error: ${errorString}`);
       }
     }
 

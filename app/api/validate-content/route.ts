@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
+});
 
 export async function POST(request: NextRequest) {
   try {
     // Check if API key is available
-    if (!process.env.GOOGLE_AI_API_KEY) {
-      console.error('GOOGLE_AI_API_KEY not found in environment variables');
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY not found in environment variables');
       return NextResponse.json(
         { 
           error: 'AI validation service not configured',
@@ -28,7 +30,6 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Starting AI validation for content:', content);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const prompt = `
 You are a content validation expert for Hero Portfolio, a professional portfolio building platform. Your task is to evaluate the appropriateness of user-submitted portfolio descriptions by checking for unknown/made-up words.
@@ -103,10 +104,29 @@ IMPORTANT:
 - Return ONLY valid JSON, no additional text
 `;
 
-    console.log('Sending prompt to Gemini...');
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    console.log('Sending prompt to OpenAI...');
+    let text: string;
+    try {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+      });
+      
+      text = completion.choices[0]?.message?.content || '';
+      
+      if (!text) {
+        throw new Error('No response from OpenAI');
+      }
+    } catch (aiError) {
+      console.error('OpenAI API Error:', aiError);
+      throw aiError;
+    }
     console.log('Raw AI response:', text);
 
     // Extract JSON from the response
