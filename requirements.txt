@@ -1,0 +1,22 @@
+# Python dependencies for MyMusicMagic project
+# This file is for any Python scripts or utilities you may add in the future
+
+# Core utilities
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# Data processing (if needed for scripts)
+pandas>=2.0.0
+
+# Database utilities (if needed for Supabase interactions)
+psycopg2-binary>=2.9.9
+
+# HTTP client
+httpx>=0.25.0
+
+# JSON handling
+jsonschema>=4.19.0
+
+# Date/time utilities
+python-dateutil>=2.8.2
+

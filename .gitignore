@@ -3,6 +3,12 @@
 /.pnp
 .pnp.js
 
+# Python virtual environment
+.venv/
+venv/
+env/
+ENV/
+
 # testing
 /coverage
 
@@ -39,4 +45,7 @@ next-env.d.ts
 *.swo
 
 # Supabase
-.supabase/ 
+.supabase/
+
+# SQL files (database scripts - don't commit to repo)
+*.sql 

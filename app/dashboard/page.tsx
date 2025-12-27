@@ -109,14 +109,21 @@ export default function DashboardPage() {
       }
 
       // Check if user is admin (check profiles table for role)
-      const { data: adminProfile } = await supabase
+      // Explicitly set to false first, then only set to true if confirmed admin
+      setIsAdmin(false)
+      
+      const { data: adminProfile, error: adminError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single()
 
-      if (adminProfile?.role === 'admin') {
+      // Only set isAdmin to true if we have a valid response with role === 'admin'
+      if (!adminError && adminProfile && adminProfile.role === 'admin') {
         setIsAdmin(true)
+      } else {
+        // Explicitly ensure isAdmin is false for non-admin users or errors
+        setIsAdmin(false)
       }
 
       // Ensure user subscription exists
@@ -1247,7 +1254,6 @@ export default function DashboardPage() {
                     }`}
                     onClick={() => {
                       setSelectedTemplate(template.id);
-                      setAiPrompt('');
                     }}
                   >
                     {/* Template Preview */}
