@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import { Avatar } from '@/components/ui/avatar'
 import { Database } from '@/types/database'
 import { Save, User, Mail, Globe, Camera, Lock, Eye, EyeOff, Bell, Shield, Key } from 'lucide-react'
 import { formatUrl } from '@/lib/utils'
-import DashboardLayout from '@/components/dashboard/DashboardLayout'
 
-type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
+type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null)
@@ -54,28 +54,28 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-          router.push('/auth/signin');
-          return;
+          router.push('/auth/signin')
+          return
         }
-        setUser(user);
+        setUser(user)
 
         // Fetch user profile
         const { data: profileData, error: profileError } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .single()
 
         if (profileData) {
-          setProfile(profileData);
+          setProfile(profileData)
           setFormData({
             username: profileData.username || '',
             full_name: profileData.full_name || '',
             website_url: profileData.website_url || '',
             avatar_url: profileData.avatar_url || ''
-          });
+          })
         }
 
         setIsLoading(false)
@@ -105,9 +105,9 @@ export default function ProfilePage() {
           avatar_url: formData.avatar_url,
           updated_at: new Date().toISOString()
         })
-        .eq('id', profile.id);
+        .eq('id', profile.id)
 
-      if (error) throw error;
+      if (error) throw error
 
       setProfile({ ...profile, ...formData })
       setSuccess('Profile updated successfully!')
@@ -141,9 +141,9 @@ export default function ProfilePage() {
     try {
       const { error } = await supabase.auth.updateUser({
         password: passwordData.newPassword
-      });
+      })
 
-      if (error) throw error;
+      if (error) throw error
 
       setPasswordData({
         currentPassword: '',
@@ -621,5 +621,5 @@ export default function ProfilePage() {
         </div>
       </div>
     </DashboardLayout>
-  );
+  )
 } 

@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import DashboardLayout from '@/components/dashboard/DashboardLayout'
 import { Avatar } from '@/components/ui/avatar'
 import { Database } from '@/types/database'
 import { CreditCard, Calendar, Download, Crown, Shield, Zap, Check, X, Star, Users, Globe, BarChart3 } from 'lucide-react'
-import DashboardLayout from '@/components/dashboard/DashboardLayout'
 
-type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
-type UserSubscription = Database['public']['Tables']['user_subscriptions']['Row'];
+type UserProfile = Database['public']['Tables']['user_profiles']['Row']
+type UserSubscription = Database['public']['Tables']['user_subscriptions']['Row']
 
 export default function BillingPage() {
   const [user, setUser] = useState<any>(null)
@@ -406,5 +406,5 @@ export default function BillingPage() {
         </div>
       </div>
     </DashboardLayout>
-  );
+  )
 } 

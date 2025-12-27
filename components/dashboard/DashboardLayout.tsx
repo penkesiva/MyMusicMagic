@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Sparkles, Home, FolderOpen, BarChart3, Settings, User, HelpCircle, LogOut, Shield } from 'lucide-react'
 
-interface DashboardLayoutProps {
-  children: React.ReactNode
+type DashboardLayoutProps = {
+  children: ReactNode
   currentPage?: string
 }
 
