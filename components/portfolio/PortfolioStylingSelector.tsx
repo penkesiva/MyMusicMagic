@@ -21,10 +21,10 @@ const PortfolioStylingSelector: React.FC<PortfolioStylingSelectorProps> = ({
     <div className="space-y-2">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex justify-between items-center font-semibold text-sm text-white hover:text-gray-300 transition-colors"
+        className="w-full flex justify-between items-center font-semibold text-sm text-slate-900 hover:text-slate-700 transition-colors"
       >
         Styles
-        <ChevronDown className={`w-4 h-4 transition-transform text-white ${isExpanded ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 transition-transform text-slate-700 ${isExpanded ? 'rotate-180' : ''}`} />
       </button>
       
       {isExpanded && (
@@ -32,8 +32,8 @@ const PortfolioStylingSelector: React.FC<PortfolioStylingSelectorProps> = ({
           {/* Card Shadows */}
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="text-sm font-medium text-white">Card Shadows</div>
-              <div className="text-xs text-gray-400 mt-1">Soft drop-shadows under project cards</div>
+              <div className="text-sm font-medium text-slate-900">Card Shadows</div>
+              <div className="text-xs text-slate-500 mt-1">Soft drop-shadows under project cards</div>
             </div>
             <Switch
               id="card-shadows"
@@ -46,8 +46,8 @@ const PortfolioStylingSelector: React.FC<PortfolioStylingSelectorProps> = ({
           {/* Image Frames */}
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="text-sm font-medium text-white">Image Frames</div>
-              <div className="text-xs text-gray-400 mt-1">Rounded-corner or square images</div>
+              <div className="text-sm font-medium text-slate-900">Image Frames</div>
+              <div className="text-xs text-slate-500 mt-1">Rounded-corner or square images</div>
             </div>
             <Switch
               id="image-frames"
@@ -60,8 +60,8 @@ const PortfolioStylingSelector: React.FC<PortfolioStylingSelectorProps> = ({
           {/* Animations */}
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="text-sm font-medium text-white">Animations</div>
-              <div className="text-xs text-gray-400 mt-1">Simple fade-ins on scroll</div>
+              <div className="text-sm font-medium text-slate-900">Animations</div>
+              <div className="text-xs text-slate-500 mt-1">Simple fade-ins on scroll</div>
             </div>
             <Switch
               id="animations"

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown, Check } from "lucide-react";
 import { THEMES } from "@/lib/themes";
 import { Portfolio } from "@/types/portfolio";
 
@@ -16,81 +16,113 @@ export default function PortfolioThemeSelector({
   onFieldChange,
   theme
 }: PortfolioThemeSelectorProps) {
-  const [colorThemeOpen, setColorThemeOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleThemeClick = (themeName: string) => {
     onFieldChange("theme_name", themeName);
+    setIsOpen(false);
   };
 
   // Separate gradient and solid themes
   const gradientThemes = THEMES.filter(t => t.isGradient);
   const solidThemes = THEMES.filter(t => !t.isGradient);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className="space-y-2 relative">
-      <button 
-        onClick={() => setColorThemeOpen(!colorThemeOpen)} 
-        className="w-full flex justify-between items-center font-semibold text-sm text-white"
+    <div className="space-y-2 relative" ref={dropdownRef}>
+      <label className="block font-semibold text-sm text-slate-900 mb-2">Accent Color</label>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 hover:border-slate-300 transition-colors"
       >
-        Color Theme
-        <ChevronDown className={`w-4 h-4 transition-transform text-white ${colorThemeOpen ? 'rotate-180' : ''}`} />
+        <div className="flex items-center gap-2">
+          <div
+            className="w-4 h-4 rounded border border-slate-300"
+            style={{
+              background: theme.gradientColors 
+                ? `linear-gradient(135deg, ${theme.gradientColors[0]} 0%, ${theme.gradientColors[1]} 100%)`
+                : theme.previewColor,
+            }}
+          />
+          <span>{theme.name}</span>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
-      {colorThemeOpen && (
-        <div className="space-y-3">
+      
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-96 overflow-auto">
           {/* Gradient Themes */}
-          <div>
-            <div className="text-xs text-gray-400 mb-2 px-1">Gradients</div>
-            <div className="grid grid-cols-6 gap-1 p-1">
+          <div className="p-3 border-b border-slate-100">
+            <div className="text-xs font-medium text-slate-500 mb-2 px-1">Gradients</div>
+            <div className="grid grid-cols-5 gap-2">
               {gradientThemes.map((themeOption) => (
                 <button
                   key={themeOption.name}
                   onClick={() => handleThemeClick(themeOption.name)}
-                  className={`aspect-square w-8 h-8 transition-all duration-200 focus:outline-none rounded-md ${
+                  className={`aspect-square w-full transition-all duration-200 focus:outline-none rounded-md relative ${
                     theme.name === themeOption.name 
-                      ? 'ring-2 ring-white ring-offset-1 ring-offset-gray-800' 
+                      ? 'ring-2 ring-[#7f13ec] ring-offset-1' 
                       : 'hover:scale-105'
                   }`}
                   style={{
                     background: themeOption.gradientColors 
                       ? `linear-gradient(135deg, ${themeOption.gradientColors[0]} 0%, ${themeOption.gradientColors[1]} 100%)`
                       : themeOption.previewColor,
-                    border: theme.name === themeOption.name ? '2px solid #fff' : '1px solid rgba(255,255,255,0.1)',
+                    border: theme.name === themeOption.name ? '2px solid #7f13ec' : '1px solid rgba(0,0,0,0.1)',
                   }}
                   title={themeOption.name}
-                />
+                >
+                  {theme.name === themeOption.name && (
+                    <Check className="absolute top-0.5 right-0.5 w-3 h-3 text-white drop-shadow-md" />
+                  )}
+                </button>
               ))}
             </div>
           </div>
 
           {/* Solid Themes */}
-          <div>
-            <div className="text-xs text-gray-400 mb-2 px-1">Solid</div>
-            <div className="grid grid-cols-6 gap-1 p-1">
+          <div className="p-3">
+            <div className="text-xs font-medium text-slate-500 mb-2 px-1">Solid</div>
+            <div className="grid grid-cols-5 gap-2">
               {solidThemes.map((themeOption) => (
                 <button
                   key={themeOption.name}
                   onClick={() => handleThemeClick(themeOption.name)}
-                  className={`aspect-square w-8 h-8 transition-all duration-200 focus:outline-none rounded-md ${
+                  className={`aspect-square w-full transition-all duration-200 focus:outline-none rounded-md relative ${
                     theme.name === themeOption.name 
-                      ? 'ring-2 ring-white ring-offset-1 ring-offset-gray-800' 
+                      ? 'ring-2 ring-[#7f13ec] ring-offset-1' 
                       : 'hover:scale-105'
                   }`}
                   style={{
                     background: themeOption.previewColor,
-                    border: theme.name === themeOption.name ? '2px solid #fff' : '1px solid rgba(255,255,255,0.1)',
+                    border: theme.name === themeOption.name ? '2px solid #7f13ec' : '1px solid rgba(0,0,0,0.1)',
                   }}
                   title={themeOption.name}
-                />
+                >
+                  {theme.name === themeOption.name && (
+                    <Check className="absolute top-0.5 right-0.5 w-3 h-3 text-white drop-shadow-md" />
+                  )}
+                </button>
               ))}
             </div>
           </div>
-        </div>
-      )}
-      
-      {/* Theme name display at bottom right of section - only when expanded */}
-      {colorThemeOpen && theme.name && (
-        <div className="absolute bottom-0 right-0 bg-black/80 text-white px-2 py-1 rounded text-xs font-medium">
-          {theme.name}
         </div>
       )}
     </div>

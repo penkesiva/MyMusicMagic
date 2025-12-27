@@ -64,7 +64,7 @@ function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onN
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    background: enabled ? 'rgba(255,255,255,0.04)' : 'transparent',
+    background: enabled ? 'rgba(127, 19, 236, 0.08)' : 'transparent',
     borderRadius: 6,
     padding: '4px 8px',
     marginBottom: 4,
@@ -84,7 +84,7 @@ function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onN
 
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
-      <span {...listeners} {...dragHandleProps} style={{ marginRight: 8, cursor: 'grab', color: '#aaa' }}>
+      <span {...listeners} {...dragHandleProps} style={{ marginRight: 8, cursor: 'grab', color: '#94a3b8' }}>
         <List size={16} />
       </span>
       <div 
@@ -99,22 +99,22 @@ function SortableSectionItem({ id, name, enabled, onToggle, dragHandleProps, onN
         onClick={handleSectionClick}
         onMouseEnter={(e) => {
           if (enabled) {
-            e.currentTarget.style.color = '#a855f7';
+            e.currentTarget.style.color = '#7f13ec';
           }
         }}
         onMouseLeave={(e) => {
           if (enabled) {
-            e.currentTarget.style.color = '#fff';
+            e.currentTarget.style.color = '#1e293b';
           }
         }}
         title={`Click to scroll to ${name} section`}
       >
-        <span style={{ color: enabled ? '#a855f7' : '#666' }}>
+        <span style={{ color: enabled ? '#7f13ec' : '#94a3b8' }}>
           {getSectionIcon(id)}
         </span>
         <span style={{ 
           fontWeight: enabled ? 500 : 400, 
-          color: enabled ? '#fff' : '#888',
+          color: enabled ? '#1e293b' : '#64748b',
           opacity: enabled ? 1 : 0.6
         }}>
           {name}
@@ -146,10 +146,10 @@ export default function PortfolioSectionManager({
     <div className="space-y-2">
       <button 
         onClick={() => setSectionsOpen(!sectionsOpen)} 
-        className="w-full flex justify-between items-center font-semibold text-sm text-white"
+        className="w-full flex justify-between items-center font-semibold text-sm text-slate-900"
       >
         Sections
-        <ChevronDown className={`w-4 h-4 transition-transform text-white ${sectionsOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 transition-transform text-slate-700 ${sectionsOpen ? 'rotate-180' : ''}`} />
       </button>
       {sectionsOpen && (
         <div className="space-y-2">

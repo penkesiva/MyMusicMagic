@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
 const FONT_PAIRS = [
@@ -50,33 +50,56 @@ const PortfolioFontSelector: React.FC<PortfolioFontSelectorProps> = ({
   selectedFontPair,
   onFontPairChange,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const selectedFont = FONT_PAIRS.find(f => f.id === selectedFontPair) || FONT_PAIRS[0];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 relative" ref={dropdownRef}>
+      <label className="block font-semibold text-sm text-slate-900 mb-2">Typography</label>
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex justify-between items-center font-semibold text-sm text-white hover:text-gray-300 transition-colors"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 hover:border-slate-300 transition-colors"
       >
-        Fonts
-        <ChevronDown className={`w-4 h-4 transition-transform text-white ${isExpanded ? 'rotate-180' : ''}`} />
+        <span>{selectedFont.name}</span>
+        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       
-      {isExpanded && (
-        <div className="space-y-1 pl-2">
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {FONT_PAIRS.map((fontPair) => (
             <button
               key={fontPair.id}
-              onClick={() => onFontPairChange(fontPair.id)}
-              className="w-full p-3 text-left transition-all duration-200"
+              onClick={() => {
+                onFontPairChange(fontPair.id);
+                setIsOpen(false);
+              }}
+              className="w-full p-3 text-left transition-all duration-200 hover:bg-slate-50 first:rounded-t-lg last:rounded-b-lg"
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <div className="font-medium text-sm text-white">{fontPair.name}</div>
-                  <div className="text-xs text-gray-500 mt-1">{fontPair.description}</div>
+                  <div className="font-medium text-sm text-slate-900">{fontPair.name}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{fontPair.description}</div>
                 </div>
                 {selectedFontPair === fontPair.id && (
-                  <Check className="w-5 h-5 text-blue-600" />
+                  <Check className="w-4 h-4 text-[#7f13ec] ml-2" />
                 )}
               </div>
             </button>

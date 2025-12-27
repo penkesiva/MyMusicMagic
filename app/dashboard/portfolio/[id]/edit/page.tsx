@@ -39,6 +39,7 @@ import SubscribeForm from '@/components/portfolio/SubscribeForm';
 import PostMeForm from '@/components/portfolio/PostMeForm';
 import PortfolioFooterForm from '@/components/portfolio/PortfolioFooterForm';
 import { Avatar } from '@/components/ui/avatar';
+import { lightUITheme as ui } from '@/lib/uiTheme';
 
 const NAVBAR_HEIGHT = 56;
 const SIDEBAR_MIN_WIDTH = 220;
@@ -641,12 +642,27 @@ const PortfolioEditorPage = () => {
   }
 
   const selectedTheme = THEMES.find(t => t.name === portfolio.theme_name) || THEMES[0];
+  // Static light editor palette (UI only; does not affect saved theme)
+  const colors = {
+    text: 'text-slate-700',
+    heading: 'text-slate-900',
+    textSecondary: 'text-slate-500',
+    textBox: 'bg-white',
+    textBoxBorder: 'border border-slate-200',
+    textBoxText: 'text-slate-900',
+    textBoxPlaceholder: 'placeholder:text-slate-400',
+    card: 'bg-white',
+    button: 'bg-[#7f13ec]',
+    buttonText: 'text-white',
+    buttonHover: 'hover:bg-[#6a10c5]',
+    buttonBorder: 'border-[#7f13ec]'
+  };
 
   return (
-    <div className="h-screen w-screen flex flex-row bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+    <div className={`h-screen w-screen flex flex-row ${ui.pageBg} ${ui.font}`}>
       {/* Left Sidebar - Full height, from top to bottom */}
       <aside
-        className={`flex flex-col gap-4 bg-black/40 text-sm overflow-y-auto h-full border-r border-white/10 transition-all duration-200 relative ${sidebarOpen ? '' : 'hidden md:flex'} pt-4 px-2 custom-scrollbar-hide`}
+        className={`flex flex-col gap-4 ${ui.sidebarBg} text-sm overflow-y-auto h-full border-r transition-all duration-200 relative ${sidebarOpen ? '' : 'hidden md:flex'} pt-4 px-3 custom-scrollbar-hide`}
         style={{
           width: 320,
           minWidth: 320,
@@ -654,58 +670,44 @@ const PortfolioEditorPage = () => {
           transition: 'width 0.2s',
         }}
       >
+        {/* AI Assistant removed - now available in dashboard */}
+
+        {/* Back to Dashboard - Top of sidebar */}
         <button
           onClick={() => router.push('/dashboard')}
-          className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/15 hover:border-white/20 transition-all duration-200 text-sm font-medium group mx-auto justify-center"
+          className="inline-flex items-center gap-2 mb-4 px-1 text-slate-600 hover:text-slate-900 transition-all duration-200 text-sm font-medium"
         >
-          <svg className="w-4 h-4 text-white group-hover:text-purple-300 transition" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
           <span className="whitespace-nowrap">Back to Dashboard</span>
         </button>
-        <div className="flex flex-row items-center justify-center text-center mb-4 gap-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-          <div className="flex flex-col items-start text-left">
-            <h2 className="text-lg font-bold text-white">Portfolio Editor</h2>
-            <p className="text-xs text-gray-300 mt-1">Customize your hero-portfolio.</p>
-          </div>
+
+        {/* GLOBAL STYLES Section */}
+        <div className="space-y-4">
+          <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">Global Styles</h3>
+          
+          {/* Theme Selector Component */}
+          <PortfolioThemeSelector
+            portfolio={portfolio}
+            onFieldChange={handleFieldChange}
+            theme={selectedTheme}
+          />
+
+          {/* Font Selector Component */}
+          <PortfolioFontSelector
+            selectedFontPair={portfolio.font_pair || 'sf-pro'}
+            onFontPairChange={(fontPair) => handleFieldChange('font_pair', fontPair)}
+          />
+
+          {/* Styling Selector Component */}
+          <PortfolioStylingSelector
+            cardShadows={portfolio.card_shadows ?? true}
+            imageFrames={portfolio.image_frames ?? true}
+            animations={portfolio.animations ?? true}
+            onStylingChange={(setting, value) => handleFieldChange(setting === 'cardShadows' ? 'card_shadows' : setting === 'imageFrames' ? 'image_frames' : 'animations', value)}
+          />
         </div>
-
-        {/* AI Assistant removed - now available in dashboard */}
-
-        {/* Theme Selector Component */}
-        <PortfolioThemeSelector
-          portfolio={portfolio}
-          onFieldChange={handleFieldChange}
-          theme={selectedTheme}
-        />
-
-        {/* Separator */}
-        <div className="border-t border-white/10 my-4"></div>
-
-        {/* Font Selector Component */}
-        <PortfolioFontSelector
-          selectedFontPair={portfolio.font_pair || 'sf-pro'}
-          onFontPairChange={(fontPair) => handleFieldChange('font_pair', fontPair)}
-        />
-
-        {/* Separator */}
-        <div className="border-t border-white/10 my-4"></div>
-
-        {/* Styling Selector Component */}
-        <PortfolioStylingSelector
-          cardShadows={portfolio.card_shadows ?? true}
-          imageFrames={portfolio.image_frames ?? true}
-          animations={portfolio.animations ?? true}
-          onStylingChange={(setting, value) => handleFieldChange(setting === 'cardShadows' ? 'card_shadows' : setting === 'imageFrames' ? 'image_frames' : 'animations', value)}
-        />
-
-        {/* Separator */}
-        <div className="border-t border-white/10 my-4"></div>
 
         {/* Section Manager Component */}
         <PortfolioSectionManager
@@ -718,103 +720,121 @@ const PortfolioEditorPage = () => {
         />
       </aside>
       {/* Main Area: Nav-Bar + Editor */}
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col flex-1 min-h-0 bg-[#fcfcfd]">
         {/* Nav-Bar - Only above editor area */}
         <div
-          className="flex items-center justify-between px-6"
+          className={`flex items-center justify-between px-6 border-b border-slate-200 bg-white`}
           style={{
             height: NAVBAR_HEIGHT,
             minHeight: NAVBAR_HEIGHT,
             maxHeight: NAVBAR_HEIGHT,
-            background: 'rgba(20,20,30,0.95)',
-            boxShadow: '0 2px 8px 0 rgba(0,0,0,0.10)',
-            borderBottom: '1px solid rgba(255,255,255,0.07)',
+            background: '#ffffff',
+            boxShadow: '0 1px 0 rgba(0,0,0,0.04)',
+            borderBottom: '1px solid rgba(226,232,240,1)',
             zIndex: 50,
             position: 'relative',
           }}
         >
+          {/* Left: Portfolio Info with Saved Status */}
           <div className="flex items-center gap-4">
             <button
-              className="md:hidden p-2 text-white"
+              className="md:hidden p-2 text-slate-700"
               onClick={() => setSidebarOpen((v) => !v)}
               aria-label="Toggle sidebar"
             >
               <span className="material-icons">menu</span>
             </button>
-            <span className="text-lg font-semibold text-gray-300">Editing:</span>
-            <span className="text-xl font-bold text-white">{portfolio.name || 'Untitled Portfolio'}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Save Controls Group */}
-            <div className="flex items-center gap-4 bg-white/5 rounded-lg px-4 py-2 border border-white/10">
-              {/* Save Status */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">Status:</span>
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  savingStatus === 'saving' ? 'bg-yellow-500/20 text-yellow-300' :
-                  savingStatus === 'saved' ? 'bg-green-500/20 text-green-300' :
-                  savingStatus === 'unsaved' ? 'bg-orange-500/20 text-orange-300' :
-                  'bg-red-500/20 text-red-300'
-                }`}>
-                  {savingStatus === 'saving' ? 'Saving...' :
-                    savingStatus === 'saved' ? 'Saved' :
-                    savingStatus === 'unsaved' ? 'Unsaved' : 'Error'}
-                </span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-[#7f13ec] rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </div>
+              <div className="flex flex-col hidden sm:flex">
+                <span className="text-sm font-semibold text-slate-900">{portfolio.name || 'Untitled Portfolio'}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">Last edited {portfolio.updated_at ? (() => {
+                    const now = new Date();
+                    const updated = new Date(portfolio.updated_at);
+                    const diffMs = now.getTime() - updated.getTime();
+                    const diffMins = Math.floor(diffMs / 60000);
+                    if (diffMins < 1) return 'just now';
+                    if (diffMins === 1) return '1 minute ago';
+                    return `${diffMins} minutes ago`;
+                  })() : 'just now'}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                    savingStatus === 'saving' ? 'bg-yellow-100 text-yellow-700' :
+                    savingStatus === 'saved' ? 'bg-green-100 text-green-700' :
+                    savingStatus === 'unsaved' ? 'bg-orange-100 text-orange-700' :
+                    'bg-red-100 text-red-700'
+                  }`}>
+                    {savingStatus === 'saving' ? 'Saving...' :
+                      savingStatus === 'saved' ? 'SAVED' :
+                      savingStatus === 'unsaved' ? 'Unsaved' : 'Error'}
+                  </span>
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-3">
+            {/* Chain Link Icon (for sharing/copying URL) */}
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/portfolio/${userProfile?.username}/${portfolio.slug}`;
+                navigator.clipboard.writeText(url);
+                // You could add a toast notification here
+              }}
+              className="p-2 text-slate-600 hover:text-slate-900 transition-colors"
+              title="Copy portfolio link"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </button>
 
             {/* Preview Button */}
             <Button
               onClick={() => window.open(`/portfolio/preview/${portfolio.id}`, '_blank', 'noopener,noreferrer')}
               variant="outline"
               size="sm"
-              className="bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30"
+              className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
             >
-              <Eye className="h-4 w-4 mr-1" />
+              <Eye className="h-4 w-4 mr-1.5" />
               Preview
             </Button>
 
             {/* Publish Button */}
             <Button
               onClick={handlePublish}
-              variant="outline"
+              variant="default"
               size="sm"
               disabled={!hasUnpublishedChanges && isPublished}
               className={`${
                 hasUnpublishedChanges 
-                  ? 'bg-orange-600/20 border-orange-500/30 text-orange-300 hover:bg-orange-600/30' 
+                  ? 'bg-[#7f13ec] border-[#7f13ec] text-white hover:bg-[#6a10c5]' 
                   : isPublished
-                  ? 'bg-green-600/20 border-green-500/30 text-green-300'
-                  : 'bg-gray-600/20 border-gray-500/30 text-gray-400'
+                  ? 'bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600'
+                  : 'bg-[#7f13ec] border-[#7f13ec] text-white hover:bg-[#6a10c5]'
               }`}
             >
               {hasUnpublishedChanges ? (
                 <>
-                  <Upload className="h-4 w-4 mr-1" />
-                  Publish Changes
+                  <Upload className="h-4 w-4 mr-1.5" />
+                  Publish
                 </>
               ) : isPublished ? (
                 <>
-                  <Check className="h-4 w-4 mr-1" />
+                  <Check className="h-4 w-4 mr-1.5" />
                   Published
                 </>
               ) : (
                 <>
-                  <Upload className="h-4 w-4 mr-1" />
+                  <Upload className="h-4 w-4 mr-1.5" />
                   Publish
                 </>
               )}
-            </Button>
-
-            {/* Public Button */}
-            <Button
-              onClick={() => window.open(`/portfolio/${userProfile?.username}/${portfolio.slug}`, '_blank', 'noopener,noreferrer')}
-              variant="outline"
-              size="sm"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-            >
-              <ExternalLink className="h-4 w-4 mr-1" />
-              Public
             </Button>
 
             {/* Enhanced Avatar Component */}
@@ -827,15 +847,15 @@ const PortfolioEditorPage = () => {
         </div>
         {/* Error Popup */}
         {saveError && (
-          <div className="fixed top-20 right-6 z-50 bg-red-900/90 border border-red-500/50 rounded-lg p-4 max-w-sm shadow-lg">
+          <div className="fixed top-20 right-6 z-50 bg-white border border-red-200 rounded-xl p-4 max-w-sm shadow-lg shadow-red-100">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
-                <h3 className="text-red-200 font-medium mb-1">Save Error</h3>
-                <p className="text-red-300 text-sm">{saveError}</p>
+                <h3 className="text-red-600 font-semibold mb-1">Save Error</h3>
+                <p className="text-sm text-red-500">{saveError}</p>
               </div>
               <button
                 onClick={() => setSaveError(null)}
-                className="text-red-300 hover:text-red-100 transition-colors"
+                className="text-red-400 hover:text-red-600 transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -844,14 +864,12 @@ const PortfolioEditorPage = () => {
         )}
 
         {/* Main Editor Content */}
-        <main className={`flex-1 p-6 overflow-y-auto ${selectedTheme.colors.background}`} style={{ minHeight: 0 }}>
-                  {/* AI Loading Animation removed - AI now available in dashboard */}
-          
+        <main className="flex-1 p-6 overflow-y-auto bg-[#f7f4fb]" style={{ minHeight: 0 }}>
           <div className="max-w-5xl mx-auto space-y-6">
             <div className="flex justify-end items-center gap-2">
-              <span className="text-sm text-gray-400">Manage Sections</span>
-              <Button onClick={expandAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Expand All</Button>
-              <Button onClick={collapseAll} variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">Collapse All</Button>
+              <span className="text-sm text-slate-500">Manage Sections</span>
+              <Button onClick={expandAll} variant="outline" size="sm" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50">Expand All</Button>
+              <Button onClick={collapseAll} variant="outline" size="sm" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50">Collapse All</Button>
             </div>
 
             {/* Section Editors */}
@@ -862,35 +880,35 @@ const PortfolioEditorPage = () => {
               const isEnabled = (portfolio.sections_config as any)?.[key]?.enabled;
               
               return (
-                <section key={key} id={key} className={`bg-white/5 rounded-xl border border-gray-500/30 overflow-hidden transition-all duration-300 ${!isEnabled ? 'opacity-50' : ''}`}>
+                <section key={key} id={key} className={`bg-white rounded-xl border border-slate-200 overflow-hidden transition-all duration-300 shadow-sm ${!isEnabled ? 'opacity-60' : ''}`}>
                   <button 
                     onClick={() => toggleSection(key)} 
-                    className={`w-full flex items-center justify-between p-2 ${selectedTheme.colors.card} hover:bg-opacity-80 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
+                    className={`w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-slate-100 transition-colors ${!isEnabled ? 'cursor-not-allowed' : ''}`}
                   >
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1 text-purple-400">
+                      <div className="flex items-center gap-1 text-[#7f13ec]">
                         {getSectionIcon(key)}
-                        <h2 className={`text-sm font-semibold ${selectedTheme.colors.heading}`}>
+                        <h2 className="text-sm font-semibold text-slate-900">
                           {sectionConfig.defaultName}
                         </h2>
                       </div>
                       {!isEnabled && (
-                        <span className="text-xs bg-red-500/20 text-red-700 dark:text-red-300 px-1 py-0.5 rounded-full border border-red-500/40 font-medium">
+                        <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full border border-red-200 font-medium">
                           Disabled
                         </span>
                       )}
                     </div>
-                    <ChevronDown className={`w-4 h-4 transform transition-transform ${selectedTheme.colors.text} ${openSections[key] ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 transform transition-transform text-slate-500 ${openSections[key] ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {openSections[key] && (
-                    <div className="p-6">
+                    <div className="p-6 bg-white">
 
 
                       {/* Section Title Editor */}
                       {sectionConfig.hasCustomTitle && (
                         <div className="mb-6">
-                          <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
                             Section Title
                           </label>
                           <Input
@@ -898,7 +916,7 @@ const PortfolioEditorPage = () => {
                             value={getSectionTitle(key, portfolio)}
                             onChange={(e) => handleSectionConfigChange(key as keyof typeof SECTIONS_CONFIG, 'title', e.target.value)}
                             placeholder={`Enter title for ${sectionConfig.defaultName} section`}
-                            className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
+                            className="w-full text-sm bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-[#7f13ec] focus:ring-[#7f13ec]"
                           />
                         </div>
                       )}
@@ -912,7 +930,7 @@ const PortfolioEditorPage = () => {
                             {/* Left Column: Title & Subtitle */}
                             <div className="space-y-4">
                               <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                   Hero Title
                                 </label>
                                 <Input
@@ -920,11 +938,11 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_title || ''}
                                   onChange={(e) => handleFieldChange('hero_title', e.target.value)}
                                   placeholder="Your main title"
-                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
+                                  className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder}`}
                                 />
                               </div>
                               <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                   Hero Subtitle
                                 </label>
                                 <Input
@@ -932,14 +950,14 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_subtitle || ''}
                                   onChange={(e) => handleFieldChange('hero_subtitle', e.target.value)}
                                   placeholder="Brief description or tagline"
-                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
+                                  className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder}`}
                                 />
                               </div>
                             </div>
 
                             {/* Right Column: Image Upload */}
                             <div className="space-y-2">
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                 Hero Background Image
                               </label>
                               {portfolio.hero_image_url ? (
@@ -953,12 +971,12 @@ const PortfolioEditorPage = () => {
                                   </div>
                               ) : (
                                   <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                                    selectedTheme.colors.text.includes('text-white') || selectedTheme.colors.text.includes('text-purple-100') || selectedTheme.colors.text.includes('text-red-100') || selectedTheme.colors.text.includes('text-blue-100')
+                                    colors.text.includes('text-white') || colors.text.includes('text-purple-100') || colors.text.includes('text-red-100') || colors.text.includes('text-blue-100')
                                       ? 'border-white/20' // Dark theme
                                       : 'border-gray-400/40' // Light theme
                                   }`}>
                                     <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                    <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No image set</p>
+                                    <p className={`text-xs ${colors.text} mb-2`}>No image set</p>
                                   </div>
                               )}
                               <div className="flex gap-2">
@@ -967,7 +985,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.hero_image_url || ''}
                                   onChange={(e) => handleFieldChange('hero_image_url', e.target.value)}
                                   placeholder="Paste image URL"
-                                  className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
+                                  className={`flex-1 text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder}`}
                                 />
                                 <input
                                   type="file" id="hero-upload" accept="image/*"
@@ -980,8 +998,8 @@ const PortfolioEditorPage = () => {
                                 />
                                 <Button
                                   onClick={() => document.getElementById('hero-upload')?.click()}
-                                  variant="outline" size="sm" disabled={uploadingHero}
-                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                  variant="default" size="sm" disabled={uploadingHero}
+                                  className="bg-[#7f13ec] text-white hover:bg-[#6a10c5]"
                                 >
                                   {uploadingHero ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                 </Button>
@@ -993,10 +1011,10 @@ const PortfolioEditorPage = () => {
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text}`}>
+                                <label className={`block text-sm font-medium ${colors.text}`}>
                                   Call-to-Action Buttons
                                 </label>
-                                <p className={`text-xs ${selectedTheme.colors.text} opacity-70 mt-1`}>
+                                <p className={`text-xs ${colors.text} opacity-70 mt-1`}>
                                   Add buttons to guide visitors to important sections or external links
                                 </p>
                               </div>
@@ -1006,8 +1024,8 @@ const PortfolioEditorPage = () => {
                                   variant="outline" size="sm"
                                   className={`${
                                     showUrlInfo 
-                                      ? 'bg-blue-600/20 border-blue-500/30 text-blue-300 hover:bg-blue-600/30' 
-                                      : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                                      ? 'bg-[#7f13ec] border-[#7f13ec] text-white hover:bg-[#6a10c5]' 
+                                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                                   }`}
                                   data-url-info-button
                                 >
@@ -1031,17 +1049,17 @@ const PortfolioEditorPage = () => {
                             
                             {showUrlInfo && (
                               <div ref={urlInfoRef} className="p-3 bg-blue-600/10 border border-blue-500/20 rounded-lg mt-2">
-                                <p className={`text-xs ${selectedTheme.colors.text} mb-2 font-medium`}>💡 URL Examples:</p>
+                                <p className={`text-xs ${colors.text} mb-2 font-medium`}>💡 URL Examples:</p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                                   <div>
-                                    <span className={`${selectedTheme.colors.text} opacity-70`}>Internal sections:</span>
-                                    <div className={`${selectedTheme.colors.text} opacity-90`}>• #about, #tracks, #gallery, #contact</div>
-                                    <div className={`${selectedTheme.colors.text} opacity-90`}>• #resume, #key_projects, #testimonials</div>
+                                    <span className={`${colors.text} opacity-70`}>Internal sections:</span>
+                                    <div className={`${colors.text} opacity-90`}>• #about, #tracks, #gallery, #contact</div>
+                                    <div className={`${colors.text} opacity-90`}>• #resume, #key_projects, #testimonials</div>
                                   </div>
                                   <div>
-                                    <span className={`${selectedTheme.colors.text} opacity-70`}>External links:</span>
-                                    <div className={`${selectedTheme.colors.text} opacity-90`}>• https://example.com</div>
-                                    <div className={`${selectedTheme.colors.text} opacity-90`}>• mailto:email@example.com</div>
+                                    <span className={`${colors.text} opacity-70`}>External links:</span>
+                                    <div className={`${colors.text} opacity-90`}>• https://example.com</div>
+                                    <div className={`${colors.text} opacity-90`}>• mailto:email@example.com</div>
                                   </div>
                                 </div>
                               </div>
@@ -1051,7 +1069,7 @@ const PortfolioEditorPage = () => {
                               {safeGetArray(portfolio.hero_cta_buttons).map((button: any, index: number) => (
                                 <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
                                   <div>
-                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-1`}>Button text</p>
+                                    <p className={`text-xs ${colors.text} opacity-60 mb-1`}>Button text</p>
                                     <Input
                                       type="text"
                                       value={button.text || ''}
@@ -1061,11 +1079,11 @@ const PortfolioEditorPage = () => {
                                         handleFieldChange('hero_cta_buttons', buttons);
                                       }}
                                       placeholder="e.g., View Resume, Contact Me"
-                                      className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
+                                      className={`text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder}`}
                                     />
                                   </div>
                                   <div>
-                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-1`}>
+                                    <p className={`text-xs ${colors.text} opacity-60 mb-1`}>
                                       {button.link?.startsWith('#') ? 'Internal section' : 
                                        button.link?.startsWith('http') ? 'External link' : 
                                        button.link?.startsWith('mailto:') ? 'Email link' :
@@ -1078,14 +1096,14 @@ const PortfolioEditorPage = () => {
                                         onChange={(e) => handleUrlInput(index, e.target.value)}
                                         onFocus={() => setShowUrlSuggestions(prev => ({ ...prev, [index]: true }))}
                                         placeholder="e.g., #resume, https://..."
-                                        className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
+                                        className={`text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder}`}
                                       />
                                       {showUrlSuggestions[index] && (
-                                        <div className={`absolute z-10 w-full border border-white/20 rounded-md shadow-lg max-h-60 overflow-y-auto ${selectedTheme.colors.card}`} data-suggestion-box>
+                                        <div className="absolute z-10 w-full border border-slate-200 rounded-md shadow-lg max-h-60 overflow-y-auto bg-white" data-suggestion-box>
                                           {urlSuggestions[index]?.map((suggestion, sIndex) => (
                                             <div
                                               key={sIndex}
-                                              className={`p-2 cursor-pointer hover:bg-white/10 ${selectedTheme.colors.text}`}
+                                              className="p-2 cursor-pointer hover:bg-slate-100 text-slate-700"
                                               onClick={() => selectSuggestion(index, suggestion)}
                                             >
                                               #{suggestion}
@@ -1096,7 +1114,7 @@ const PortfolioEditorPage = () => {
                                     </div>
                                   </div>
                                   <div>
-                                    <p className={`text-xs ${selectedTheme.colors.text} opacity-60 mb-1`}>Button style</p>
+                                    <p className={`text-xs ${colors.text} opacity-60 mb-1`}>Button style</p>
                                     <select
                                       value={button.style || 'primary'}
                                       onChange={(e) => {
@@ -1104,7 +1122,7 @@ const PortfolioEditorPage = () => {
                                         buttons[index] = { ...button, style: e.target.value };
                                         handleFieldChange('hero_cta_buttons', buttons);
                                       }}
-                                      className={`text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} rounded-md h-9 w-full`}
+                                      className={`text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} rounded-md h-9 w-full`}
                                     >
                                       <option value="primary">Primary</option>
                                       <option value="secondary">Secondary</option>
@@ -1163,7 +1181,7 @@ const PortfolioEditorPage = () => {
                             {/* Left Column: Text Content */}
                             <div className="space-y-4">
                               <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                                <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                   About Text
                                 </label>
                                 <Textarea
@@ -1171,14 +1189,14 @@ const PortfolioEditorPage = () => {
                                   onChange={(e) => handleFieldChange('about_text', e.target.value)}
                                   placeholder="Tell your story..."
                                   rows={8}
-                                  className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                  className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                                 />
                               </div>
                             </div>
 
                             {/* Right Column: Profile Photo */}
                             <div className="space-y-2">
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                 Profile Photo
                               </label>
                               {portfolio.profile_photo_url ? (
@@ -1193,7 +1211,7 @@ const PortfolioEditorPage = () => {
                               ) : (
                                   <div className="border-2 border-dashed border-gray-500/50 rounded-lg p-6 text-center">
                                     <Image className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                                    <p className={`text-xs ${selectedTheme.colors.text} mb-2`}>No photo set</p>
+                                    <p className={`text-xs ${colors.text} mb-2`}>No photo set</p>
                                   </div>
                               )}
                               <div className="flex gap-2">
@@ -1202,7 +1220,7 @@ const PortfolioEditorPage = () => {
                                   value={portfolio.profile_photo_url || ''}
                                   onChange={(e) => handleFieldChange('profile_photo_url', e.target.value)}
                                   placeholder="Paste photo URL"
-                                  className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                  className={`flex-1 text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                                 />
                                 <input
                                   type="file" id="profile-upload" accept="image/*"
@@ -1216,7 +1234,7 @@ const PortfolioEditorPage = () => {
                                 <Button
                                   onClick={() => document.getElementById('profile-upload')?.click()}
                                   variant="outline" size="sm" disabled={uploadingProfile}
-                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                  className="bg-[#7f13ec] text-white hover:bg-[#6a10c5]"
                                 >
                                   {uploadingProfile ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                 </Button>
@@ -1241,7 +1259,7 @@ const PortfolioEditorPage = () => {
                       {key === 'tracks' && (
                         <div className="space-y-6">
                           <div className="flex items-center justify-between">
-                            <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>Tracks</h3>
+                            <h3 className={`text-lg font-semibold ${colors.heading}`}>Tracks</h3>
                             <div className="flex items-center gap-2">
                               {/* View Mode Toggle Buttons */}
                               <div className="flex items-center gap-1">
@@ -1249,7 +1267,7 @@ const PortfolioEditorPage = () => {
                                   size="sm"
                                   variant={trackViewMode === 'list' ? 'default' : 'outline'}
                                   onClick={() => setTrackViewMode('list')}
-                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                  className={`${trackViewMode === 'list' ? 'bg-[#7f13ec] text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
                                 >
                                   <List className="h-4 w-4" />
                                 </Button>
@@ -1257,7 +1275,7 @@ const PortfolioEditorPage = () => {
                                   size="sm"
                                   variant={trackViewMode === 'grid' ? 'default' : 'outline'}
                                   onClick={() => setTrackViewMode('grid')}
-                                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                  className={`${trackViewMode === 'grid' ? 'bg-[#7f13ec] text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
                                 >
                                   <Grid className="h-4 w-4" />
                                 </Button>
@@ -1277,10 +1295,10 @@ const PortfolioEditorPage = () => {
                           <div className="bg-white/5 rounded-lg p-4 border border-gray-500/30">
                             <div className="flex items-center justify-between">
                               <div>
-                                <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-1`}>
+                                <label className={`block text-sm font-medium ${colors.text} mb-1`}>
                                   Show Audio Player
                                 </label>
-                                <p className={`text-xs ${selectedTheme.colors.text} opacity-70`}>
+                                <p className={`text-xs ${colors.text} opacity-70`}>
                                   {((portfolio.sections_config?.tracks?.audio_player_mode || 'bottom') === 'bottom') 
                                     ? 'Audio player will appear at the bottom of the page when a track is played.'
                                     : 'Audio controls will appear inline with each track for direct playback.'
@@ -1380,7 +1398,7 @@ const PortfolioEditorPage = () => {
                       {key === 'gallery' && (
                         <div className="space-y-6">
                           <div className="flex items-center justify-between">
-                            <h3 className={`text-lg font-semibold ${selectedTheme.colors.heading}`}>Gallery</h3>
+                            <h3 className={`text-lg font-semibold ${colors.heading}`}>Gallery</h3>
                             <div className="flex items-center gap-2">
                               {/* View Mode Toggle Buttons */}
                               <div className="flex items-center gap-1">
@@ -1388,7 +1406,7 @@ const PortfolioEditorPage = () => {
                                   size="sm"
                                   variant={galleryViewMode === 'list' ? 'default' : 'outline'}
                                   onClick={() => setGalleryViewMode('list')}
-                                  className={`${galleryViewMode === 'list' ? selectedTheme.colors.button : 'bg-white/10'} border-white/20 ${selectedTheme.colors.buttonText} hover:bg-white/20`}
+                                  className={`${galleryViewMode === 'list' ? 'bg-[#7f13ec] text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
                                 >
                                   <List className="h-4 w-4" />
                                 </Button>
@@ -1396,7 +1414,7 @@ const PortfolioEditorPage = () => {
                                   size="sm"
                                   variant={galleryViewMode === 'grid' ? 'default' : 'outline'}
                                   onClick={() => setGalleryViewMode('grid')}
-                                  className={`${galleryViewMode === 'grid' ? selectedTheme.colors.button : 'bg-white/10'} border-white/20 ${selectedTheme.colors.buttonText} hover:bg-white/20`}
+                                  className={`${galleryViewMode === 'grid' ? 'bg-[#7f13ec] text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
                                 >
                                   <Grid className="h-4 w-4" />
                                 </Button>
@@ -1404,7 +1422,7 @@ const PortfolioEditorPage = () => {
                               <Button
                                 onClick={() => setShowAddGalleryForm(true)}
                                 variant="outline"
-                                className={`${selectedTheme.colors.button} ${selectedTheme.colors.buttonText} ${selectedTheme.colors.buttonHover} border ${selectedTheme.colors.buttonBorder}`}
+                                className={`${colors.button} ${colors.buttonText} ${colors.buttonHover} border ${colors.buttonBorder}`}
                               >
                                 <Plus className="h-4 w-4 mr-2" />
                                 Add Item
@@ -1456,7 +1474,7 @@ const PortfolioEditorPage = () => {
                       {key === 'hobbies' && (
                         <div className="space-y-6">
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Add Hobbies
                             </label>
                             <div className="flex gap-2 mb-4">
@@ -1465,7 +1483,7 @@ const PortfolioEditorPage = () => {
                                 value={hobbySearch}
                                 onChange={(e) => setHobbySearch(e.target.value)}
                                 placeholder="Search hobbies..."
-                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder}`}
+                                className={`flex-1 text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder}`}
                               />
                             </div>
                             
@@ -1474,24 +1492,24 @@ const PortfolioEditorPage = () => {
                                 <button
                                   key={hobby.name}
                                   onClick={() => handleAddHobby(hobby)}
-                                  className={`flex flex-col items-center p-3 rounded-lg border transition-colors ${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder} hover:${selectedTheme.colors.card} hover:opacity-80`}
+                                  className={`flex flex-col items-center p-3 rounded-lg border transition-colors ${colors.card} ${colors.textBoxBorder} hover:${colors.card} hover:opacity-80`}
                                 >
                                   <span className="text-2xl mb-1">{hobby.icon}</span>
-                                  <span className={`text-xs text-center ${selectedTheme.colors.text}`}>{hobby.name}</span>
+                                  <span className={`text-xs text-center ${colors.text}`}>{hobby.name}</span>
                                 </button>
                               ))}
                             </div>
                           </div>
                           
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Selected Hobbies
                             </label>
                             <div className="flex flex-wrap gap-2">
                               {safeGetArray(portfolio.hobbies_json).map((hobby: any, index: number) => (
-                                <div key={`hobby-${index}-${hobby.name}`} className={`flex items-center gap-2 p-2 rounded-lg border ${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder}`}>
+                                <div key={`hobby-${index}-${hobby.name}`} className={`flex items-center gap-2 p-2 rounded-lg border ${colors.card} ${colors.textBoxBorder}`}>
                                   <span className="text-lg">{hobby.icon}</span>
-                                  <span className={`text-sm ${selectedTheme.colors.text}`}>{hobby.name}</span>
+                                  <span className={`text-sm ${colors.text}`}>{hobby.name}</span>
                                   <button
                                     onClick={() => handleRemoveHobby(hobby.name)}
                                     className="text-red-400 hover:text-red-300"
@@ -1508,7 +1526,7 @@ const PortfolioEditorPage = () => {
                       {key === 'skills' && (
                         <div className="space-y-6">
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Add Skills
                             </label>
                             <div className="flex gap-2 mb-4">
@@ -1517,7 +1535,7 @@ const PortfolioEditorPage = () => {
                                 value={skillSearch}
                                 onChange={(e) => setSkillSearch(e.target.value)}
                                 placeholder="Search skills..."
-                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                className={`flex-1 text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             
@@ -1526,23 +1544,23 @@ const PortfolioEditorPage = () => {
                                 <button
                                   key={skill.name}
                                   onClick={() => handleAddSkill(skill)}
-                                  className={`flex items-center gap-2 p-3 rounded-lg border transition-colors ${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder} hover:${selectedTheme.colors.card} hover:opacity-80`}
+                                  className={`flex items-center gap-2 p-3 rounded-lg border transition-colors ${colors.card} ${colors.textBoxBorder} hover:${colors.card} hover:opacity-80`}
                                 >
                                   <skill.icon className="h-5 w-5" style={{ color: skill.color }} />
-                                  <span className={`text-sm ${selectedTheme.colors.text}`}>{skill.name}</span>
+                                  <span className={`text-sm ${colors.text}`}>{skill.name}</span>
                                 </button>
                               ))}
                             </div>
                           </div>
                           
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Selected Skills
                             </label>
                             <div className="flex flex-wrap gap-2">
                               {safeGetArray(portfolio.skills_json).map((skill: any, index: number) => (
-                                <div key={`skill-${index}-${skill.name}`} className={`flex items-center gap-2 p-2 rounded-lg border ${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder}`}>
-                                  <span className={`text-sm ${selectedTheme.colors.text}`}>{skill.name}</span>
+                                <div key={`skill-${index}-${skill.name}`} className={`flex items-center gap-2 p-2 rounded-lg border ${colors.card} ${colors.textBoxBorder}`}>
+                                  <span className={`text-sm ${colors.text}`}>{skill.name}</span>
                                   <button
                                     onClick={() => handleRemoveSkill(skill.name)}
                                     className="text-red-400 hover:text-red-300"
@@ -1559,7 +1577,7 @@ const PortfolioEditorPage = () => {
                       {key === 'resume' && (
                         <div className="space-y-6">
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Resume File
                             </label>
                             <div className="flex gap-2">
@@ -1568,7 +1586,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.resume_url || ''}
                                 onChange={(e) => handleFieldChange('resume_url', e.target.value)}
                                 placeholder="Paste resume URL"
-                                className={`flex-1 text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                className={`flex-1 text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                               <input
                                 type="file" id="resume-upload" accept=".pdf,.doc,.docx"
@@ -1582,7 +1600,7 @@ const PortfolioEditorPage = () => {
                               <Button
                                 onClick={() => document.getElementById('resume-upload')?.click()}
                                 variant="outline" size="sm" disabled={uploadingResume}
-                                className={`${selectedTheme.colors.card} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.text} hover:${selectedTheme.colors.card} hover:opacity-80`}
+                                className={`${colors.card} ${colors.textBoxBorder} ${colors.text} hover:${colors.card} hover:opacity-80`}
                               >
                                 {uploadingResume ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                               </Button>
@@ -1610,7 +1628,7 @@ const PortfolioEditorPage = () => {
                       {key === 'contact' && (
                         <div className="space-y-6">
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Contact Description
                             </label>
                             <Textarea
@@ -1618,12 +1636,12 @@ const PortfolioEditorPage = () => {
                               onChange={(e) => handleFieldChange('contact_description', e.target.value)}
                               placeholder="Ready to work together? Let's talk!"
                               rows={3}
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                              className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Contact Email
                             </label>
                             <Input
@@ -1631,12 +1649,12 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_email || ''}
                               onChange={(e) => handleFieldChange('contact_email', e.target.value)}
                               placeholder="your.email@example.com"
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                              className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Contact Phone
                             </label>
                             <Input
@@ -1644,12 +1662,12 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_phone || ''}
                               onChange={(e) => handleFieldChange('contact_phone', e.target.value)}
                               placeholder="e.g. +1 555-123-4567"
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                              className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Contact Location
                             </label>
                             <Input
@@ -1657,12 +1675,12 @@ const PortfolioEditorPage = () => {
                               value={portfolio.contact_location || ''}
                               onChange={(e) => handleFieldChange('contact_location', e.target.value)}
                               placeholder="e.g. New York, NY"
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                              className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
                           <div>
-                            <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                            <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                               Website URL
                             </label>
                             <Input
@@ -1670,13 +1688,13 @@ const PortfolioEditorPage = () => {
                               value={portfolio.website_url || ''}
                               onChange={(e) => handleFieldChange('website_url', e.target.value)}
                               placeholder="https://yourwebsite.com"
-                              className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                              className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                             />
                           </div>
                           
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                 LinkedIn URL
                               </label>
                               <Input
@@ -1684,11 +1702,11 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.linkedin_url || ''}
                                 onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
                                 placeholder="https://linkedin.com/in/yourprofile"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                 Twitter URL
                               </label>
                               <Input
@@ -1696,11 +1714,11 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.twitter_url || ''}
                                 onChange={(e) => handleFieldChange('twitter_url', e.target.value)}
                                 placeholder="https://twitter.com/yourhandle"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                 Instagram URL
                               </label>
                               <Input
@@ -1708,11 +1726,11 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.instagram_url || ''}
                                 onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
                                 placeholder="https://instagram.com/yourhandle"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                 GitHub URL
                               </label>
                               <Input
@@ -1720,11 +1738,11 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.github_url || ''}
                                 onChange={(e) => handleFieldChange('github_url', e.target.value)}
                                 placeholder="https://github.com/yourusername"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                             <div>
-                              <label className={`block text-sm font-medium ${selectedTheme.colors.text} mb-2`}>
+                              <label className={`block text-sm font-medium ${colors.text} mb-2`}>
                                 YouTube URL
                               </label>
                               <Input
@@ -1732,7 +1750,7 @@ const PortfolioEditorPage = () => {
                                 value={portfolio.youtube_url || ''}
                                 onChange={(e) => handleFieldChange('youtube_url', e.target.value)}
                                 placeholder="https://youtube.com/@yourchannel"
-                                className={`w-full text-sm ${selectedTheme.colors.textBox} ${selectedTheme.colors.textBoxBorder} ${selectedTheme.colors.textBoxText} ${selectedTheme.colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
+                                className={`w-full text-sm ${colors.textBox} ${colors.textBoxBorder} ${colors.textBoxText} ${colors.textBoxPlaceholder} focus:ring-1 focus:ring-purple-400`}
                               />
                             </div>
                           </div>

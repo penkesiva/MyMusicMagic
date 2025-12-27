@@ -308,7 +308,21 @@ export default function DashboardPage() {
     });
 
     try {
-      const slug = newPortfolioName.toLowerCase().replace(/[^a-z0-9]/g, '-')
+      const baseSlug = newPortfolioName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-{2,}/g, '-').replace(/^-|-$/g, '') || 'portfolio'
+      let finalSlug = baseSlug
+
+      // Ensure slug uniqueness per user by appending a short suffix if needed
+      for (let i = 0; i < 5; i++) {
+        const { data: existing } = await supabase
+          .from('user_portfolios')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('slug', finalSlug)
+          .maybeSingle()
+
+        if (!existing) break
+        finalSlug = `${baseSlug}-${Math.random().toString(36).slice(-4)}`
+      }
       
       // Get template data if selected
       let templateData = null;
@@ -689,7 +703,7 @@ export default function DashboardPage() {
         .insert({
           user_id: user.id,
           name: newPortfolioName,
-          slug: slug,
+          slug: finalSlug,
           template_id: selectedTemplate || null,
           theme_name: defaultThemeName,
           font_pair: defaultFontPair,
@@ -751,11 +765,11 @@ export default function DashboardPage() {
       setCreatingPortfolioData(null)
       setSuccess(aiPrompt.trim() ? '✨ AI-generated portfolio with sample projects created successfully!' : 'Portfolio created successfully!')
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err) {
-      console.error('Portfolio creation error:', err)
+    } catch (err: any) {
+      console.error('Portfolio creation error:', err?.message || err)
       setIsCreatingPortfolio(false)
       setCreatingPortfolioData(null)
-      setError('Failed to create portfolio')
+      setError(err?.message || 'Failed to create portfolio')
       setTimeout(() => setError(null), 3000)
     }
   }
