@@ -12,9 +12,9 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { TemplatePreview } from '@/components/ui/template-preview'
-import { Sparkles, Layout, Edit, ExternalLink, Trash2, Star, Briefcase } from 'lucide-react'
+import { Sparkles, Layout, Edit, ExternalLink, Trash2, Star, Briefcase, Home, FolderOpen, BarChart3, Settings, User, HelpCircle, LogOut, Palette, Eye, Clock, MoreVertical } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { User as UserIcon, Settings, LogOut, User as UserIconSolid, Crown, Shield, HelpCircle, Bell, ChevronDown } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import Portal from '@/components/Portal'
 import { Avatar } from '@/components/ui/avatar';
 
@@ -818,35 +818,105 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-gray-200">
-      {/* Header */}
-      <header className="bg-white/5 backdrop-blur-sm border-b border-white/10 shadow-lg relative z-20">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#1a1a2e] text-slate-900 dark:text-slate-200 overflow-hidden h-screen flex">
+      {/* Success/Error Messages */}
+      {success && (
+        <div className="fixed top-4 right-4 bg-green-500/20 border border-green-500/30 text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 backdrop-blur-sm">
+          {success}
             </div>
-            <h1 className="text-2xl font-bold text-white">Hero Portfolio</h1>
+      )}
+      {error && (
+        <div className="fixed top-4 right-4 bg-red-500/20 border border-red-500/30 text-red-400 px-6 py-3 rounded-lg shadow-lg z-50 backdrop-blur-sm">
+          {error}
           </div>
-          <div className="flex items-center space-x-4 relative z-30">
-            {/* Welcome message (desktop only) */}
-            {profile?.username && (
-              <span className="hidden md:inline-block text-white text-sm font-medium mr-4">Welcome {profile.username}</span>
+      )}
+
+      {/* Left Sidebar */}
+      <aside className="w-64 h-full flex flex-col justify-between bg-white dark:bg-[#161625] border-r border-slate-200 dark:border-white/5 flex-shrink-0 transition-colors">
+          <div className="flex flex-col gap-4 p-3">
+          {/* Logo */}
+          <div className="flex items-center gap-2 px-2">
+            <div className="bg-center bg-no-repeat bg-cover rounded-full h-8 w-8 bg-[#3366ff]/20 flex items-center justify-center text-[#3366ff]">
+              <Sparkles className="w-4 h-4 text-[#3366ff]" />
+          </div>
+            <h1 className="text-slate-900 dark:text-white text-base font-bold tracking-tight">Hero Portfolio</h1>
+        </div>
+
+          {/* Navigation */}
+          <nav className="flex flex-col gap-1">
+            <Link 
+              href="/dashboard" 
+              className="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group"
+            >
+              <Home className="w-4 h-4" />
+              <p className="text-xs font-medium leading-normal group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Home</p>
+            </Link>
+            <Link 
+              href="/dashboard" 
+              className="flex items-center gap-2 px-2 py-2 rounded-lg bg-[#3366ff]/20 text-[#3366ff] dark:bg-[#3366ff]/20 dark:text-white transition-colors group"
+            >
+              <FolderOpen className="w-4 h-4 group-hover:text-[#3366ff] transition-colors" />
+              <p className="text-xs font-medium leading-normal">Projects</p>
+            </Link>
+            <Link 
+              href="/dashboard/analytics" 
+              className="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group"
+            >
+              <BarChart3 className="w-4 h-4" />
+              <p className="text-xs font-medium leading-normal group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Analytics</p>
+            </Link>
+            <Link 
+              href="/dashboard/settings" 
+              className="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group"
+            >
+              <Settings className="w-4 h-4" />
+              <p className="text-xs font-medium leading-normal group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Settings</p>
+            </Link>
+            <Link 
+              href="/dashboard/profile" 
+              className="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group"
+            >
+              <User className="w-4 h-4" />
+              <p className="text-xs font-medium leading-normal group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Profile</p>
+            </Link>
+            {isAdmin && (
+              <Link 
+                href="/dashboard/admin" 
+                className="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group"
+              >
+                <Shield className="w-4 h-4" />
+                <p className="text-xs font-medium leading-normal group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Admin</p>
+              </Link>
             )}
-            
-            {/* Enhanced Avatar Component */}
-            <Avatar 
-              userProfile={profile} 
-              size="lg" 
-              showMenu={true}
-              menuPosition="portal"
-              menuTargetId="create-portfolio-card"
-            />
+          </nav>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="flex flex-col gap-3 p-3 border-t border-slate-200 dark:border-white/5">
+          <button 
+            onClick={() => router.push('/dashboard/billing')}
+            className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-3 bg-[#3366ff] text-white text-xs font-bold shadow-lg shadow-[#3366ff]/25 hover:bg-[#4a7dfa] transition-all"
+          >
+            <span className="truncate">Upgrade Plan</span>
+          </button>
+          <div className="flex flex-col gap-0.5">
+            <Link 
+              href="/dashboard/help" 
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <p className="text-xs font-medium leading-normal">Help & Support</p>
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <p className="text-xs font-medium leading-normal">Log Out</p>
+            </button>
           </div>
         </div>
-      </header>
+      </aside>
 
       {/* Success/Error Messages */}
       {success && (
@@ -860,371 +930,275 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      {/* Main Content */}
+      <main className="flex-1 h-full overflow-y-auto relative">
         {isLoading ? (
-          <div className="flex items-center justify-center min-h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3366ff]"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Profile and Subscription */}
-            {/* Removed Profile and Subscription cards */}
-            {/* Right Column - Create Portfolio and My Portfolios */}
-            <div className="space-y-8 col-span-2">
-              {/* Admin Link - Only visible to admins */}
-              {isAdmin && (
-                <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-sm border border-purple-400/20 rounded-2xl p-6 shadow-xl">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                        <Shield className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-white">Admin Access</h3>
-                        <p className="text-sm text-gray-400">Manage users, portfolios, templates, and subscriptions</p>
-                      </div>
-                    </div>
-                    <Link
-                      href="/dashboard/admin"
-                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-semibold"
-                    >
-                      Go to Admin Panel
-                    </Link>
-                  </div>
-                </div>
-              )}
+          <div className="layout-container flex flex-col max-w-[1400px] mx-auto px-4 py-6 md:px-6 md:py-6">
+            {/* Welcome Header */}
+            <header className="flex flex-col gap-1.5 mb-6">
+              <h1 className="text-slate-900 dark:text-white text-2xl md:text-3xl font-bold leading-tight tracking-[-0.02em]">
+                Welcome, {profile?.full_name || profile?.username || 'there'}. <br/>
+                <span className="text-slate-400 dark:text-slate-500 text-base md:text-lg font-normal">
+                  What vision will you bring to life today?
+                </span>
+              </h1>
+            </header>
 
-              {/* Create Portfolio Card - always visible */}
-              <div id="create-portfolio-card" className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-purple-600/10 backdrop-blur-sm border border-purple-400/20 rounded-2xl p-6 shadow-2xl z-10">
-                {/* Background decoration */}
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-50"></div>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl"></div>
+            {/* AI Prompt Section */}
+            <section className="relative w-full rounded-xl overflow-hidden mb-8 p-1 bg-gradient-to-br from-[#3366ff] via-[#3366ff]/50 to-[#3366ff]/30 p-[1px]">
+              <div className="relative w-full bg-white dark:bg-[#23233a] rounded-xl p-4 md:p-6 flex flex-col gap-4 shadow-2xl">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-[#3366ff]/20 blur-[100px] rounded-full pointer-events-none"></div>
                 
-                <div className="relative z-10">
-                                    <div className="mb-4">
-                    <h2 className="text-base font-bold text-white">Create Portfolio</h2>
-                  </div>
-                  
-                  {/* Modern AI-First Create Portfolio form */}
-                  <div className="space-y-4">
-                    {/* AI Description Section */}
-                    <div className="relative">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center">
-                            <Sparkles className="w-3 h-3 text-white" />
-                          </div>
-                          <h3 className="text-sm font-semibold text-white">Describe your portfolio</h3>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const examples = [
-                              "A passionate jazz musician with 10+ years of experience performing at prestigious clubs and festivals across the country, specializing in contemporary jazz fusion and experimental compositions",
-                              "A full-stack developer with 5 years of experience specializing in React, Node.js, and cloud architecture, passionate about creating scalable web applications and mentoring junior developers",
-                              "A freelance photographer with expertise in wedding photography and corporate events, capturing authentic moments and creating stunning visual narratives for clients worldwide",
-                              "A UI/UX designer with 7 years of experience creating beautiful mobile apps and websites, focusing on user-centered design and accessibility for major tech companies",
-                              "A classical pianist and music educator with a love for contemporary compositions, performing regularly at concert halls and teaching students of all skill levels"
-                            ];
-                            const randomExample = examples[Math.floor(Math.random() * examples.length)];
-                            setAiPrompt(randomExample);
-                          }}
-                          className="text-xs text-purple-300 hover:text-purple-200 transition-colors underline"
-                        >
-                          Try Example
-                        </button>
-                      </div>
+                <div className="flex flex-col gap-4 relative z-10">
+                  <div className="flex flex-col w-full">
+                    <label className="sr-only" htmlFor="ai-prompt">Describe your creative vision</label>
+                    <div className="relative group">
                       <textarea
+                        id="ai-prompt"
                         value={aiPrompt}
                         onChange={e => {
                           setAiPrompt(e.target.value);
                           if (e.target.value) setSelectedTemplate('');
-                          // Clear validation error when user starts typing
                           if (validationErrors.aiPrompt) {
                             setValidationErrors(prev => ({ ...prev, aiPrompt: false }));
                           }
                         }}
-                        className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm resize-none ${
+                        className={`flex w-full min-w-0 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-[#3366ff]/50 border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#1a1a2e]/80 min-h-[120px] placeholder:text-slate-400 dark:placeholder:text-slate-500 p-3 text-sm font-normal leading-relaxed shadow-inner transition-all ${
                           validationErrors.aiPrompt 
                             ? 'border-red-400/60 bg-red-500/5' 
-                            : 'border-purple-400/30'
+                            : ''
                         }`}
-                        placeholder="Tell us about your portfolio... (e.g., 'A jazz musician with 10 years of experience performing in clubs and festivals')"
-                        rows={3}
+                        placeholder="Describe the essence of your project. What story do you want to tell? What emotions should it evoke? (e.g., 'A tranquil gallery for nature photography, with warm, muted tones and organic textures,' or 'A vibrant portfolio for a digital artist, full of dynamic shapes and bold colors')..."
                       />
+                      <div className="absolute bottom-3 right-3 flex gap-2">
+                        <button
+                          onClick={handleCreatePortfolio}
+                          disabled={nameExists || isCheckingName || !aiPrompt.trim() || !newPortfolioName.trim()}
+                          className="flex items-center justify-center rounded-lg h-8 px-3 bg-[#3366ff] hover:bg-[#4a7dfa] text-white gap-1.5 text-xs font-bold tracking-[0.015em] shadow-lg shadow-[#3366ff]/30 transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          <span>Generate</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                     </div>
 
-                    {/* Portfolio Name - Username Style */}
+                {/* Portfolio Name Input */}
+                <div className="flex flex-col gap-2 relative z-10">
                     <div className="flex items-center justify-center">
                       <div className="relative">
                         <input
                           type="text"
                           value={newPortfolioName}
                           onChange={(e) => {
-                            // Limit to 30 characters (Instagram username limit)
                             const value = e.target.value.slice(0, 30);
-                            // Only allow letters, numbers, underscores, and hyphens
                             const sanitizedValue = value.replace(/[^a-zA-Z0-9_-]/g, '');
                             setNewPortfolioName(sanitizedValue);
-                            // Clear validation error when user starts typing
                             if (validationErrors.portfolioName) {
                               setValidationErrors(prev => ({ ...prev, portfolioName: false }));
                             }
                           }}
-                          className={`w-64 px-3 py-2 pr-8 bg-white/10 border rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all backdrop-blur-sm text-sm ${
-                            validationErrors.portfolioName 
+                        className={`w-56 px-2.5 py-1.5 pr-7 bg-slate-50 dark:bg-[#1a1a2e]/80 border rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#3366ff]/50 text-xs ${
+                          validationErrors.portfolioName || nameExists
                               ? 'border-red-400/60 bg-red-500/5' 
-                              : nameExists
-                              ? 'border-red-400/60 bg-red-500/5'
-                              : 'border-purple-400/30'
+                            : 'border-slate-200 dark:border-white/10'
                           }`}
-                          placeholder="My Hero Portfolio Name"
+                        placeholder="Portfolio Name"
                           maxLength={30}
                         />
-                        <span className="absolute bottom-1 right-2 text-xs text-purple-300/70">
+                      <span className="absolute bottom-0.5 right-1.5 text-[10px] text-slate-400">
                           {30 - newPortfolioName.length}
                         </span>
                       </div>
                     </div>
                     
-                    {/* Name availability indicator - separate section with proper spacing */}
+                  {/* Name availability indicator */}
                     {newPortfolioName.trim() && (
                       <div className="flex justify-center">
-                        <div className="flex items-center space-x-2 text-sm">
+                      <div className="flex items-center space-x-1.5 text-xs">
                           {isCheckingName ? (
                             <>
-                              <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-3 h-3 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
                               <span className="text-yellow-400">Checking availability...</span>
                             </>
                           ) : nameExists ? (
                             <>
-                              <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                              </svg>
                               <span className="text-orange-400">Portfolio name already exists</span>
                             </>
                           ) : (
                             <>
-                              <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
                               <span className="text-green-400">Portfolio name available</span>
                             </>
                           )}
                         </div>
                       </div>
                     )}
+                </div>
 
-                    {/* Templates section - Modal Trigger */}
-                    <div className="flex items-center justify-center space-x-3">
+                {/* Template Selection */}
+                <div className="flex flex-col gap-2 relative z-10">
+                  <h3 className="text-slate-900 dark:text-white tracking-tight text-base font-bold flex items-center gap-2">
+                    <Palette className="w-4 h-4 text-[#3366ff]" />
+                    Or draw inspiration from a template
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
+                    {templates.slice(0, 6).map((template) => (
                       <button
-                        type="button"
+                        key={template.id}
                         onClick={() => {
-                          setOriginalTemplateSelection(selectedTemplate);
-                          setShowTemplateModal(true);
+                          setSelectedTemplate(template.id);
+                          setShowTemplateModal(false);
                         }}
-                        className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-200 rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 text-sm font-medium shadow-sm"
+                        className="group flex flex-col text-left gap-1.5 p-2 rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#23233a] hover:border-[#3366ff]/50 hover:shadow-lg dark:hover:shadow-[#3366ff]/10 transition-all"
                       >
-                        Choose Template
-                      </button>
-                      {selectedTemplate && (
-                        <div className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 rounded-lg text-xs font-medium border border-green-400/30 shadow-sm">
-                          <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                          {templates.find(t => t.id === selectedTemplate)?.name || 'Template selected'}
+                        <div className="w-full aspect-[4/3] rounded overflow-hidden relative bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Layout className="w-6 h-6 text-slate-400" />
                         </div>
-                      )}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/40 transition-opacity">
+                            <span className="px-2 py-0.5 bg-white text-slate-900 text-[10px] font-bold rounded-full">Explore</span>
                     </div>
-
-
-
-                    {/* Action buttons - Compact */}
-                    <div className="flex justify-end space-x-3 pt-3">
-                      <button
-                        onClick={() => {
-                          setNewPortfolioName('');
-                          setSelectedTemplate('');
-                          setAiPrompt('');
-                          setShowTemplates(false);
-                        }}
-                        className="px-4 py-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 text-sm"
-                      >
-                        Cancel
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-xs text-slate-900 dark:text-white group-hover:text-[#3366ff] transition-colors truncate">{template.name}</h4>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">{template.description || 'Template'}</p>
+                        </div>
                       </button>
+                    ))}
                       <button
-                        onClick={handleCreatePortfolio}
-                        disabled={nameExists || isCheckingName}
-                        className={`px-6 py-2 border transition-all duration-300 font-medium text-sm ${
-                          nameExists || isCheckingName
-                            ? 'bg-gray-500/20 border-gray-400/30 text-gray-400 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/30 text-purple-200 hover:from-purple-500/30 hover:to-pink-500/30'
-                        }`}
-                      >
-                        {isCheckingName ? 'Checking...' : 'Create Portfolio'}
+                      onClick={() => setShowTemplateModal(true)}
+                      className="group flex flex-col text-left gap-1.5 p-2 rounded-md border border-dashed border-slate-300 dark:border-white/20 bg-transparent hover:bg-slate-50 dark:hover:bg-white/5 transition-all items-center justify-center min-h-[80px]"
+                    >
+                      <Layout className="w-6 h-6 text-slate-400 group-hover:text-[#3366ff] transition-colors" />
+                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400 group-hover:text-[#3366ff] text-center">All Templates</span>
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+            </section>
 
 
 
-              {/* My Portfolios Card - remove Create Portfolio button */}
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl relative z-10">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-base font-bold text-white">My Portfolios</h2>
+            {/* Your Creations Section */}
+            <section className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  Your Creations
+                  <span className="text-xs font-normal px-1.5 py-0.5 rounded bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300">
+                    {portfolios.length} {portfolios.length === 1 ? 'Active' : 'Active'}
+                  </span>
+                </h2>
+                {portfolios.length > 0 && (
+                  <button className="text-xs font-medium text-[#3366ff] hover:text-[#4a7dfa] transition-colors">
+                    View all projects
+                      </button>
+                )}
                 </div>
+
                 {portfolios.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-gray-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                      </svg>
+                  <div className="text-center py-8">
+                  <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Briefcase className="w-6 h-6 text-slate-400" />
                     </div>
-                    <h3 className="text-lg font-medium text-white mb-2">No portfolios yet</h3>
-                    <p className="text-gray-400 mb-4">Create your first portfolio to get started</p>
+                  <h3 className="text-base font-medium text-slate-900 dark:text-white mb-1">No portfolios yet</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">Create your first portfolio to get started</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="flex flex-col gap-4">
                     {/* Cooking Animation Card */}
                     {isCreatingPortfolio && creatingPortfolioData && (
-                      <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-400/30 rounded-xl p-5 animate-pulse">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-spin">
-                              <Sparkles className="h-4 w-4 text-white" />
+                    <div className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-lg bg-white dark:bg-[#23233a] border border-slate-200 dark:border-white/5 hover:border-[#3366ff]/30 transition-all shadow-sm animate-pulse">
+                      <div className="w-full sm:w-24 h-16 sm:h-16 rounded-md overflow-hidden shrink-0 bg-gradient-to-br from-[#3366ff]/20 to-[#3366ff]/10 flex items-center justify-center">
+                        <Sparkles className="w-6 h-6 text-[#3366ff] animate-spin" />
                             </div>
-                            <div>
-                              <h3 className="text-lg font-semibold text-white truncate">
-                                {creatingPortfolioData.name}
-                              </h3>
-                              <p className="text-sm text-purple-300">
-                                {creatingPortfolioData.template}
-                              </p>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">{creatingPortfolioData.name}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">Creating your portfolio...</p>
                             </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="px-3 py-1 text-xs bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded-full animate-pulse">
-                              Cooking...
+                      <div className="px-2">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 text-[10px] font-semibold">
+                          <span className="w-1 h-1 rounded-full bg-current animate-pulse"></span>
+                          Creating...
                             </span>
-                          </div>
-                        </div>
-
-                        {/* Cooking Animation */}
-                        <div className="space-y-3">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                            <span className="text-sm text-gray-300">🤖 AI is analyzing your description...</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                            <span className="text-sm text-gray-300">🎨 Generating personalized content...</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                            <span className="text-sm text-gray-300">✨ Crafting your portfolio...</span>
-                          </div>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="mt-4">
-                          <div className="w-full bg-gray-700/50 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
-                          </div>
                         </div>
                       </div>
                     )}
                     
-                    {/* Existing Portfolios */}
+                  {/* Portfolio Cards */}
                     {portfolios.map((p) => (
-                      <div key={p.id} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/10 transition-all duration-300 group">
-                        {/* Portfolio Header */}
-                        <div className="flex justify-between items-start mb-4">
+                    <div key={p.id} className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-lg bg-white dark:bg-[#23233a] border border-slate-200 dark:border-white/5 hover:border-[#3366ff]/30 transition-all shadow-sm">
+                      <div className="w-full sm:w-24 h-16 sm:h-16 rounded-md overflow-hidden shrink-0 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
+                        {p.theme_name && (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Layout className="w-6 h-6 text-slate-400" />
+                          </div>
+                        )}
+                      </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold text-white truncate group-hover:text-purple-300 transition-colors">
-                              {p.name}
-                            </h3>
-                            <p className="text-sm text-gray-400 mt-1">/{p.slug}</p>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">{p.name}</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                          {p.is_published 
+                            ? `https://${profile?.username || 'user'}.heroportfolio.com/${p.slug}`
+                            : 'Not published yet'
+                          }
+                        </p>
                           </div>
-                          <div className="flex flex-col items-end space-y-2">
-                            <button
-                              onClick={() => handleTogglePublish(p.id, p.is_published)}
-                              className={`px-3 py-1 text-xs rounded-full font-medium ${
+                      <div className="px-2">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                                 p.is_published
-                                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                  : 'bg-orange-500/20 text-orange-300 border border-orange-500/30'
-                              } hover:opacity-80 transition-all duration-300`}
-                            >
+                            ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                            : 'bg-slate-100 dark:bg-slate-700/30 text-slate-600 dark:text-slate-400'
+                        }`}>
+                          <span className="w-1 h-1 rounded-full bg-current"></span>
                               {p.is_published ? 'Published' : 'Draft'}
-                            </button>
-                            {p.is_default && (
-                              <span className="px-3 py-1 text-xs bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full">
-                                Default
                               </span>
-                            )}
                           </div>
+                      <div className="flex items-center gap-4 text-xs text-slate-400 sm:border-l sm:border-slate-200 sm:dark:border-white/10 sm:pl-4">
+                        <div className="flex items-center gap-1" title="Total Views">
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>-</span>
                         </div>
-
-                        {/* Portfolio Details */}
-                        <div className="mb-4">
-                          <p className="text-gray-400 text-sm">
-                            {p.theme_name ? `${p.theme_name} Theme` : 'Default Theme'}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-2">
-                            Created {new Date(p.created_at).toLocaleDateString()}
-                          </p>
+                        <div className="flex items-center gap-1" title="Last Edited">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{new Date(p.updated_at || p.created_at).toLocaleDateString()}</span>
                         </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex justify-between items-center">
-                          <div className="flex space-x-2">
+                      </div>
+                      <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                             <button
                               onClick={() => router.push(`/dashboard/portfolio/${p.id}/edit`)}
-                              className="p-2 bg-purple-600/20 border border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-600/30 transition-all duration-300 group"
-                              title="Edit Portfolio"
+                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-colors"
+                          title="Edit Site"
                             >
-                              <Edit className="h-4 w-4" />
+                          <Edit className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => window.open(`/portfolio/${profile?.username || 'user'}/${p.slug}`, '_blank', 'noopener,noreferrer')}
-                              className="p-2 bg-white/10 border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all duration-300 group"
+                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-colors"
                               title="View Portfolio"
                             >
-                              <ExternalLink className="h-4 w-4" />
+                          <ExternalLink className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDeletePortfolio(p.id)}
-                              className="p-2 bg-red-600/20 border border-red-500/30 text-red-300 rounded-lg hover:bg-red-600/30 transition-all duration-300 group"
-                              title="Delete Portfolio"
+                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-colors"
+                          title="Settings"
                             >
-                              <Trash2 className="h-4 w-4" />
+                          <MoreVertical className="w-4 h-4" />
                             </button>
                           </div>
-                        </div>
-
-                        {/* Public URL */}
-                        {p.slug && (
-                          <div className="mt-4 pt-4 border-t border-white/10">
-                            <p className="text-xs text-gray-400 mb-1">Public URL:</p>
-                            <a 
-                              href={`/portfolio/${profile?.username || 'user'}/${p.slug}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="text-purple-400 hover:underline text-xs break-all"
-                            >
-                              {`/portfolio/${profile?.username || 'user'}/${p.slug}`}
-                            </a>
-                          </div>
-                        )}
                       </div>
                     ))}
                   </div>
                 )}
-              </div>
-            </div>
+            </section>
           </div>
         )}
-      </div>
+      </main>
 
       {/* Template Selection Modal */}
       {showTemplateModal && (
@@ -1322,6 +1296,18 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Mobile Floating Action Button */}
+      <div className="fixed bottom-6 right-6 lg:hidden z-50">
+        <button
+          onClick={() => {
+            setShowTemplateModal(true);
+          }}
+          className="flex items-center justify-center w-14 h-14 rounded-full bg-[#3366ff] text-white shadow-xl shadow-[#3366ff]/40 hover:scale-110 transition-transform"
+        >
+          <Sparkles className="w-7 h-7" />
+        </button>
+      </div>
     </div>
   )
 } 
