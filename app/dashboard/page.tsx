@@ -12,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { TemplatePreview } from '@/components/ui/template-preview'
-import { Sparkles, Layout, Edit, ExternalLink, Trash2, Star, Briefcase, Home, FolderOpen, BarChart3, Settings, User, HelpCircle, LogOut, Palette, Eye, Clock } from 'lucide-react'
+import { Sparkles, Layout, Edit, ExternalLink, Trash2, Star, Briefcase, Home, BarChart3, Settings, User, HelpCircle, LogOut, Palette, Eye, Clock, MoreVertical } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Shield } from 'lucide-react';
 import Portal from '@/components/Portal'
@@ -38,6 +38,8 @@ export default function DashboardPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<UserPortfolio | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
   
   // Set Basic Template as default when templates load
   useEffect(() => {
@@ -231,6 +233,23 @@ export default function DashboardPage() {
 
     return () => clearTimeout(timeoutId);
   }, [newPortfolioName, user]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null)
+      }
+    }
+
+    if (openMenuId) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [openMenuId])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -868,17 +887,10 @@ export default function DashboardPage() {
           <nav className="flex flex-col gap-1">
             <Link 
               href="/dashboard" 
-              className="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group"
-            >
-              <Home className="w-4 h-4" />
-              <p className="text-xs font-medium leading-normal group-hover:text-slate-900 dark:group-hover:text-white transition-colors">Home</p>
-            </Link>
-            <Link 
-              href="/dashboard" 
               className="flex items-center gap-2 px-2 py-2 rounded-lg bg-[#3366ff]/20 text-[#3366ff] dark:bg-[#3366ff]/20 dark:text-white transition-colors group"
             >
-              <FolderOpen className="w-4 h-4 group-hover:text-[#3366ff] transition-colors" />
-              <p className="text-xs font-medium leading-normal">Projects</p>
+              <Home className="w-4 h-4" />
+              <p className="text-xs font-medium leading-normal">Home</p>
             </Link>
             <Link 
               href="/dashboard/analytics" 
@@ -1016,6 +1028,7 @@ export default function DashboardPage() {
                       <div className="relative">
                         <input
                           type="text"
+                          required
                           value={newPortfolioName}
                           onChange={(e) => {
                             const value = e.target.value.slice(0, 30);
@@ -1025,12 +1038,17 @@ export default function DashboardPage() {
                               setValidationErrors(prev => ({ ...prev, portfolioName: false }));
                             }
                           }}
+                          onBlur={() => {
+                            if (!newPortfolioName.trim()) {
+                              setValidationErrors(prev => ({ ...prev, portfolioName: true }));
+                            }
+                          }}
                         className={`w-56 px-2.5 py-1.5 pr-7 bg-slate-50 dark:bg-[#1a1a2e]/80 border rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#3366ff]/50 text-xs ${
                           validationErrors.portfolioName || nameExists
                               ? 'border-red-400/60 bg-red-500/5' 
                             : 'border-slate-200 dark:border-white/10'
                           }`}
-                        placeholder="Portfolio Name"
+                        placeholder="Portfolio Name (required)"
                           maxLength={30}
                         />
                       <span className="absolute bottom-0.5 right-1.5 text-[10px] text-slate-400">
@@ -1039,8 +1057,15 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     
+                    {/* Error message */}
+                    {validationErrors.portfolioName && !newPortfolioName.trim() && (
+                      <div className="flex justify-center">
+                        <span className="text-xs text-red-500">Portfolio name is required</span>
+                      </div>
+                    )}
+                    
                   {/* Name availability indicator */}
-                    {newPortfolioName.trim() && (
+                    {newPortfolioName.trim() && !validationErrors.portfolioName && (
                       <div className="flex justify-center">
                       <div className="flex items-center space-x-1.5 text-xs">
                           {isCheckingName ? (
@@ -1190,7 +1215,7 @@ export default function DashboardPage() {
                           <span>{new Date(p.updated_at || p.created_at).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity relative" ref={menuRef}>
                             <button
                               onClick={() => router.push(`/dashboard/portfolio/${p.id}/edit`)}
                           className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-colors"
@@ -1205,13 +1230,29 @@ export default function DashboardPage() {
                             >
                           <ExternalLink className="w-4 h-4" />
                             </button>
-                            <button
-                          onClick={() => setDeleteTarget(p)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 dark:text-red-400 transition-colors"
-                          title="Delete portfolio"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="relative">
+                              <button
+                                onClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 transition-colors"
+                                title="More options"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </button>
+                              {openMenuId === p.id && (
+                                <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-[#23233a] border border-slate-200 dark:border-white/10 rounded-lg shadow-lg z-50 py-1">
+                                  <button
+                                    onClick={() => {
+                                      setDeleteTarget(p)
+                                      setOpenMenuId(null)
+                                    }}
+                                    className="w-full px-3 py-2 text-left text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2 transition-colors"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                     ))}

@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Sparkles, Home, FolderOpen, BarChart3, Settings, User, HelpCircle, LogOut, Shield } from 'lucide-react'
+import { Sparkles, Home, BarChart3, Settings, User, HelpCircle, LogOut, Shield } from 'lucide-react'
 
 type DashboardLayoutProps = {
   children: ReactNode
@@ -76,17 +76,6 @@ export default function DashboardLayout({ children, currentPage }: DashboardLayo
             >
               <Home className="w-4 h-4" />
               <p className="text-xs font-medium leading-normal">Home</p>
-            </Link>
-            <Link 
-              href="/dashboard" 
-              className={`flex items-center gap-2 px-2 py-2 rounded-lg transition-colors group ${
-                isActive('/dashboard') && pathname === '/dashboard'
-                  ? 'bg-[#3366ff]/20 text-[#3366ff] dark:bg-[#3366ff]/20 dark:text-white'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 group-hover:text-slate-900 dark:group-hover:text-white'
-              }`}
-            >
-              <FolderOpen className="w-4 h-4" />
-              <p className="text-xs font-medium leading-normal">Projects</p>
             </Link>
             <Link 
               href="/dashboard/analytics" 
